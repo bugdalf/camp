@@ -19,6 +19,13 @@ export const columns: ColumnDef<Inscripcion>[] = [
         )}
       </div>
     ),
+    meta: {
+      filterable: {
+        type: 'text',
+        placeholder: '',
+        label: 'Buscar por nombre'
+      }
+    }
   },
   {
     accessorKey: 'age',
@@ -27,7 +34,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
       <div>
         {row.original.age} años
       </div>
-    ),
+    )
   },
   {
     accessorKey: 'cellphone_number',
@@ -65,6 +72,17 @@ export const columns: ColumnDef<Inscripcion>[] = [
         )}
       </div>
     ),
+    meta: {
+      filterable: {
+        type: 'select',
+        placeholder: 'Pago',
+        label: 'Tipo de pago',
+        options: [
+          { label: 'Yape', value: 'yape' },
+          { label: 'Efectivo', value: 'efectivo' },
+        ]
+      }
+    }
   },
   {
     accessorKey: 'payment_checked',
@@ -84,6 +102,17 @@ export const columns: ColumnDef<Inscripcion>[] = [
         )}
       </div>
     ),
+    meta: {
+      filterable: {
+        type: 'select',
+        options: [
+          { label: 'Verificado', value: true },
+          { label: 'Pendiente', value: false }
+        ],
+        label: 'Estado de pago',
+        placeholder: 'Estado de pago'
+      }
+    },
   },
   {
     accessorKey: 'terms_accepted',
@@ -116,7 +145,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
       }
     },
     meta: {
-      hidden: true,
+      visible: false,
     }
   },
   {
@@ -137,7 +166,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
       }
     },
     meta: {
-      hidden: true,
+      visible: false,
     }
   },
 ]

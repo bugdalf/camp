@@ -1,10 +1,10 @@
 "use client"
 
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { useMemo, useState } from "react"
 
 import {
   Table,
@@ -19,16 +20,61 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table"
-
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+import {
+  EllipsisVerticalIcon,
+  PenIcon,
+  PlusIcon,
+  Trash2Icon,
+} from "lucide-react"
+
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { DataTableHeader } from "./data-table-header"
-import { Button } from "@/components/ui/button"
-import { EllipsisVerticalIcon, PenIcon, PlusIcon, Trash2Icon } from "lucide-react"
-import { DialogHandlers, ExtraAction } from "@/shared/types/ui.types"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DataTableFilters } from "./data-table-filters"
+
+import type { DialogHandlers, ExtraAction } from "@/shared/types/ui.types"
+
+type TextFilter = {
+  type: "text"
+  label?: string
+  placeholder?: string
+}
+
+type SelectFilterOption = {
+  label: string
+  value: any
+}
+
+type SelectFilter = {
+  type: "select"
+  label?: string
+  placeholder?: string
+  options: SelectFilterOption[]
+}
+
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData, TValue> {
+    /**
+     * Visible por defecto en la tabla
+     */
+    visible?: boolean
+
+    /**
+     * Configuración de filtro por columna
+     */
+    filterable?: TextFilter | SelectFilter
+  }
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -43,61 +89,81 @@ export function DataTable<TData, TValue>({
   data,
   entity,
   dialogHandlers,
-  extraActions
+  extraActions,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [globalFilter, setGlobalFilter] = useState("")
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [rowSelection, setRowSelection] = useState({})
 
+  /**
+   * 🔹 Visibilidad inicial desde meta.visible
+   */
+  const initialVisibility = useMemo<VisibilityState>(() => {
+    return Object.fromEntries(
+      columns.map((col) => [
+        col.id ?? String(col.header?.toString),
+        col.meta?.visible ?? true,
+      ])
+    )
+  }, [columns])
+
+  const [columnVisibility, setColumnVisibility] =
+    useState<VisibilityState>(initialVisibility)
 
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    onGlobalFilterChange: setGlobalFilter,
-
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      globalFilter
     },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
   })
 
   return (
-    <div className="overflow-hidden grow flex flex-col">
-      <div className="flex items-center justify-between py-4 px-1">
-        <Input
+    <div className="flex h-full flex-col gap-3 overflow-hidden">
+      {/* 🔍 Filtros */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        {/* <Input
           placeholder="Buscar..."
           value={table.getState().globalFilter ?? ""}
-          onChange={(event) => setGlobalFilter(event.target.value)}
+          onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="max-w-sm"
-        />
+        /> */}
+        <DataTableFilters table={table} />
+
         <div className="flex gap-2">
-          <Button onClick={() => {
-            dialogHandlers.setSelectedItem(null);
-            dialogHandlers.setOpenDialog(true);
-          }}>
-            <PlusIcon />Crear {entity}
+          <Button
+            onClick={() => {
+              dialogHandlers.setSelectedItem(null)
+              dialogHandlers.setOpenDialog(true)
+            }}
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Crear {entity}
           </Button>
+
           <DataTableViewOptions table={table} />
         </div>
       </div>
-      <div className="grow overflow-auto">
-        <Table className="">
+
+      {/* 📋 Tabla */}
+      <div className="relative flex-1 overflow-auto rounded-md border">
+        <Table>
           <DataTableHeader table={table} />
+
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -105,32 +171,54 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
-                  <TableCell>
+
+                  {/* ⚙️ Acciones */}
+                  <TableCell className="w-[40px]">
                     <DropdownMenu modal={false}>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="ml-2 h-8 data-[state=open]:bg-slate-200 dark:data-[state=open]:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700">
-                          <EllipsisVerticalIcon className="h-3 w-3" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                        >
+                          <EllipsisVerticalIcon className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => {
-                          dialogHandlers.setSelectedItem(row.original);
-                          dialogHandlers.setOpenDialog(true);
-                        }}>
-                          <PenIcon /> Editar
+
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            dialogHandlers.setSelectedItem(row.original)
+                            dialogHandlers.setOpenDialog(true)
+                          }}
+                        >
+                          <PenIcon className="mr-2 h-4 w-4" />
+                          Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => {
-                          dialogHandlers.setSelectedItem(row.original)
-                          dialogHandlers.setOpenDialogDelete(true);
-                        }}>
-                          <Trash2Icon /> Eliminar
+
+                        <DropdownMenuItem
+                          onClick={() => {
+                            dialogHandlers.setSelectedItem(row.original)
+                            dialogHandlers.setOpenDialogDelete(true)
+                          }}
+                        >
+                          <Trash2Icon className="mr-2 h-4 w-4" />
+                          Eliminar
                         </DropdownMenuItem>
+
                         {extraActions?.map((action) => (
-                          <DropdownMenuItem onClick={() => action.handler(row.original)} key={action.label}>
-                            <action.icon /> {action.label}
+                          <DropdownMenuItem
+                            key={action.label}
+                            onClick={() => action.handler(row.original)}
+                          >
+                            <action.icon className="mr-2 h-4 w-4" />
+                            {action.label}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
@@ -140,7 +228,10 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length + 1}
+                  className="h-24 text-center text-muted-foreground"
+                >
                   No hay resultados
                 </TableCell>
               </TableRow>
@@ -148,6 +239,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
+      {/* 📄 Paginación */}
       <DataTablePagination table={table} />
     </div>
   )
