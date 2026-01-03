@@ -58,6 +58,18 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
     dialogHandlers.setOpenDialog(false);
   }
 
+  // 🎯 Función para manejar cambio de edad
+  const handleAgeChange = (age: number, setValue: any, getValues: any) => {
+    const isUnder18 = age < 18;
+    setValue('is_under_18', isUnder18, { shouldValidate: true });
+
+    // Si pasa a ser mayor de 18, limpiar campos del padre
+    if (!isUnder18) {
+      setValue('parent_name', '', { shouldValidate: true });
+      setValue('parent_cellphone_number', '', { shouldValidate: true });
+    }
+  }
+
   // Configuración de formulario
   const fields: FieldConfig[] = [
     {
@@ -69,46 +81,48 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       placeholder: 'Ingresa tu nombre completo'
     },
     {
+      name: 'cellphone_number',
+      label: 'Número de celular',
+      type: 'text',
+      required: false,
+      className: 'col-span-2',
+      placeholder: '987654321'
+    },
+    {
       name: 'age',
       label: 'Edad',
       type: 'integer',
       required: true,
       className: 'col-span-1',
-      placeholder: 'Ej: 25'
-    },
-    {
-      name: 'cellphone_number',
-      label: 'Número de celular',
-      type: 'text',
-      required: false,
-      className: 'col-span-1',
-      placeholder: '987654321'
+      placeholder: 'Ej: 25',
+      onChange: handleAgeChange // 🎯 Añadir handler
     },
     {
       name: 'is_under_18',
       label: '¿Es menor de 18 años?',
       type: 'checkbox',
       required: false,
-      className: 'col-span-2',
-      defaultValue: false
+      className: 'col-span-1 items-end border-none',
+      defaultValue: false,
+      disabled: true // 🔒 Deshabilitar porque se calcula automáticamente
     },
     {
       name: 'parent_name',
       label: 'Nombre del padre/tutor',
       type: 'text',
-      required: false, // La validación condicional está en el schema
+      required: true,
       className: 'col-span-2',
       placeholder: 'Requerido si es menor de 18 años',
-      dependsOn: { field: 'is_under_18', value: true }
+      dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
     },
     {
       name: 'parent_cellphone_number',
       label: 'Celular del padre/tutor',
       type: 'text',
-      required: false, // La validación condicional está en el schema
+      required: true,
       className: 'col-span-2',
       placeholder: 'Requerido si es menor de 18 años',
-      dependsOn: { field: 'is_under_18', value: true }
+      dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
     },
     {
       name: 'payment_method',

@@ -26,7 +26,7 @@ export default function GenericDialog({
     <Dialog modal={false} open={openDialog} onOpenChange={(open) => setOpenDialog(open)}>
       {openDialog && <div className="fixed inset-0 bg-black/50 z-40" aria-hidden="true" />}
       <DialogContent
-        className="shadow-lg max-h-[90vh] w-full sm:w-fit flex flex-col z-50 "
+        className="shadow-lg h-[80vh] w-full sm:w-fit flex flex-col z-50 overflow-hidden "
         onInteractOutside={(e) => {
           const target = e.target as Element
           if (

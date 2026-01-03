@@ -36,6 +36,8 @@ export interface FieldConfig {
     field: string
     value: any
   }
+  onChange?: (value: any, setValue: any, getValues: any) => void // ⬅️ Callback cuando cambia el valor
+  disabled?: boolean // ⬅️ Para deshabilitar campos
 }
 
 export interface FormConfig {

@@ -8,26 +8,37 @@ interface FormFieldProps {
 }
 
 export default function FieldInteger({ fieldConfig, formField }: FormFieldProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Permitir campo vacío
+    if (value === '') {
+      formField.onChange('');
+      return;
+    }
+
+    // Convertir a número si es un valor válido
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue)) {
+      formField.onChange(numValue);
+    }
+  };
+
   return (
     <FormItem className={fieldConfig.className}>
-      <FormLabel>{fieldConfig.label} {fieldConfig.required && <span className="text-red-400">*</span>}</FormLabel>
+      <FormLabel>
+        {fieldConfig.label}
+        {fieldConfig.required && <span className="text-red-400">*</span>}
+      </FormLabel>
       <FormControl>
         <Input
           type="number"
-          step={1}
-          inputMode="numeric"
-          {...formField}
-          value={formField.value ?? ""}
-          onChange={(e) => {
-            // Convertimos el valor a número entero si es posible
-            const value = e.target.value;
-            if (value === "") return formField.onChange("");
-
-            // Solo aceptar dígitos numéricos
-            if (/^\d+$/.test(value)) {
-              formField.onChange(Number(value));
-            }
-          }}
+          placeholder={fieldConfig.placeholder}
+          value={formField.value === undefined || formField.value === null ? '' : formField.value}
+          onChange={handleChange}
+          onBlur={formField.onBlur}
+          disabled={formField.disabled}
+          name={formField.name}
         />
       </FormControl>
       <FormMessage />

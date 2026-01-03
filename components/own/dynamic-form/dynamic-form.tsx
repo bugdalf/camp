@@ -40,34 +40,63 @@ export function DynamicForm({
     await onSubmit(data)
   }
 
+  // 👁️ Función para verificar si un campo debe mostrarse
+  const shouldShowField = (fieldConfig: FieldConfig): boolean => {
+    if (!fieldConfig.dependsOn) return true;
+
+    const dependentValue = form.watch(fieldConfig.dependsOn.field);
+    return dependentValue === fieldConfig.dependsOn.value;
+  }
+
   const renderField = (fieldConfig: FieldConfig) => {
+    // 👁️ No renderizar si el campo no debe mostrarse
+    if (!shouldShowField(fieldConfig)) {
+      return null;
+    }
+
     return (
       <FormField
         key={fieldConfig.name}
         control={form.control}
         name={fieldConfig.name}
         render={({ field: formField }) => {
+          // 🎯 Wrapper para onChange personalizado
+          const handleChange = (value: any) => {
+            formField.onChange(value);
+
+            // Ejecutar onChange personalizado si existe
+            if (fieldConfig.onChange) {
+              fieldConfig.onChange(value, form.setValue, form.getValues);
+            }
+          };
+
+          const enhancedFormField = {
+            ...formField,
+            onChange: handleChange,
+            disabled: fieldConfig.disabled || formField.disabled
+          };
+
           switch (fieldConfig.type) {
             case 'textarea':
-              return <FieldTextarea fieldConfig={fieldConfig} formField={formField} />
+              return <FieldTextarea fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'select':
-              return <FieldSelect fieldConfig={fieldConfig} formField={formField} />
+              return <FieldSelect fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'color':
-              return <FieldColor fieldConfig={fieldConfig} formField={formField} />
+              return <FieldColor fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'checkbox':
-              return <FieldCheckbox fieldConfig={fieldConfig} formField={formField} />
+              return <FieldCheckbox fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'integer':
-              return <FieldInteger fieldConfig={fieldConfig} formField={formField} />
+              return <FieldInteger fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'password':
-              return <FieldPassword fieldConfig={fieldConfig} formField={formField} />
+              return <FieldPassword fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'date':
-              return <FieldDatePicker fieldConfig={fieldConfig} formField={formField} />
+              return <FieldDatePicker fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'image':
-              return <FieldImage fieldConfig={fieldConfig} formField={formField} />
+              return <FieldImage fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'email':
             case 'text':
             default:
-              return <FieldText fieldConfig={fieldConfig} formField={formField} />
+              return <FieldText fieldConfig={fieldConfig} formField={enhancedFormField} />
           }
         }}
       />
@@ -76,15 +105,18 @@ export function DynamicForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmitHandler)} className={cn("w-full sm:min-w-md grid gap-2 grid-cols-1", className)} noValidate>
+      <form onSubmit={form.handleSubmit(onSubmitHandler)} className={cn("w-full sm:min-w-md grid gap-2 grid-cols-1 h-full overflow-auto px-1 relative", className)} noValidate>
         {fields.map((field) => renderField(field))}
-        <Button
-          type="submit"
-          disabled={form.formState.isSubmitting || !form.formState.isValid}
-          className="w-full col-span-full"
-        >
-          {form.formState.isSubmitting ? 'Cargando...' : 'Guardar'}
-        </Button>
+
+        <div className="w-full col-span-full sticky bottom-0 bg-card">
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting || !form.formState.isValid}
+            className="w-full col-span-full"
+          >
+            {form.formState.isSubmitting ? 'Cargando...' : 'Guardar'}
+          </Button>
+        </div>
       </form>
     </Form>
   )
