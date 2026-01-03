@@ -8,6 +8,9 @@ import GenericDialog from "@/components/own/generic-dialog/generic-dialog";
 import DeleteDialog from "@/components/own/generic-dialog/delete-dialog";
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store";
 import { InscripcionesForm } from "./inscripciones-form";
+import { toast } from "sonner";
+import { EyeIcon, Link2Icon } from "lucide-react";
+import { Inscripcion } from "@/shared/types/supabase.types";
 
 function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
@@ -33,7 +36,7 @@ export default function InscripcionesPage() {
   }, []);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-auto">
       <h2 className="text-2xl font-bold">Inscripciones</h2>
       <p className="text-xs">Registro de todos los campistas</p>
       <DataTable
@@ -41,6 +44,29 @@ export default function InscripcionesPage() {
         data={inscripciones || []}
         entity=""
         dialogHandlers={dialogHandlers}
+        extraActions={[
+          {
+            label: "Compartir Ticket",
+            handler: async (inscripcion: Inscripcion) => {
+              const url = `${window.location.origin}/campista/${inscripcion.id}`;
+              try {
+                await navigator.clipboard.writeText(url);
+                toast.info(`${url} copiado al portapapeles`);
+              } catch (err) {
+                toast.error("Error al copiar");
+              }
+            },
+            icon: Link2Icon
+          },
+          {
+            label: "Ver Ticket",
+            handler: (inscripcion: Inscripcion) => {
+              const url = `${window.location.origin}/campista/${inscripcion.id}`;
+              window.open(url, "_blank");
+            },
+            icon: EyeIcon
+          }
+        ]}
       />
       <GenericDialog
         openDialog={dialogHandlers.openDialog}

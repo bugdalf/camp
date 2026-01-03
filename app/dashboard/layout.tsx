@@ -40,7 +40,7 @@ export default function DashboardLayout({
 
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
@@ -51,7 +51,7 @@ export default function DashboardLayout({
             <DynamicBreadcrumb />
           </div>
         </header>
-        <div className="h-[calc(100vh-4rem)] bg-background flex flex-col p-4">
+        <div className="h-[calc(100vh-4rem)] w-full bg-background flex flex-col p-4 overflow-auto">
           {children}
         </div>
       </SidebarInset>

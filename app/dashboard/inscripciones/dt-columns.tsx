@@ -24,7 +24,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
     accessorKey: 'age',
     header: 'Edad',
     cell: ({ row }) => (
-      <div className="text-center">
+      <div>
         {row.original.age} años
       </div>
     ),
@@ -89,11 +89,11 @@ export const columns: ColumnDef<Inscripcion>[] = [
     accessorKey: 'terms_accepted',
     header: 'Términos',
     cell: ({ row }) => (
-      <div className="text-center">
+      <div className="flex items-center justify-start gap-2">
         {row.original.terms_accepted ? (
-          <CheckCircle2 className="h-4 w-4 text-green-600 mx-auto" />
+          <CheckCircle2 className="h-4 w-4 text-green-600" />
         ) : (
-          <XCircle className="h-4 w-4 text-red-600 mx-auto" />
+          <XCircle className="h-4 w-4 text-red-600" />
         )}
       </div>
     ),
@@ -115,6 +115,9 @@ export const columns: ColumnDef<Inscripcion>[] = [
         return '-';
       }
     },
+    meta: {
+      hidden: true,
+    }
   },
   {
     accessorKey: 'updated_at',
@@ -133,5 +136,8 @@ export const columns: ColumnDef<Inscripcion>[] = [
         return '-';
       }
     },
+    meta: {
+      hidden: true,
+    }
   },
 ]
