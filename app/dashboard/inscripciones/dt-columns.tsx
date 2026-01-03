@@ -1,27 +1,137 @@
+import { Inscripcion } from "@/shared/types/supabase.types";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 
-export const columns: ColumnDef<any>[] = [
+export const columns: ColumnDef<Inscripcion>[] = [
   {
     accessorKey: 'name',
     header: 'Nombre',
+    cell: ({ row }) => (
+      <div className="flex flex-col">
+        <span className="font-medium">{row.original.name}</span>
+        {row.original.is_under_18 && (
+          <span className="text-xs text-muted-foreground">
+            Menor de edad
+          </span>
+        )}
+      </div>
+    ),
   },
   {
-    accessorKey: 'order',
-    header: 'Orden',
+    accessorKey: 'age',
+    header: 'Edad',
+    cell: ({ row }) => (
+      <div className="text-center">
+        {row.original.age} años
+      </div>
+    ),
   },
   {
-    accessorKey: 'color',
-    header: 'Color',
-    cell: ({ row }) => <div style={{ backgroundColor: row.original.color }} className="w-6 h-6 rounded" />,
+    accessorKey: 'cellphone_number',
+    header: 'Teléfono',
+    cell: ({ row }) => (
+      <div className="flex flex-col gap-1">
+        {row.original.cellphone_number && (
+          <span className="text-sm">{row.original.cellphone_number}</span>
+        )}
+        {row.original.is_under_18 && row.original.parent_cellphone_number && (
+          <span className="text-xs text-muted-foreground">
+            Tutor: {row.original.parent_cellphone_number}
+          </span>
+        )}
+      </div>
+    ),
   },
-  // {
-  //   accessorKey: 'created_at',
-  //   header: 'Creado',
-  //   cell: ({ row }) => row.original.created_at,
-  // },
-  // {
-  //   accessorKey: 'updated_at',
-  //   header: 'Actualizado',
-  //   cell: ({ row }) => row.original.updated_at,
-  // },
+  {
+    accessorKey: 'payment_method',
+    header: 'Pago',
+    cell: ({ row }) => (
+      <div className="flex flex-col gap-1">
+        <Badge variant='outline' className={row.original.payment_method === 'yape' ? 'bg-purple-500 text-white' : 'bg-green-500 text-white'}>
+          {row.original.payment_method === 'yape' ? '📱 Yape' : '💵 Efectivo'}
+        </Badge>
+        {row.original.payment_recipe_url && (
+          <a
+            href={row.original.payment_recipe_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+          >
+            Ver comprobante <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'payment_checked',
+    header: 'Estado de pago',
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        {row.original.payment_checked ? (
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle2 className="h-4 w-4" />
+            <span className="text-sm">Verificado</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 text-orange-600">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm">Pendiente</span>
+          </div>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'terms_accepted',
+    header: 'Términos',
+    cell: ({ row }) => (
+      <div className="text-center">
+        {row.original.terms_accepted ? (
+          <CheckCircle2 className="h-4 w-4 text-green-600 mx-auto" />
+        ) : (
+          <XCircle className="h-4 w-4 text-red-600 mx-auto" />
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'created_at',
+    header: 'Registrado',
+    cell: ({ row }) => {
+      if (!row.original.created_at) return '-';
+
+      try {
+        const date = new Date(row.original.created_at);
+        return (
+          <div className="text-xs text-muted-foreground">
+            {formatDistanceToNow(date, { addSuffix: true, locale: es })}
+          </div>
+        );
+      } catch {
+        return '-';
+      }
+    },
+  },
+  {
+    accessorKey: 'updated_at',
+    header: 'Actualizado',
+    cell: ({ row }) => {
+      if (!row.original.updated_at) return '-';
+
+      try {
+        const date = new Date(row.original.updated_at);
+        return (
+          <div className="text-xs text-muted-foreground">
+            {formatDistanceToNow(date, { addSuffix: true, locale: es })}
+          </div>
+        );
+      } catch {
+        return '-';
+      }
+    },
+  },
 ]
