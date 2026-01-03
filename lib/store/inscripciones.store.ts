@@ -6,11 +6,62 @@ import { Inscripcion } from "@/shared/types/supabase.types";
 let inscripcionesChannel: ReturnType<typeof supabase.channel> | null = null
 const supabase = createClient();
 
+// 🔧 Función helper para subir imágenes a Supabase Storage
+const uploadPaymentRecipe = async (file: File): Promise<string | null> => {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+    const filePath = `payment-recipes/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('inscripciones') // 📦 Nombre de tu bucket en Supabase Storage
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error al subir imagen:', uploadError);
+      toast.error('No se pudo subir el comprobante');
+      return null;
+    }
+
+    // 🔗 Obtener URL pública
+    const { data } = supabase.storage
+      .from('inscripciones')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  } catch (error) {
+    console.error('Error en uploadPaymentRecipe:', error);
+    toast.error('Error al procesar la imagen');
+    return null;
+  }
+};
+
+// 🗑️ Función helper para eliminar imagen anterior
+const deletePaymentRecipe = async (url: string): Promise<void> => {
+  try {
+    // Extraer el path del URL público
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split('/');
+    // El path generalmente es: /storage/v1/object/public/inscripciones/payment-recipes/filename.jpg
+    const bucketIndex = pathParts.indexOf('inscripciones');
+    if (bucketIndex !== -1) {
+      const filePath = pathParts.slice(bucketIndex + 1).join('/');
+
+      await supabase.storage
+        .from('inscripciones')
+        .remove([filePath]);
+    }
+  } catch (error) {
+    console.error('Error al eliminar imagen:', error);
+    // No mostramos toast aquí porque es una operación silenciosa
+  }
+};
+
 type InscripcionesStore = {
   inscripciones: Inscripcion[]
   fetchInscripciones: () => Promise<void>
-  createInscripcion: (values: Record<string, Inscripcion>) => Promise<void>
-  updateInscripcion: (values: Record<string, Inscripcion>, id: string) => Promise<void>
+  createInscripcion: (values: any) => Promise<void>
+  updateInscripcion: (values: any, id: string) => Promise<void>
   deleteInscripcion: (id: string) => Promise<void>
 
   subscribeToInscripciones: () => void
@@ -21,89 +72,197 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
   inscripciones: [],
 
   fetchInscripciones: async () => {
-    const { data } = await supabase.from('inscripciones').select('*').order('updated_at');
-    set({ inscripciones: data ?? [] });
+    try {
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .select('*')
+        .order('created_at', { ascending: false }); // Ordenar por más reciente
+
+      if (error) throw error;
+
+      set({ inscripciones: data ?? [] });
+    } catch (error) {
+      console.error('Error al obtener inscripciones:', error);
+      toast.error('No se pudieron cargar las inscripciones');
+    }
   },
 
   createInscripcion: async (values) => {
-    const { data } = await supabase.from('inscripciones').insert(values).select().single();
+    try {
+      let paymentRecipeUrl = values.payment_recipe_url;
 
-    if (data) {
-      toast.success('Inscripcion creada correctamente')
-    } else {
-      toast.error('La inscripcion no se pudo crear')
-    }
+      // 📤 Si hay un archivo File, subirlo primero
+      if (values.payment_recipe_url instanceof File) {
+        paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
+        if (!paymentRecipeUrl) {
+          return; // Ya se mostró el error en uploadPaymentRecipe
+        }
+      }
 
-    // El realtime se encargará de actualizar el estado
-    // Pero mantenemos esto por si acaso el realtime no está activo
-    if (data && !inscripcionesChannel) {
-      set({ inscripciones: [...get().inscripciones, data] })
+      // 📝 Preparar datos para insertar
+      const inscripcionData: Partial<Inscripcion> = {
+        name: values.name,
+        age: values.age,
+        is_under_18: values.is_under_18 || false,
+        cellphone_number: values.cellphone_number || null,
+        payment_method: values.payment_method,
+        payment_recipe_url: paymentRecipeUrl || null,
+        payment_checked: values.payment_checked || false,
+        parent_name: values.parent_name || null,
+        parent_cellphone_number: values.parent_cellphone_number || null,
+        terms_accepted: values.terms_accepted || false,
+      };
+
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .insert(inscripcionData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        toast.success('Inscripción creada correctamente');
+      }
+
+      // El realtime se encargará de actualizar el estado
+      // Pero mantenemos esto por si acaso el realtime no está activo
+      if (data && !inscripcionesChannel) {
+        set({ inscripciones: [data, ...get().inscripciones] });
+      }
+    } catch (error) {
+      console.error('Error al crear inscripción:', error);
+      toast.error('La inscripción no se pudo crear');
     }
   },
 
   updateInscripcion: async (values, id) => {
-    const { data } = await supabase
-      .from('inscripciones')
-      .update({ ...values })
-      .eq('id', id)
-      .select()
-      .single()
+    try {
+      let paymentRecipeUrl = values.payment_recipe_url;
 
-    if (data) {
-      toast.success('Inscripcion actualizada correctamente')
-    } else {
-      toast.error('La inscripcion no se pudo actualizar')
-    }
+      // 📤 Si hay un nuevo archivo File, subirlo
+      if (values.payment_recipe_url instanceof File) {
+        // 🗑️ Obtener la inscripción actual para eliminar la imagen anterior
+        const currentInscripcion = get().inscripciones.find(i => i.id === id);
+        if (currentInscripcion?.payment_recipe_url) {
+          await deletePaymentRecipe(currentInscripcion.payment_recipe_url);
+        }
 
-    // El realtime se encargará de actualizar el estado
-    if (data && !inscripcionesChannel) {
-      set({ inscripciones: get().inscripciones.map(inscripcion => inscripcion.id === id ? data : inscripcion) })
+        paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
+        if (!paymentRecipeUrl) {
+          return; // Ya se mostró el error en uploadPaymentRecipe
+        }
+      }
+
+      // 📝 Preparar datos para actualizar
+      const inscripcionData: Partial<Inscripcion> = {
+        name: values.name,
+        age: values.age,
+        is_under_18: values.is_under_18 || false,
+        cellphone_number: values.cellphone_number || null,
+        payment_method: values.payment_method,
+        payment_recipe_url: paymentRecipeUrl || null,
+        payment_checked: values.payment_checked || false,
+        parent_name: values.parent_name || null,
+        parent_cellphone_number: values.parent_cellphone_number || null,
+        terms_accepted: values.terms_accepted || false,
+      };
+
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .update(inscripcionData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        toast.success('Inscripción actualizada correctamente');
+      }
+
+      // El realtime se encargará de actualizar el estado
+      if (data && !inscripcionesChannel) {
+        set({
+          inscripciones: get().inscripciones.map(
+            inscripcion => inscripcion.id === id ? data : inscripcion
+          )
+        });
+      }
+    } catch (error) {
+      console.error('Error al actualizar inscripción:', error);
+      toast.error('La inscripción no se pudo actualizar');
     }
   },
 
   deleteInscripcion: async (id) => {
-    const { data } = await supabase
-      .from('inscripciones')
-      .delete()
-      .eq('id', id)
-      .select()
-      .single()
+    try {
+      // 🗑️ Obtener la inscripción para eliminar su imagen si existe
+      const inscripcionToDelete = get().inscripciones.find(i => i.id === id);
 
-    if (data) {
-      toast.success('Inscripcion eliminada correctamente')
-    } else {
-      toast.error('La inscripcion no se pudo eliminar')
-    }
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .delete()
+        .eq('id', id)
+        .select()
+        .single();
 
-    // El realtime se encargará de actualizar el estado
-    if (data && !inscripcionesChannel) {
-      set({ inscripciones: get().inscripciones.filter(inscripcion => inscripcion.id !== id) })
+      if (error) throw error;
+
+      // 🗑️ Eliminar imagen asociada si existe
+      if (inscripcionToDelete?.payment_recipe_url) {
+        await deletePaymentRecipe(inscripcionToDelete.payment_recipe_url);
+      }
+
+      if (data) {
+        toast.success('Inscripción eliminada correctamente');
+      }
+
+      // El realtime se encargará de actualizar el estado
+      if (data && !inscripcionesChannel) {
+        set({
+          inscripciones: get().inscripciones.filter(
+            inscripcion => inscripcion.id !== id
+          )
+        });
+      }
+    } catch (error) {
+      console.error('Error al eliminar inscripción:', error);
+      toast.error('La inscripción no se pudo eliminar');
     }
   },
 
   subscribeToInscripciones: () => {
     inscripcionesChannel = supabase
-      .channel('custom-all')
+      .channel('inscripciones-changes')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'inscripciones',
       }, (payload: any) => {
         if (payload.eventType === 'INSERT') {
-          set({ inscripciones: [...get().inscripciones, payload.new] })
+          set({ inscripciones: [payload.new, ...get().inscripciones] });
         } else if (payload.eventType === 'UPDATE') {
-          set({ inscripciones: get().inscripciones.map(inscripcion => inscripcion.id === payload.new.id ? payload.new : inscripcion) })
+          set({
+            inscripciones: get().inscripciones.map(
+              inscripcion => inscripcion.id === payload.new.id ? payload.new : inscripcion
+            )
+          });
         } else if (payload.eventType === 'DELETE') {
-          set({ inscripciones: get().inscripciones.filter(inscripcion => inscripcion.id !== payload.old.id) })
+          set({
+            inscripciones: get().inscripciones.filter(
+              inscripcion => inscripcion.id !== payload.old.id
+            )
+          });
         }
       })
-      .subscribe()
+      .subscribe();
   },
 
   unsubscribeFromInscripciones: () => {
     if (inscripcionesChannel) {
-      inscripcionesChannel.unsubscribe()
-      inscripcionesChannel = null
+      inscripcionesChannel.unsubscribe();
+      inscripcionesChannel = null;
     }
   },
 }))

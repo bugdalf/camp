@@ -15,6 +15,7 @@ import { getDefaultValueForField } from './get-default-values'
 import FieldPassword from './fields/field-password'
 import FieldDatePicker from './fields/field-date-picker'
 import FieldColor from './fields/field-color'
+import FieldImage from './fields/field-image'
 
 export function DynamicForm({
   fields,
@@ -61,6 +62,8 @@ export function DynamicForm({
               return <FieldPassword fieldConfig={fieldConfig} formField={formField} />
             case 'date':
               return <FieldDatePicker fieldConfig={fieldConfig} formField={formField} />
+            case 'image':
+              return <FieldImage fieldConfig={fieldConfig} formField={formField} />
             case 'email':
             case 'text':
             default:

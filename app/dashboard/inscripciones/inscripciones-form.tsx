@@ -1,3 +1,4 @@
+'use client'
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
@@ -5,9 +6,41 @@ import { z } from "zod";
 
 const inscripcionesFormSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
-  order: z.number().min(1, 'El orden es requerido'),
-  color: z.string().min(1, 'El color es requerido'),
-})
+  age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
+  is_under_18: z.boolean().default(false),
+  cellphone_number: z.string().min(9, 'Número inválido').optional(),
+  payment_method: z.enum(['yape', 'efectivo']),
+  payment_recipe_url: z.union([
+    z.instanceof(File),
+    z.string(),
+    z.undefined()
+  ]).optional(),
+  payment_checked: z.boolean().default(false),
+  parent_name: z.string().optional(),
+  parent_cellphone_number: z.string().optional(),
+  terms_accepted: z.boolean().refine(val => val === true, {
+    message: 'Debes aceptar los términos y condiciones'
+  }),
+}).superRefine((data, ctx) => {
+  // Validar campos del padre si es menor de 18
+  if (data.is_under_18) {
+    if (!data.parent_name || data.parent_name.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'El nombre del padre/tutor es requerido para menores de 18 años',
+        path: ['parent_name'],
+      });
+    }
+    if (!data.parent_cellphone_number || data.parent_cellphone_number.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'El número del padre/tutor es requerido para menores de 18 años',
+        path: ['parent_cellphone_number'],
+      });
+    }
+  }
+});
+
 interface InscripcionesFormProps {
   dialogHandlers: DialogHandlers;
   onCreate: (data: Record<string, any>) => Promise<void>;
@@ -25,35 +58,95 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
     dialogHandlers.setOpenDialog(false);
   }
 
-  // configuracion de formulario
+  // Configuración de formulario
   const fields: FieldConfig[] = [
-    { name: 'name', label: 'Nombre', type: 'text', required: true, className: 'col-span-2' },
-    { name: 'order', label: 'Orden', type: 'integer', required: true, className: 'col-span-2' },
     {
-      name: 'color', label: 'Color', type: 'color', required: true, defaultValue: "#3b82f6", className: 'col-span-2', options: [
-        { label: "Rojo", value: "#ef4444" },
-        { label: "Rojo Oscuro", value: "#dc2626" },
-        { label: "Naranja", value: "#f97316" },
-        { label: "Ámbar", value: "#f59e0b" },
-        { label: "Amarillo", value: "#eab308" },
-        { label: "Lima", value: "#84cc16" },
-        { label: "Verde", value: "#10b981" },
-        { label: "Esmeralda", value: "#059669" },
-        { label: "Turquesa", value: "#14b8a6" },
-        { label: "Cian", value: "#06b6d4" },
-        { label: "Azul Cielo", value: "#0ea5e9" },
-        { label: "Azul", value: "#3b82f6" },
-        { label: "Índigo", value: "#6366f1" },
-        { label: "Violeta", value: "#8b5cf6" },
-        { label: "Púrpura", value: "#a855f7" },
-        { label: "Fucsia", value: "#d946ef" },
-        { label: "Rosa", value: "#ec4899" },
-        { label: "Rosa Intenso", value: "#f43f5e" },
-        { label: "Gris", value: "#6b7280" },
-        { label: "Negro", value: "#000000" },
-      ],
+      name: 'name',
+      label: 'Nombre completo',
+      type: 'text',
+      required: true,
+      className: 'col-span-2',
+      placeholder: 'Ingresa tu nombre completo'
     },
-  ]
+    {
+      name: 'age',
+      label: 'Edad',
+      type: 'integer',
+      required: true,
+      className: 'col-span-1',
+      placeholder: 'Ej: 25'
+    },
+    {
+      name: 'cellphone_number',
+      label: 'Número de celular',
+      type: 'text',
+      required: false,
+      className: 'col-span-1',
+      placeholder: '987654321'
+    },
+    {
+      name: 'is_under_18',
+      label: '¿Es menor de 18 años?',
+      type: 'checkbox',
+      required: false,
+      className: 'col-span-2',
+      defaultValue: false
+    },
+    {
+      name: 'parent_name',
+      label: 'Nombre del padre/tutor',
+      type: 'text',
+      required: false, // La validación condicional está en el schema
+      className: 'col-span-2',
+      placeholder: 'Requerido si es menor de 18 años',
+      dependsOn: { field: 'is_under_18', value: true }
+    },
+    {
+      name: 'parent_cellphone_number',
+      label: 'Celular del padre/tutor',
+      type: 'text',
+      required: false, // La validación condicional está en el schema
+      className: 'col-span-2',
+      placeholder: 'Requerido si es menor de 18 años',
+      dependsOn: { field: 'is_under_18', value: true }
+    },
+    {
+      name: 'payment_method',
+      label: 'Método de pago',
+      type: 'select',
+      required: true,
+      className: 'col-span-2',
+      options: [
+        { label: 'Yape', value: 'yape' },
+        { label: 'Efectivo', value: 'efectivo' }
+      ]
+    },
+    {
+      name: 'payment_recipe_url',
+      label: 'Comprobante de pago (imagen)',
+      type: 'image',
+      required: false,
+      className: 'col-span-2',
+      accept: 'image/*',
+      helpText: 'Sube una captura de tu comprobante de pago'
+    },
+    {
+      name: 'payment_checked',
+      label: 'Pago verificado (solo admin)',
+      type: 'checkbox',
+      required: false,
+      className: 'col-span-2',
+      defaultValue: false
+    },
+    {
+      name: 'terms_accepted',
+      label: 'Acepto los términos y condiciones',
+      type: 'checkbox',
+      required: true,
+      className: 'col-span-2',
+      defaultValue: false
+    },
+  ];
 
   return (
     <DynamicForm
