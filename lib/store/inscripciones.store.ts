@@ -63,6 +63,7 @@ type InscripcionesStore = {
   createInscripcion: (values: any) => Promise<void>
   updateInscripcion: (values: any, id: string) => Promise<void>
   deleteInscripcion: (id: string) => Promise<void>
+  deleteSoftInscripcion: (id: string) => Promise<void>
 
   subscribeToInscripciones: () => void
   unsubscribeFromInscripciones: () => void
@@ -229,6 +230,36 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
     } catch (error) {
       console.error('Error al eliminar inscripción:', error);
       toast.error('La inscripción no se pudo eliminar');
+    }
+  },
+
+  deleteSoftInscripcion: async (id) => {
+    const inscripcionToDelete = get().inscripciones.find(i => i.id === id);
+    try {
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .update({ is_active: inscripcionToDelete?.is_active ? false : true })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        toast.success('Inscripción cancelada correctamente');
+      }
+
+      // El realtime se encargará de actualizar el estado
+      if (data && !inscripcionesChannel) {
+        set({
+          inscripciones: get().inscripciones.map(
+            inscripcion => inscripcion.id === id ? data : inscripcion
+          )
+        });
+      }
+    } catch (error) {
+      console.error('Error al cancelar inscripción:', error);
+      toast.error('La inscripción no se pudo cancelar');
     }
   },
 

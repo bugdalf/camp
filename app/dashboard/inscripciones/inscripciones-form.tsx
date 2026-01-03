@@ -168,7 +168,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='grid-cols-2'
+      className='grid-cols-2 px-2'
     />
   )
 }

@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import {
+  BanIcon,
+  CheckIcon,
   EllipsisVerticalIcon,
   PenIcon,
   PlusIcon,
@@ -76,7 +78,7 @@ declare module "@tanstack/react-table" {
   }
 }
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { is_active?: boolean }, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   entity?: string
@@ -84,7 +86,7 @@ interface DataTableProps<TData, TValue> {
   extraActions?: ExtraAction[]
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { is_active?: boolean }, TValue>({
   columns,
   data,
   entity,
@@ -192,25 +194,6 @@ export function DataTable<TData, TValue>({
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            dialogHandlers.setSelectedItem(row.original)
-                            dialogHandlers.setOpenDialog(true)
-                          }}
-                        >
-                          <PenIcon className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem
-                          onClick={() => {
-                            dialogHandlers.setSelectedItem(row.original)
-                            dialogHandlers.setOpenDialogDelete(true)
-                          }}
-                        >
-                          <Trash2Icon className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </DropdownMenuItem>
 
                         {extraActions?.map((action) => (
                           <DropdownMenuItem
@@ -221,6 +204,39 @@ export function DataTable<TData, TValue>({
                             {action.label}
                           </DropdownMenuItem>
                         ))}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            dialogHandlers.setSelectedItem(row.original)
+                            dialogHandlers.setOpenDialog(true)
+                          }}
+                        >
+                          <PenIcon className="mr-2 h-4 w-4" />
+                          Editar
+                        </DropdownMenuItem>
+
+                        {row.original.is_active ? (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              dialogHandlers.setSelectedItem(row.original)
+                              dialogHandlers.setOpenDialogDelete(true)
+                            }}
+                            className="text-red-500"
+                          >
+                            <BanIcon className="mr-2 h-4 w-4 text-red-500" />
+                            Cancelar
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              dialogHandlers.setSelectedItem(row.original)
+                              dialogHandlers.setOpenDialogDelete(true)
+                            }}
+                            className="text-green-500"
+                          >
+                            <CheckIcon className="mr-2 h-4 w-4 text-green-500" />
+                            Re-activar
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

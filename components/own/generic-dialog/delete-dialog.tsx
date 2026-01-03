@@ -32,12 +32,12 @@ export default function DeleteDialog({ openDeleteDialog, setOpenDeleteDialog, ti
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no podra ser recuperada, se eliminara {selectedItem?.name}
+            Esta acción no podra ser recuperada, se cancelara la inscripción de {selectedItem?.name}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>Eliminar</AlertDialogAction>
+          <AlertDialogCancel>Regresar</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">Cancelar Inscripción</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -11,6 +11,8 @@ import { InscripcionesForm } from "./inscripciones-form";
 import { toast } from "sonner";
 import { EyeIcon, Link2Icon } from "lucide-react";
 import { Inscripcion } from "@/shared/types/supabase.types";
+import { InscripcionHistoryList } from "./inscripcion-history-modal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
@@ -29,7 +31,7 @@ function useDialogHandlers(): DialogHandlers {
 
 export default function InscripcionesPage() {
   const dialogHandlers = useDialogHandlers();
-  const { inscripciones, fetchInscripciones, createInscripcion, updateInscripcion, deleteInscripcion } = useInscripcionesStore();
+  const { inscripciones, fetchInscripciones, createInscripcion, updateInscripcion, deleteSoftInscripcion } = useInscripcionesStore();
 
   useEffect(() => {
     fetchInscripciones();
@@ -73,14 +75,27 @@ export default function InscripcionesPage() {
         setOpenDialog={dialogHandlers.setOpenDialog}
         title="Inscribir"
       >
-        <InscripcionesForm dialogHandlers={dialogHandlers} onCreate={createInscripcion} onEdit={updateInscripcion} />
+        <Tabs defaultValue="form" className="w-lg overflow-auto">
+          <TabsList className="w-full">
+            <TabsTrigger value="form">Formulario</TabsTrigger>
+            <TabsTrigger value="history">Historial</TabsTrigger>
+          </TabsList>
+          <TabsContent value="form" className="w-full overflow-auto">
+            <InscripcionesForm dialogHandlers={dialogHandlers} onCreate={createInscripcion} onEdit={updateInscripcion} />
+          </TabsContent>
+          <TabsContent value="history" className="w-full overflow-auto">
+            {dialogHandlers.selectedItem && (
+              <InscripcionHistoryList inscripcionId={dialogHandlers.selectedItem.id} inscripcionName={dialogHandlers.selectedItem.name} />
+            )}
+          </TabsContent>
+        </Tabs>
       </GenericDialog>
       <DeleteDialog
         openDeleteDialog={dialogHandlers.openDialogDelete}
         setOpenDeleteDialog={dialogHandlers.setOpenDialogDelete}
         selectedItem={dialogHandlers.selectedItem}
-        title="Eliminar Grupo de clientes"
-        action={deleteInscripcion}
+        title="Cancelar Inscripción"
+        action={deleteSoftInscripcion}
       />
     </div>
   )
