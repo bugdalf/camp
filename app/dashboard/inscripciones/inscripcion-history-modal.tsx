@@ -53,8 +53,21 @@ export function InscripcionHistoryList({
       parent_name: 'Nombre del padre',
       parent_cellphone_number: 'Teléfono del padre',
       terms_accepted: 'Términos aceptados',
+      is_active: 'Estado de la inscripción',
     };
     return fieldNames[field] || field;
+  };
+
+  const formatValue = (value: unknown) => {
+    if (typeof value === 'boolean') {
+      return value ? 'Sí' : 'No';
+    }
+
+    if (value === null || value === undefined || value === '') {
+      return '(vacío)';
+    }
+
+    return String(value);
   };
 
   return (
@@ -130,16 +143,16 @@ export function InscripcionHistoryList({
                             </p>
 
                             {oldValue !== undefined && (
-                              <p className="text-red-600">
+                              <p className="text-slate-400">
                                 <span className="font-medium">Antes:</span>{' '}
-                                {String(oldValue) || '(vacío)'}
+                                {formatValue(oldValue)}
                               </p>
                             )}
 
                             {newValue !== undefined && (
-                              <p className="text-green-600">
-                                <span className="font-medium">Después:</span>{' '}
-                                {String(newValue) || '(vacío)'}
+                              <p>
+                                <span className="font-medium">Actual:</span>{' '}
+                                {formatValue(newValue)}
                               </p>
                             )}
                           </div>
