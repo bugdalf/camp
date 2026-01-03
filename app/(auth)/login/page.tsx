@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getClient } from "@/lib/supabase/client"
-import { useAuthStore } from "@/lib/store/auth-store"
+import { useAuthStore } from "@/lib/store/auth.store"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")

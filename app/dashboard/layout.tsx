@@ -51,8 +51,8 @@ export default function DashboardLayout({
             <DynamicBreadcrumb />
           </div>
         </header>
-        <div className="min-h-screen bg-background">
-          <main className="">{children}</main>
+        <div className="h-[calc(100vh-4rem)] bg-background flex flex-col p-4">
+          {children}
         </div>
       </SidebarInset>
     </SidebarProvider>

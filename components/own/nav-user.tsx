@@ -24,7 +24,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { User } from "@/lib/types"
-import { useAuthStore } from "@/lib/store/auth-store"
+import { useAuthStore } from "@/lib/store/auth.store"
 import { getClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
