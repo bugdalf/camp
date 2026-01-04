@@ -103,9 +103,10 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
       // 📝 Preparar datos para insertar
       const voluntarioData: Partial<Voluntario> = {
         name: values.name,
+        cellphone_number: values.cellphone_number || null,
+        commission: values.commission,
         age: values.age,
         is_under_18: values.is_under_18 || false,
-        cellphone_number: values.cellphone_number || null,
         payment_method: values.payment_method,
         payment_recipe_url: paymentRecipeUrl || null,
         payment_checked: values.payment_checked || false,
@@ -158,9 +159,10 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
       // 📝 Preparar datos para actualizar
       const voluntarioData: Partial<Voluntario> = {
         name: values.name,
+        cellphone_number: values.cellphone_number || null,
+        commission: values.commission,
         age: values.age,
         is_under_18: values.is_under_18 || false,
-        cellphone_number: values.cellphone_number || null,
         payment_method: values.payment_method,
         payment_recipe_url: paymentRecipeUrl || null,
         payment_checked: values.payment_checked || false,

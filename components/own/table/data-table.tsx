@@ -102,10 +102,11 @@ export function DataTable<TData extends { is_active?: boolean }, TValue>({
    */
   const initialVisibility = useMemo<VisibilityState>(() => {
     return Object.fromEntries(
-      columns.map((col) => [
-        col.id ?? String(col.header?.toString),
-        col.meta?.visible ?? true,
-      ])
+      columns.map((col) => {
+        // TanStack Table usa 'accessorKey' o 'id' como identificador
+        const columnId = col.id ?? (col as any).accessorKey ?? '';
+        return [columnId, col.meta?.visible ?? true];
+      })
     )
   }, [columns])
 
@@ -136,12 +137,6 @@ export function DataTable<TData extends { is_active?: boolean }, TValue>({
     <div className="flex h-full flex-col gap-3 overflow-hidden">
       {/* 🔍 Filtros */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-        {/* <Input
-          placeholder="Buscar..."
-          value={table.getState().globalFilter ?? ""}
-          onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        /> */}
         <DataTableFilters table={table} />
 
         <div className="flex gap-2">

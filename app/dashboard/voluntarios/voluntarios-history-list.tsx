@@ -1,6 +1,6 @@
 'use client';
 
-import { useInscripcionAudit } from '@/lib/hooks/use-inscripcion-audit';
+import { useVoluntarioAudit } from '@/lib/hooks/use-voluntario-audit';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 

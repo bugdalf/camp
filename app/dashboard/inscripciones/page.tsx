@@ -84,8 +84,12 @@ export default function InscripcionesPage() {
             <InscripcionesForm dialogHandlers={dialogHandlers} onCreate={createInscripcion} onEdit={updateInscripcion} />
           </TabsContent>
           <TabsContent value="history" className="w-full overflow-auto">
-            {dialogHandlers.selectedItem && (
+            {dialogHandlers.selectedItem ? (
               <InscripcionHistoryList inscripcionId={dialogHandlers.selectedItem.id} inscripcionName={dialogHandlers.selectedItem.name} />
+            ) : (
+              <p className="text-center py-10 text-gray-500">
+                Una vez inscrito un campista, puedes ver su historial aquí
+              </p>
             )}
           </TabsContent>
         </Tabs>

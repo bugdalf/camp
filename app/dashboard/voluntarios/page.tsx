@@ -85,8 +85,12 @@ export default function VoluntariosPage() {
             <VoluntariosForm dialogHandlers={dialogHandlers} onCreate={createVoluntario} onEdit={updateVoluntario} />
           </TabsContent>
           <TabsContent value="history" className="w-full overflow-auto">
-            {dialogHandlers.selectedItem && (
+            {dialogHandlers.selectedItem ? (
               <VoluntariosHistoryList voluntarioId={dialogHandlers.selectedItem.id} voluntarioName={dialogHandlers.selectedItem.name} />
+            ) : (
+              <p className="text-center py-10 text-gray-500">
+                Una vez creado un voluntario, puedes ver su historial aquí
+              </p>
             )}
           </TabsContent>
         </Tabs>

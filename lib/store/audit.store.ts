@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { toast } from "sonner";
 import { createClient } from "../supabase/client";
-import { InscripcionAudit, AuditLogView, AuditFilters, AuditAction } from "@/shared/types/supabase.types";
+import { InscripcionAudit, AuditLogView, AuditFilters, AuditAction, VoluntarioAudit } from "@/shared/types/supabase.types";
 
 const supabase = createClient();
 
@@ -24,6 +24,9 @@ type AuditStore = {
 
   // Obtener historial detallado de una inscripción específica
   getInscripcionHistory: (inscripcionId: string) => Promise<InscripcionAudit[]>;
+
+  // Obtener historial detallado de un voluntario específico
+  getVoluntarioHistory: (voluntarioId: string) => Promise<VoluntarioAudit[]>;
 
   // Obtener actividad reciente de un usuario
   getUserActivity: (userId: string, limit?: number) => Promise<InscripcionAudit[]>;
@@ -175,6 +178,25 @@ export const useAuditStore = create<AuditStore>((set, get) => ({
         .from('inscripciones_audit')
         .select('*')
         .eq('inscripcion_id', inscripcionId)
+        .order('changed_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data ?? [];
+    } catch (error) {
+      console.error('Error al obtener historial:', error);
+      toast.error('No se pudo cargar el historial');
+      return [];
+    }
+  },
+
+  // 📖 Historial completo de una inscripción
+  getVoluntarioHistory: async (voluntarioId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('voluntarios_audit')
+        .select('*')
+        .eq('voluntario_id', voluntarioId)
         .order('changed_at', { ascending: false });
 
       if (error) throw error;

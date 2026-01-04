@@ -7,6 +7,7 @@ import { z } from "zod";
 const voluntariosFormSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
+  commission: z.enum(['cocina', 'limpieza', 'produccion']),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().min(9, 'Número inválido').optional(),
   payment_method: z.enum(['yape', 'efectivo']),
@@ -87,6 +88,18 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       required: false,
       className: 'col-span-2',
       placeholder: '987654321'
+    },
+    {
+      name: 'commission',
+      label: 'Comisión',
+      type: 'select',
+      required: true,
+      className: 'col-span-2',
+      options: [
+        { label: 'Cocina', value: 'cocina' },
+        { label: 'Limpieza', value: 'limpieza' },
+        { label: 'Producción', value: 'produccion' }
+      ]
     },
     {
       name: 'age',

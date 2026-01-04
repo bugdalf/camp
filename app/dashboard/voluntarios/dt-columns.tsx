@@ -28,15 +28,6 @@ export const columns: ColumnDef<Voluntario>[] = [
     }
   },
   {
-    accessorKey: 'age',
-    header: 'Edad',
-    cell: ({ row }) => (
-      <div>
-        {row.original.age} años
-      </div>
-    )
-  },
-  {
     accessorKey: 'cellphone_number',
     header: 'Teléfono',
     cell: ({ row }) => (
@@ -51,6 +42,24 @@ export const columns: ColumnDef<Voluntario>[] = [
         )}
       </div>
     ),
+  },
+  {
+    accessorKey: 'commission',
+    header: 'Comisión',
+    cell: ({ row }) => (
+      <div>
+        {row.original.commission}
+      </div>
+    )
+  },
+  {
+    accessorKey: 'age',
+    header: 'Edad',
+    cell: ({ row }) => (
+      <div>
+        {row.original.age} años
+      </div>
+    )
   },
   {
     accessorKey: 'payment_method',
