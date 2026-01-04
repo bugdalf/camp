@@ -11,7 +11,7 @@ import { InscripcionesForm } from "./inscripciones-form";
 import { toast } from "sonner";
 import { EyeIcon, Link2Icon } from "lucide-react";
 import { Inscripcion } from "@/shared/types/supabase.types";
-import { InscripcionHistoryList } from "./inscripcion-history-modal";
+import { InscripcionHistoryList } from "./inscripcion-history-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function useDialogHandlers(): DialogHandlers {

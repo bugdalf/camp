@@ -15,11 +15,42 @@ export type Inscripcion = {
   updated_at?: string;
 }
 
+export type Voluntario = {
+  id?: string;
+  name?: string;
+  age?: number;
+  is_under_18?: boolean;
+  cellphone_number?: string;
+  payment_method?: 'yape' | 'efectivo';
+  payment_recipe_url?: string;
+  payment_checked?: boolean;
+  parent_name?: string;
+  parent_cellphone_number?: string;
+  terms_accepted?: boolean;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE';
 
 export interface InscripcionAudit {
   id: string;
   inscripcion_id: string;
+  action: AuditAction;
+  user_id: string | null;
+  user_email: string | null;
+  changed_at: string;
+  old_data: Record<string, any> | null;
+  new_data: Record<string, any> | null;
+  changed_fields: string[] | null;
+  ip_address: string | null;
+  user_agent: string | null;
+}
+
+export interface VoluntarioAudit {
+  id: string;
+  voluntario_id: string;
   action: AuditAction;
   user_id: string | null;
   user_email: string | null;
@@ -50,3 +81,4 @@ export interface AuditFilters {
   dateTo?: string;
   limit?: number;
 }
+
