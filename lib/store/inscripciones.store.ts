@@ -60,6 +60,7 @@ const deletePaymentRecipe = async (url: string): Promise<void> => {
 type InscripcionesStore = {
   inscripciones: Inscripcion[]
   fetchInscripciones: () => Promise<void>
+  fetchInscripcionById: (id: string) => Promise<Inscripcion | null>
   createInscripcion: (values: any) => Promise<void>
   updateInscripcion: (values: any, id: string) => Promise<void>
   deleteInscripcion: (id: string) => Promise<void>
@@ -83,8 +84,26 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
 
       set({ inscripciones: data ?? [] });
     } catch (error) {
-      console.error('Error al obtener inscripciones:', error);
       toast.error('No se pudieron cargar las inscripciones');
+    }
+  },
+
+  fetchInscripcionById: async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        toast.error('No se pudo cargar la inscripción');
+        return null;
+      }
+      return data;
+    } catch (error) {
+      toast.error('No se pudo cargar la inscripción');
+      return null;
     }
   },
 

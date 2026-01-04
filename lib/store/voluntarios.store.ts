@@ -60,6 +60,7 @@ const deletePaymentRecipe = async (url: string): Promise<void> => {
 type VoluntariosStore = {
   voluntarios: Voluntario[]
   fetchVoluntarios: () => Promise<void>
+  fetchVoluntarioById: (id: string) => Promise<Voluntario | null>
   createVoluntario: (values: any) => Promise<void>
   updateVoluntario: (values: any, id: string) => Promise<void>
   deleteVoluntario: (id: string) => Promise<void>
@@ -85,6 +86,24 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
     } catch (error) {
       console.error('Error al obtener voluntarios:', error);
       toast.error('No se pudieron cargar los voluntarios');
+    }
+  },
+
+  fetchVoluntarioById: async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('voluntarios')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Error al obtener voluntario por ID:', error);
+      toast.error('No se pudo cargar el voluntario');
+      return null;
     }
   },
 
