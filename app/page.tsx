@@ -9,7 +9,6 @@ import { useState, useMemo } from "react"
 export default function LandingPage() {
   const [hoveredTeam, setHoveredTeam] = useState<string | null>(null);
 
-  // Encuentra el equipo actualmente hovered
   const currentTeam = useMemo(() => {
     return hoveredTeam
       ? teams.find(team => team.name === hoveredTeam)
@@ -23,59 +22,90 @@ export default function LandingPage() {
       {/* Hero Section - Full Screen */}
       <section className="relative min-h-screen w-full flex flex-col items-center px-4 bg-slate-950">
         <div className="w-full h-screen flex flex-col items-center gap-8 relative">
-          <div className="h-40">
-            aqui la otra imagen del anterior campeon
+          {/* Imagen del campeón anterior con animación */}
+          <div className="h-40 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="rounded-2xl overflow-hidden shadow-2xl">
+              aqui la otra imagen del anterior campeon
+            </div>
           </div>
-          <p className="font-display text-xl md:text-2xl text-white text-center p-3">
+
+          {/* Fecha del evento con animación */}
+          <p className="font-display text-xl md:text-2xl text-white text-center p-3 animate-in fade-in slide-in-from-top-8 duration-700 delay-150">
             22 al 26 FEBRERO
           </p>
+
           {/* Título y Logo - Dinámico según hover */}
           <div className="w-full h-full flex flex-col items-center gap-6">
-            {/* Contenedor de imágenes con altura fija para evitar saltos */}
+            {/* Contenedor de imágenes con altura fija */}
             <figure className="w-full max-w-lg relative flex items-center justify-center h-2/3">
               {/* Logo principal (por defecto) */}
               <div
-                className={`absolute inset-0 flex flex-col items-center justify-center gap-8 transition-opacity duration-500 ${currentTeam ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                className={`absolute inset-0 flex flex-col items-center justify-center gap-8 transition-all duration-500 ${currentTeam ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
                   }`}
               >
-                <img
-                  src="/main-logo.png"
-                  alt="Logo del evento"
-                  className="w-full h-auto max-h-[300px] object-contain"
-                />
+                <div className="animate-in fade-in zoom-in duration-700 delay-300">
+                  <img
+                    src="/main-logo.png"
+                    alt="Logo del evento"
+                    className="w-full h-auto max-h-[300px] object-contain drop-shadow-2xl"
+                  />
+                </div>
+
                 {/* CTA Section */}
-                <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
                   <p className="font-display text-xl md:text-2xl text-white">
                     Cupos: 200/200
                   </p>
-                  <Button variant="cta" size="cta">
-                    Regístrate hoy
-                  </Button>
+                  <Link href="/inscripcion">
+                    <Button variant="cta" size="cta" className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                      Regístrate ahora
+                    </Button>
+                  </Link>
                 </div>
               </div>
 
               {/* Imágenes dinámicas de los equipos */}
               <div
-                className={`absolute flex justify-center items-center inset-0 transition-opacity duration-500 ${currentTeam ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                className={`absolute flex justify-center items-center inset-0 transition-all duration-500 ${currentTeam ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
                   }`}
               >
                 {currentTeam && (
                   <div className="w-169 h-160 relative flex flex-col items-center justify-center gap-4">
-                    {/* Imagen del grupo */}
-                    <figure className="w-full h-full absolute inset-0">
+                    {/* Imagen del grupo con bordes redondeados */}
+                    <figure className="w-full h-full absolute inset-0 rounded-3xl overflow-hidden shadow-2xl">
                       <img
                         src={currentTeam.groupImg}
                         alt={`${currentTeam.name} grupo`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
                       />
+                      {/* Gradiente sutil en los bordes */}
+                      <div className="absolute inset-0 bg-linear-to-t from-slate-950/30 via-transparent to-slate-950/30 pointer-events-none" />
                     </figure>
+
                     {/* Título del equipo en hover */}
-                    <figure className="w-full h-50 absolute -bottom-10 z-10 scale-200">
+                    <figure
+                      className="
+                        w-full h-50 -bottom-10 z-10 scale-200
+                        animate-in fade-in slide-in-from-bottom-8 duration-500
+                        absolute overflow-hidden
+                      "
+                    >
                       <img
                         src={currentTeam.titleHoverImg}
                         alt={`${currentTeam.name} título`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover drop-shadow-2xl"
                       />
+
+                      {/* Brillo automático al aparecer */}
+                      {/* <div
+                        className="
+                          absolute inset-0
+                          bg-linear-to-r from-transparent via-white/30 to-transparent
+                          skew-x-12
+                          animate-shine
+                          pointer-events-none
+                        "
+                      /> */}
                     </figure>
                   </div>
                 )}
@@ -83,37 +113,31 @@ export default function LandingPage() {
             </figure>
           </div>
 
+          {/* Grid de Equipos con animación */}
 
-
-          {/* Grid de Equipos */}
           <TeamsGrid
             teams={teams}
             hoveredTeam={hoveredTeam}
             setHoveredTeam={setHoveredTeam}
           />
+
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="w-full bg-slate-900 border-t border-slate-800">
+      {/* Footer con animación */}
+      <footer className="w-full bg-slate-900 border-t border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Info del evento */}
             <div className="text-center md:text-left">
-              <p className="text-white font-semibold mb-1">Evento Deportivo 2025</p>
+              <p className="text-white font-semibold mb-1">Campamento desafío 2026</p>
               <p className="text-slate-400 text-sm">22 al 26 de Febrero</p>
             </div>
 
             {/* Links */}
             <div className="flex gap-6 text-sm">
-              <Link href="/contacto" className="text-slate-400 hover:text-white transition-colors">
-                Contacto
-              </Link>
-              <Link href="/sobre-nosotros" className="text-slate-400 hover:text-white transition-colors">
-                Sobre Nosotros
-              </Link>
-              <Link href="/bases" className="text-slate-400 hover:text-white transition-colors">
-                Bases
+              <Link href="/login" className="text-slate-400 hover:text-white transition-all duration-300 hover:scale-110">
+                Iniciar sesión
               </Link>
             </div>
 

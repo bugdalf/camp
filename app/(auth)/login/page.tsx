@@ -54,20 +54,21 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-background">
+    <main className="flex flex-col gap-12 py-12 items-center justify-center px-4 bg-background">
+      <img src="/main-logo.png" alt="Logo" className="w-60 h-auto m-auto" />
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Sign In</CardTitle>
-          <CardDescription>Enter your credentials to access your dashboard</CardDescription>
+          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+          <CardDescription>Ingresa tus credenciales para acceder</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo Electrónico del campamento</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="admin@camp.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -75,7 +76,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
@@ -88,15 +89,9 @@ export default function LoginPage() {
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
           </form>
-          <p className="text-sm text-muted-foreground text-center mt-4">
-            Don't have an account?{" "}
-            <Link href="/signup" className="text-primary hover:underline">
-              Sign up
-            </Link>
-          </p>
         </CardContent>
       </Card>
     </main>
