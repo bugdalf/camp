@@ -2,9 +2,12 @@
 
 import { useState } from "react"
 import { Stepper } from "@/components/own/stepper"
-import { AutoinscripcionForm } from "../dashboard/inscripciones/autoinscripcion-form"
+import { AutoinscripcionForm } from "../inscripcion-campista/autoinscripcion-form"
 import { RegistroCompletado } from "@/components/own/registro-completo"
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
+import { Inscripcion } from "@/shared/types/supabase.types"
+import { CopyIcon } from "lucide-react"
+import { toast } from "sonner"
 
 const steps = [
   { id: 1, label: "Datos" },
@@ -13,7 +16,14 @@ const steps = [
 
 export default function InscripcionCampistaPage() {
   const [step, setStep] = useState(1)
+  const [newInscription, setNewInscription] = useState<Inscripcion | null>(null);
   const { createInscripcion } = useInscripcionesStore();
+
+  const handleCopyNumber = (number: string) => {
+    navigator.clipboard.writeText(number);
+    toast.info("Número copiado al portapapeles");
+  }
+
 
   const handleCreate = async (data: Record<string, any>) => {
     const valuesToCreate = {
@@ -23,6 +33,7 @@ export default function InscripcionCampistaPage() {
     }
     const result = await createInscripcion(valuesToCreate);
     if (result) {
+      setNewInscription(result);
       setStep(2);
     }
   }
@@ -40,7 +51,19 @@ export default function InscripcionCampistaPage() {
           <div className="p-4 mb-4 border-2 border-dashed border-gray-200 rounded-md">
             <p className="text-lg font-bold">Consideraciones para tu inscripción:</p>
             <ul className="list-disc list-inside pl-4">
-              <li>Estos son los números de Yape para pagar: 987654321 - 987654321</li>
+              <li className="flex items-center gap-2">
+                <span>Estos son los números de Yape para pagar: </span>
+                <div className="flex gap-2">
+                  <div onClick={() => handleCopyNumber("987654321")} className="flex items-center gap-2 bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+                    987654321
+                    <CopyIcon />
+                  </div>
+                  <div onClick={() => handleCopyNumber("987654321")} className="flex items-center gap-2 bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+                    987654321
+                    <CopyIcon />
+                  </div>
+                </div>
+              </li>
               <li>Adjunta en el formulario una captura de tu comprobante de pago (imagen) clara</li>
               <li>Verifica que los datos del formulario sean correctos y verdaderos</li>
               <li>(mejorar)</li>
@@ -53,7 +76,7 @@ export default function InscripcionCampistaPage() {
       )}
 
       {step === 2 && (
-        <RegistroCompletado onReset={() => setStep(1)} />
+        <RegistroCompletado onReset={() => setStep(1)} inscription={newInscription} />
       )}
     </div>
   )

@@ -61,7 +61,7 @@ type InscripcionesStore = {
   inscripciones: Inscripcion[]
   fetchInscripciones: () => Promise<void>
   fetchInscripcionById: (id: string) => Promise<Inscripcion | null>
-  createInscripcion: (values: any) => Promise<boolean | undefined>
+  createInscripcion: (values: any) => Promise<Inscripcion | null>
   updateInscripcion: (values: any, id: string) => Promise<void>
   deleteInscripcion: (id: string) => Promise<void>
   deleteSoftInscripcion: (id: string) => Promise<void>
@@ -115,7 +115,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       if (values.payment_recipe_url instanceof File) {
         paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
         if (!paymentRecipeUrl) {
-          return false; // Ya se mostró el error en uploadPaymentRecipe
+          return null; // Ya se mostró el error en uploadPaymentRecipe
         }
       }
 
@@ -143,17 +143,16 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
 
       if (error) {
         if (error.code == '23505') {
-          toast.error('Ya existe una inscripción con el mismo DNI, contactanos');
-          return false;
+          toast.error('Ya existe una inscripción con el mismo DNI');
+          return null;
         }
         toast.error('La inscripción no se pudo registrar, verifica que los datos sean correctos');
-        console.error('Error al crear inscripción:', error);
-        return false;
+        return null;
       };
 
       if (data) {
         toast.success('Inscripción creada correctamente');
-        return true;
+        return data;
       }
 
       // El realtime se encargará de actualizar el estado
@@ -162,9 +161,8 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         set({ inscripciones: [data, ...get().inscripciones] });
       }
     } catch (error) {
-      console.error('Error al crear inscripción:', error);
       toast.error('La inscripción no se pudo crear');
-      return false;
+      return null;
     }
   },
 

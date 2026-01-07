@@ -55,7 +55,7 @@ export default function LandingPage() {
                   <p className="font-display text-xl md:text-2xl text-white">
                     Cupos: 200/200
                   </p>
-                  <Link href="/inscripcion">
+                  <Link href="/inscripcion-campista">
                     <Button variant="cta" size="cta" className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
                       Regístrate ahora
                     </Button>
@@ -137,6 +137,11 @@ export default function LandingPage() {
             <div className="flex gap-6 text-sm">
               <Link href="/login" className="text-slate-400 hover:text-white transition-all duration-300 hover:scale-110">
                 Iniciar sesión
+              </Link>
+            </div>
+            <div className="flex gap-6 text-sm">
+              <Link href="/inscripcion-voluntario" className="text-slate-400 hover:text-white transition-all duration-300 hover:scale-110">
+                ¿Quieres ser voluntario?
               </Link>
             </div>
 

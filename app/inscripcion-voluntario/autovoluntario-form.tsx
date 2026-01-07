@@ -1,13 +1,11 @@
 'use client'
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
-import { useAuthStore } from "@/lib/store/auth.store";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
-import { Inscripcion } from "@/shared/types/supabase.types";
-import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
+import type { FieldConfig } from "@/shared/types/ui.types";
 import { z } from "zod";
 
-const inscripcionesFormSchema = z.object({
+const autovoluntarioFormSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   dni: z
     .string()
@@ -16,15 +14,23 @@ const inscripcionesFormSchema = z.object({
       message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
     }),
   age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
+  commission: z.enum(['cocina', 'limpieza', 'produccion']),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().min(9, 'Número inválido').optional(),
-  payment_method: z.enum(['yape', 'efectivo']),
-  payment_recipe_url: z.union([
-    z.instanceof(File),
-    z.string(),
-    z.undefined()
-  ]).optional(),
-  payment_checked: z.boolean().default(false),
+  payment_recipe_url: z
+    .union([
+      z.instanceof(File),
+      z.string(),
+      z.undefined(),
+    ])
+    .refine((val) => {
+      if (!val) return false
+      if (val instanceof File) return true
+      if (typeof val === 'string') return val.trim().length > 0
+      return false
+    }, {
+      message: 'El comprobante de pago es obligatorio',
+    }),
   parent_name: z.string().optional(),
   parent_cellphone_number: z.string().optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
@@ -50,26 +56,13 @@ const inscripcionesFormSchema = z.object({
   }
 });
 
-interface InscripcionesFormProps {
-  dialogHandlers: DialogHandlers;
-  onCreate: (data: Record<string, any>) => Promise<Inscripcion | null>;
-  onEdit: (data: Record<string, any>, id: string) => Promise<void>;
+interface AutovoluntarioFormProps {
+  onCreate: (data: Record<string, any>) => Promise<void>;
 }
 
-export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: InscripcionesFormProps) {
-  const { user } = useAuthStore();
+export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
-    const valuesToCreate = {
-      ...values,
-      register_by: user?.email
-    }
-    await onCreate(valuesToCreate);
-    dialogHandlers.setOpenDialog(false);
-  }
-
-  const handleEdit = async (values: Record<string, any>): Promise<void> => {
-    await onEdit(values, dialogHandlers.selectedItem.id);
-    dialogHandlers.setOpenDialog(false);
+    await onCreate(values);
   }
 
   // 🎯 Función para manejar cambio de edad
@@ -92,7 +85,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       type: 'text',
       required: true,
       className: 'col-span-2',
-      placeholder: 'Ingresa tu nombre completo'
+      placeholder: 'Ingresa el nombre completo del voluntario'
     },
     {
       name: 'dni',
@@ -109,6 +102,18 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       required: false,
       className: 'col-span-1',
       placeholder: '987654321'
+    },
+    {
+      name: 'commission',
+      label: 'Comisión',
+      type: 'select',
+      required: false,
+      className: 'col-span-2',
+      options: [
+        { label: 'Cocina', value: 'cocina' },
+        { label: 'Limpieza', value: 'limpieza' },
+        { label: 'Producción', value: 'produccion' }
+      ]
     },
     {
       name: 'age',
@@ -147,32 +152,13 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
     },
     {
-      name: 'payment_method',
-      label: 'Método de pago',
-      type: 'select',
-      required: true,
-      className: 'col-span-2',
-      options: [
-        { label: 'Yape', value: 'yape' },
-        { label: 'Efectivo', value: 'efectivo' }
-      ]
-    },
-    {
       name: 'payment_recipe_url',
       label: 'Comprobante de pago (imagen)',
       type: 'image',
-      required: false,
+      required: true,
       className: 'col-span-2',
       accept: 'image/*',
       helpText: 'Sube una captura de tu comprobante de pago'
-    },
-    {
-      name: 'payment_checked',
-      label: 'Pago verificado (solo admin)',
-      type: 'checkbox',
-      required: false,
-      className: 'col-span-2',
-      defaultValue: false
     },
     {
       name: 'terms_accepted',
@@ -186,10 +172,10 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
 
   return (
     <DynamicForm
-      schema={inscripcionesFormSchema}
+      schema={autovoluntarioFormSchema}
       fields={fields}
-      onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
-      selectedItem={dialogHandlers.selectedItem}
+      onSubmit={handleCreate}
+      selectedItem={null}
       className='grid-cols-2 px-2'
     />
   )

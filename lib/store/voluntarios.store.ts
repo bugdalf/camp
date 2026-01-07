@@ -61,7 +61,7 @@ type VoluntariosStore = {
   voluntarios: Voluntario[]
   fetchVoluntarios: () => Promise<void>
   fetchVoluntarioById: (id: string) => Promise<Voluntario | null>
-  createVoluntario: (values: any) => Promise<void>
+  createVoluntario: (values: any) => Promise<Voluntario | null>
   updateVoluntario: (values: any, id: string) => Promise<void>
   deleteVoluntario: (id: string) => Promise<void>
   deleteSoftVoluntario: (id: string) => Promise<void>
@@ -115,13 +115,14 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
       if (values.payment_recipe_url instanceof File) {
         paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
         if (!paymentRecipeUrl) {
-          return; // Ya se mostró el error en uploadPaymentRecipe
+          return null; // Ya se mostró el error en uploadPaymentRecipe
         }
       }
 
       // 📝 Preparar datos para insertar
       const voluntarioData: Partial<Voluntario> = {
         name: values.name,
+        dni: values.dni,
         cellphone_number: values.cellphone_number || null,
         commission: values.commission,
         age: values.age,
@@ -132,6 +133,7 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
         terms_accepted: values.terms_accepted || false,
+        register_by: values.register_by || null
       };
 
       const { data, error } = await supabase
@@ -140,10 +142,18 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code == '23505') {
+          toast.error('Ya existe una inscripción con el mismo DNI');
+          return null;
+        }
+        toast.error('La inscripción no se pudo registrar, verifica que los datos sean correctos');
+        return null;
+      };
 
       if (data) {
         toast.success('Voluntario creado correctamente');
+        return data;
       }
 
       // El realtime se encargará de actualizar el estado
@@ -152,8 +162,8 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
         set({ voluntarios: [data, ...get().voluntarios] });
       }
     } catch (error) {
-      console.error('Error al crear voluntario:', error);
       toast.error('El voluntario no se pudo crear');
+      return null;
     }
   },
 
@@ -178,6 +188,7 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
       // 📝 Preparar datos para actualizar
       const voluntarioData: Partial<Voluntario> = {
         name: values.name,
+        dni: values.dni,
         cellphone_number: values.cellphone_number || null,
         commission: values.commission,
         age: values.age,
