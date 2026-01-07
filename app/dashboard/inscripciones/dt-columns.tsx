@@ -37,6 +37,15 @@ export const columns: ColumnDef<Inscripcion>[] = [
     )
   },
   {
+    accessorKey: 'dni',
+    header: 'DNI',
+    cell: ({ row }) => (
+      <div>
+        {row.original.dni}
+      </div>
+    ),
+  },
+  {
     accessorKey: 'cellphone_number',
     header: 'Teléfono',
     cell: ({ row }) => (
@@ -51,6 +60,9 @@ export const columns: ColumnDef<Inscripcion>[] = [
         )}
       </div>
     ),
+    meta: {
+      visible: false,
+    }
   },
   {
     accessorKey: 'payment_method',
@@ -115,6 +127,15 @@ export const columns: ColumnDef<Inscripcion>[] = [
     },
   },
   {
+    accessorKey: 'register_by',
+    header: 'Registrado por',
+    cell: ({ row }) => (
+      <div>
+        {row.original.register_by}
+      </div>
+    )
+  },
+  {
     accessorKey: 'terms_accepted',
     header: 'Términos',
     cell: ({ row }) => (
@@ -126,6 +147,9 @@ export const columns: ColumnDef<Inscripcion>[] = [
         )}
       </div>
     ),
+    meta: {
+      visible: false,
+    }
   },
   {
     accessorKey: 'created_at',

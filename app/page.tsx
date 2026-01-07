@@ -15,7 +15,6 @@ export default function LandingPage() {
       : null;
   }, [hoveredTeam]);
 
-  console.log(currentTeam)
 
   return (
     <>

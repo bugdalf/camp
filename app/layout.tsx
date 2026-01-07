@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { AuthProvider } from "./providers"
 import { hanken, protest } from "./fonts"
+import { Toaster } from "sonner"
 
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <Toaster closeButton richColors position="top-right" />
       </body>
     </html>
   )

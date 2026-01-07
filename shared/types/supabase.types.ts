@@ -1,6 +1,7 @@
 export type Inscripcion = {
   id?: string;
   name?: string;
+  dni?: string;
   age?: number;
   is_under_18?: boolean;
   cellphone_number?: string;
@@ -19,6 +20,7 @@ export type Inscripcion = {
 export type Voluntario = {
   id?: string;
   name?: string;
+  dni?: string;
   commission?: 'cocina' | 'limpieza' | 'produccion';
   age?: number;
   is_under_18?: boolean;

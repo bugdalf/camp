@@ -2,11 +2,18 @@
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
 import { useAuthStore } from "@/lib/store/auth.store";
+import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
 import { z } from "zod";
 
 const inscripcionesFormSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
+  dni: z
+    .string()
+    .trim()
+    .refine(isValidPeruDni, {
+      message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
+    }),
   age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().min(9, 'Número inválido').optional(),
@@ -44,13 +51,12 @@ const inscripcionesFormSchema = z.object({
 
 interface InscripcionesFormProps {
   dialogHandlers: DialogHandlers;
-  onCreate: (data: Record<string, any>) => Promise<void>;
+  onCreate: (data: Record<string, any>) => Promise<boolean | undefined>;
   onEdit: (data: Record<string, any>, id: string) => Promise<void>;
 }
 
 export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: InscripcionesFormProps) {
   const { user } = useAuthStore();
-  console.log(user)
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
     const valuesToCreate = {
       ...values,
@@ -88,11 +94,19 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       placeholder: 'Ingresa tu nombre completo'
     },
     {
+      name: 'dni',
+      label: 'DNI',
+      type: 'text',
+      required: true,
+      className: 'col-span-1',
+      placeholder: 'Ingresa tu DNI'
+    },
+    {
       name: 'cellphone_number',
       label: 'Número de celular',
       type: 'text',
       required: false,
-      className: 'col-span-2',
+      className: 'col-span-1',
       placeholder: '987654321'
     },
     {

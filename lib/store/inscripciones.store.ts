@@ -61,7 +61,7 @@ type InscripcionesStore = {
   inscripciones: Inscripcion[]
   fetchInscripciones: () => Promise<void>
   fetchInscripcionById: (id: string) => Promise<Inscripcion | null>
-  createInscripcion: (values: any) => Promise<void>
+  createInscripcion: (values: any) => Promise<boolean | undefined>
   updateInscripcion: (values: any, id: string) => Promise<void>
   deleteInscripcion: (id: string) => Promise<void>
   deleteSoftInscripcion: (id: string) => Promise<void>
@@ -115,13 +115,14 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       if (values.payment_recipe_url instanceof File) {
         paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
         if (!paymentRecipeUrl) {
-          return; // Ya se mostró el error en uploadPaymentRecipe
+          return false; // Ya se mostró el error en uploadPaymentRecipe
         }
       }
 
       // 📝 Preparar datos para insertar
       const inscripcionData: Partial<Inscripcion> = {
         name: values.name,
+        dni: values.dni,
         age: values.age,
         is_under_18: values.is_under_18 || false,
         cellphone_number: values.cellphone_number || null,
@@ -140,10 +141,19 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code == '23505') {
+          toast.error('Ya existe una inscripción con el mismo DNI, contactanos');
+          return false;
+        }
+        toast.error('La inscripción no se pudo registrar, verifica que los datos sean correctos');
+        console.error('Error al crear inscripción:', error);
+        return false;
+      };
 
       if (data) {
         toast.success('Inscripción creada correctamente');
+        return true;
       }
 
       // El realtime se encargará de actualizar el estado
@@ -154,6 +164,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
     } catch (error) {
       console.error('Error al crear inscripción:', error);
       toast.error('La inscripción no se pudo crear');
+      return false;
     }
   },
 
@@ -178,6 +189,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       // 📝 Preparar datos para actualizar
       const inscripcionData: Partial<Inscripcion> = {
         name: values.name,
+        dni: values.dni,
         age: values.age,
         is_under_18: values.is_under_18 || false,
         cellphone_number: values.cellphone_number || null,
@@ -196,7 +208,9 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        toast.error('La inscripción no se pudo actualizar, verifica que los datos sean correctos');
+      };
 
       if (data) {
         toast.success('Inscripción actualizada correctamente');
