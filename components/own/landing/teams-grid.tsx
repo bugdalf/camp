@@ -16,7 +16,7 @@ export default function TeamsGrid({ teams, hoveredTeam, setHoveredTeam }: TeamsG
   const teamsRight = useMemo(() => teams.slice(8, 12), [])
 
   return (
-    <div className="grid grid-cols-3 gap-4 h-2/6 w-full absolute bottom-0">
+    <div className="grid grid-cols-3 gap-4 h-2/6 w-full pb-12">
       {/* left */}
       <div className="w-full h-1/2 self-start flex items-center justify-center gap-4">
         {teamsLeft.map((team) => (

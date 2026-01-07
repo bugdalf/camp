@@ -85,7 +85,7 @@ export default function LandingPage() {
                     {/* Título del equipo en hover */}
                     <figure
                       className="
-                        w-full h-50 -bottom-10 z-10 scale-200
+                        w-full h-50 -bottom-10 z-10 scale-150
                         animate-in fade-in slide-in-from-bottom-8 duration-500
                         absolute overflow-hidden
                       "
