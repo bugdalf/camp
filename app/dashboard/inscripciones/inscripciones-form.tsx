@@ -1,6 +1,7 @@
 'use client'
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
+import { useAuthStore } from "@/lib/store/auth.store";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
 import { z } from "zod";
 
@@ -48,8 +49,14 @@ interface InscripcionesFormProps {
 }
 
 export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: InscripcionesFormProps) {
+  const { user } = useAuthStore();
+  console.log(user)
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
-    await onCreate(values);
+    const valuesToCreate = {
+      ...values,
+      register_by: user?.email
+    }
+    await onCreate(valuesToCreate);
     dialogHandlers.setOpenDialog(false);
   }
 

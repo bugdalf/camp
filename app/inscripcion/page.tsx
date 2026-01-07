@@ -1,43 +1,34 @@
 'use client'
 
 import { useState } from "react"
-// import { InscripcionesForm } from "@/components/own/inscripciones-form"
-import type { DialogHandlers } from "@/shared/types/ui.types"
 import { Stepper } from "@/components/own/stepper"
 import { AutoinscripcionForm } from "../dashboard/inscripciones/autoinscripcion-form"
 import { RegistroCompletado } from "@/components/own/registro-completo"
+import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 
 const steps = [
-  { id: 1, label: "Formulario" },
-  { id: 2, label: "Completado" },
+  { id: 1, label: "Datos" },
+  { id: 2, label: "Confirmado" },
 ]
 
 export default function InscripcionPage() {
   const [step, setStep] = useState(1)
-
-  // Mock de dialogHandlers para reutilizar tu formulario
-  const dialogHandlers: DialogHandlers = {
-    openDialog: true,
-    setOpenDialog: () => { },
-    selectedItem: null,
-    openDialogDelete: false,
-    setOpenDialogDelete: () => { },
-    setSelectedItem: () => { },
-  }
+  const { createInscripcion } = useInscripcionesStore();
 
   const handleCreate = async (data: Record<string, any>) => {
-    console.log("Registro enviado:", data)
-
-    // 👉 Aquí llamas a Supabase / API
-    // await createInscripcion(data)
-
-    setStep(2)
+    const valuesToCreate = {
+      ...data,
+      payment_method: 'yape',
+      register_by: data.name + " - campista"
+    }
+    await createInscripcion(valuesToCreate);
+    setStep(2);
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
+    <div className="max-w-2xl mx-auto px-4 py-10 flex flex-col items-center gap-4 justify-center">
       <figure className="mb-4">
-        <img src="/main-logo.png" alt="Campamento Desafío 2026" className="w-90 m-auto" />
+        <img src="/main-logo.png" alt="Campamento Desafío 2026" className="w-72 m-auto" />
       </figure>
       <h1 className="text-2xl font-bold mb-4">Inscripción -  Campamento Desafío 2026</h1>
       <Stepper steps={steps} currentStep={step} />

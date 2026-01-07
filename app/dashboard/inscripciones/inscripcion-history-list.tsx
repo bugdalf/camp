@@ -7,11 +7,13 @@ import { es } from 'date-fns/locale';
 interface Props {
   inscripcionId: string;
   inscripcionName?: string;
+  registerBy?: string;
 }
 
 export function InscripcionHistoryList({
   inscripcionId,
-  inscripcionName
+  inscripcionName,
+  registerBy
 }: Props) {
   const { history, loading } = useInscripcionAudit(inscripcionId);
 
@@ -79,7 +81,12 @@ export function InscripcionHistoryList({
         </h2>
         {inscripcionName && (
           <p className="text-sm text-gray-600">
-            Inscripción: {inscripcionName}
+            Inscripción de: {inscripcionName}
+          </p>
+        )}
+        {registerBy && (
+          <p className="text-sm text-gray-600">
+            Registrado por: {registerBy}
           </p>
         )}
       </div>

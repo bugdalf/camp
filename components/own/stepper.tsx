@@ -15,7 +15,7 @@ interface StepperProps {
 
 export function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <div className="flex items-center justify-between mb-8">
+    <div className="w-fit flex items-center justify-between mb-8">
       {steps.map((step, index) => {
         const isCompleted = step.id < currentStep
         const isActive = step.id === currentStep
@@ -39,7 +39,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
             {index !== steps.length - 1 && (
               <div
                 className={cn(
-                  "flex-1 h-[2px] mx-2",
+                  "h-[2px] mx-2 min-w-40",
                   step.id < currentStep ? "bg-primary" : "bg-muted"
                 )}
               />

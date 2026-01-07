@@ -11,6 +11,7 @@ export type Inscripcion = {
   parent_cellphone_number?: string;
   terms_accepted?: boolean;
   is_active?: boolean;
+  register_by?: string; // quien registro la inscripcion
   created_at?: string;
   updated_at?: string;
 }
@@ -29,6 +30,7 @@ export type Voluntario = {
   parent_cellphone_number?: string;
   terms_accepted?: boolean;
   is_active?: boolean;
+  register_by?: string; // quien registro la inscripcion
   created_at?: string;
   updated_at?: string;
 }

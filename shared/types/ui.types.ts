@@ -41,6 +41,7 @@ export interface FieldConfig {
 }
 
 export interface FormConfig {
+  buttonLabel?: string
   fields: FieldConfig[]
   schema: any
   onSubmit: (data: Record<string, any>) => void | Promise<void>

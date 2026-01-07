@@ -135,6 +135,7 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
 
   return (
     <DynamicForm
+      buttonLabel="Inscribirse"
       schema={autoinscripcionesFormSchema}
       fields={fields}
       onSubmit={handleCreate}

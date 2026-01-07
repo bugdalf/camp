@@ -18,6 +18,7 @@ import FieldColor from './fields/field-color'
 import FieldImage from './fields/field-image'
 
 export function DynamicForm({
+  buttonLabel,
   fields,
   schema,
   onSubmit,
@@ -114,7 +115,7 @@ export function DynamicForm({
             disabled={form.formState.isSubmitting || !form.formState.isValid}
             className="w-full col-span-full"
           >
-            {form.formState.isSubmitting ? 'Cargando...' : 'Guardar'}
+            {form.formState.isSubmitting ? 'Cargando...' : buttonLabel ? buttonLabel : 'Guardar'}
           </Button>
         </div>
       </form>

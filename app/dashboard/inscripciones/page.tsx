@@ -85,7 +85,7 @@ export default function InscripcionesPage() {
           </TabsContent>
           <TabsContent value="history" className="w-full overflow-auto">
             {dialogHandlers.selectedItem ? (
-              <InscripcionHistoryList inscripcionId={dialogHandlers.selectedItem.id} inscripcionName={dialogHandlers.selectedItem.name} />
+              <InscripcionHistoryList inscripcionId={dialogHandlers.selectedItem.id} inscripcionName={dialogHandlers.selectedItem.name} registerBy={dialogHandlers.selectedItem.register_by} />
             ) : (
               <p className="text-center py-10 text-gray-500">
                 Una vez inscrito un campista, puedes ver su historial aquí
