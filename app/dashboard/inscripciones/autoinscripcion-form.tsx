@@ -9,13 +9,11 @@ const autoinscripcionesFormSchema = z.object({
   age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().min(9, 'Número inválido').optional(),
-  payment_method: z.enum(['yape', 'efectivo']),
   payment_recipe_url: z.union([
     z.instanceof(File),
     z.string(),
     z.undefined()
   ]).optional(),
-  payment_checked: z.boolean().default(false),
   parent_name: z.string().optional(),
   parent_cellphone_number: z.string().optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
@@ -117,17 +115,6 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
     },
     {
-      name: 'payment_method',
-      label: 'Método de pago',
-      type: 'select',
-      required: true,
-      className: 'col-span-2',
-      options: [
-        { label: 'Yape', value: 'yape' },
-        { label: 'Efectivo', value: 'efectivo' }
-      ]
-    },
-    {
       name: 'payment_recipe_url',
       label: 'Comprobante de pago (imagen)',
       type: 'image',
@@ -135,14 +122,6 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       className: 'col-span-2',
       accept: 'image/*',
       helpText: 'Sube una captura de tu comprobante de pago'
-    },
-    {
-      name: 'payment_checked',
-      label: 'Pago verificado (solo admin)',
-      type: 'checkbox',
-      required: false,
-      className: 'col-span-2',
-      defaultValue: false
     },
     {
       name: 'terms_accepted',
