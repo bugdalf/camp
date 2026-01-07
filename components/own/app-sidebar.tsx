@@ -2,20 +2,10 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
   BackpackIcon,
-  BookOpen,
-  Bot,
-  Command,
   ContactIcon,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
+  FrameIcon,
   NotebookPenIcon,
-  PenIcon,
-  PieChart,
-  Settings2,
-  SquareTerminal,
 } from "lucide-react"
 
 
@@ -64,6 +54,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Registro</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Link href="/dashboard">
+                <SidebarMenuButton tooltip="Dashboard / check-in">
+                  <FrameIcon />
+                  <span>Dashboard / check-in</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          </SidebarMenu>
           <SidebarMenu>
             <SidebarMenuItem>
               <Link href="/dashboard/inscripciones">

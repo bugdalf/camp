@@ -13,6 +13,7 @@ export type Inscripcion = {
   terms_accepted?: boolean;
   is_active?: boolean;
   register_by?: string; // quien registro la inscripcion
+  check_in?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -33,6 +34,7 @@ export type Voluntario = {
   terms_accepted?: boolean;
   is_active?: boolean;
   register_by?: string; // quien registro la inscripcion
+  check_in?: boolean;
   created_at?: string;
   updated_at?: string;
 }

@@ -59,12 +59,15 @@ const deletePaymentRecipe = async (url: string): Promise<void> => {
 
 type VoluntariosStore = {
   voluntarios: Voluntario[]
+
   fetchVoluntarios: () => Promise<void>
   fetchVoluntarioById: (id: string) => Promise<Voluntario | null>
   createVoluntario: (values: any) => Promise<Voluntario | null>
   updateVoluntario: (values: any, id: string) => Promise<void>
   deleteVoluntario: (id: string) => Promise<void>
   deleteSoftVoluntario: (id: string) => Promise<void>
+
+  handleCheckInVoluntario: (id: string) => Promise<void>
 
   subscribeToVoluntarios: () => void
   unsubscribeFromVoluntarios: () => void
@@ -151,15 +154,12 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
         return null;
       };
 
-      if (data) {
-        toast.success('Voluntario creado correctamente');
-        return data;
-      }
-
       // El realtime se encargará de actualizar el estado
       // Pero mantenemos esto por si acaso el realtime no está activo
       if (data && !voluntariosChannel) {
+        toast.success('Voluntario creado correctamente');
         set({ voluntarios: [data, ...get().voluntarios] });
+        return data;
       }
     } catch (error) {
       toast.error('El voluntario no se pudo crear');
@@ -292,6 +292,86 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
     } catch (error) {
       console.error('Error al cancelar voluntario:', error);
       toast.error('El voluntario no se pudo cancelar');
+    }
+  },
+
+  handleCheckInVoluntario: async (id) => {
+    try {
+      // Verificar que el ID sea válido
+      if (!id) {
+        toast.error('ID de voluntario no válido');
+        return;
+      }
+
+      // Intentar buscar el voluntario en el estado local
+      let voluntarioToCheckIn = get().voluntarios.find(v => v.id === id);
+
+      // Si no está en el estado local, buscarlo en la base de datos
+      if (!voluntarioToCheckIn) {
+        const { data: voluntarioDb, error: fetchError } = await supabase
+          .from('voluntarios')
+          .select()
+          .eq('id', id)
+          .single();
+
+        if (fetchError || !voluntarioDb) {
+          toast.error('Voluntario no encontrado');
+          console.error('Error al buscar voluntario:', fetchError);
+          return;
+        }
+
+        voluntarioToCheckIn = voluntarioDb;
+      }
+
+      // Realizar la actualización
+      const { data, error } = await supabase
+        .from('voluntarios')
+        .update({ is_active: !voluntarioToCheckIn?.is_active })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error de Supabase al checkear voluntario:', error);
+        throw error;
+      }
+
+      // Verificar que se recuperó el voluntario actualizado
+      if (!data) {
+        throw new Error('No se recibieron datos del voluntario actualizado');
+      }
+
+      toast.success(`Voluntario ${data.is_active ? 'activado' : 'desactivado'} correctamente`);
+
+      // Actualizar el estado local solo si no hay canal de realtime activo
+      if (!voluntariosChannel) {
+        const voluntarioExisteEnEstado = get().voluntarios.some(v => v.id === id);
+
+        if (voluntarioExisteEnEstado) {
+          // Actualizar voluntario existente
+          set({
+            voluntarios: get().voluntarios.map(
+              voluntario => voluntario.id === id ? data : voluntario
+            )
+          });
+        } else {
+          // Agregar voluntario nuevo al estado
+          set({
+            voluntarios: [...get().voluntarios, data]
+          });
+        }
+      }
+
+      return data;
+
+    } catch (error) {
+      console.error('Error al checkear voluntario:', error);
+      toast.error(
+        error instanceof Error
+          ? `Error: ${error.message}`
+          : 'El voluntario no se pudo checkear'
+      );
+      throw error;
     }
   },
 

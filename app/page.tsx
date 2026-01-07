@@ -4,10 +4,13 @@ import { teams } from "@/lib/constants/teams"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import TeamsGrid from "@/components/own/landing/teams-grid"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 
 export default function LandingPage() {
   const [hoveredTeam, setHoveredTeam] = useState<string | null>(null);
+  const [inscripcionesCount, setInscripcionesCount] = useState<number>(0);
+  const { fetchInscripcionesCount } = useInscripcionesStore();
 
   const currentTeam = useMemo(() => {
     return hoveredTeam
@@ -15,6 +18,14 @@ export default function LandingPage() {
       : null;
   }, [hoveredTeam]);
 
+  useEffect(() => {
+    const fetchCount = async () => {
+      const count = await fetchInscripcionesCount();
+      console.log(count);
+      setInscripcionesCount(count);
+    };
+    fetchCount();
+  }, []);
 
   return (
     <>
@@ -22,9 +33,12 @@ export default function LandingPage() {
       <section className="relative min-h-screen w-full flex flex-col items-center px-4 bg-slate-950">
         <div className="w-full h-screen flex flex-col items-center gap-8 relative">
           {/* Imagen del campeón anterior con animación */}
-          <div className="h-40 animate-in fade-in slide-in-from-top-4 duration-700">
-            <div className="rounded-2xl overflow-hidden shadow-2xl">
-              aqui la otra imagen del anterior campeon
+          <div className="flex flex-col items-center gap-2 w-80 animate-in fade-in slide-in-from-top-4 duration-700 scale-60">
+            <span className="strong text-white text-center">Ultimo campeón</span>
+            <div className="w-full h-20 relative">
+              <img src="/champ-aura.png" alt="" className="w-full h-20 object-cover object-center absolute" />
+              <img src={teams[0].titleHoverImg} alt="" className="w-full absolute -top-15" />
+
             </div>
           </div>
 
@@ -53,7 +67,7 @@ export default function LandingPage() {
                 {/* CTA Section */}
                 <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
                   <p className="font-display text-xl md:text-2xl text-white">
-                    Cupos: 200/200
+                    Cupos: {inscripcionesCount}/200
                   </p>
                   <Link href="/inscripcion-campista">
                     <Button variant="cta" size="cta" className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">

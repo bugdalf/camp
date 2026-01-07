@@ -127,6 +127,36 @@ export const columns: ColumnDef<Inscripcion>[] = [
     },
   },
   {
+    accessorKey: 'check_in',
+    header: 'Check-in',
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        {row.original.check_in ? (
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle2 className="h-4 w-4" />
+            <span className="text-sm">Check-in</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 text-orange-600">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm">Pendiente</span>
+          </div>
+        )}
+      </div>
+    ),
+    meta: {
+      filterable: {
+        type: 'select',
+        options: [
+          { label: 'Check-in', value: true },
+          { label: 'Pendiente', value: false }
+        ],
+        label: 'Check-in',
+        placeholder: 'Check-in'
+      }
+    },
+  },
+  {
     accessorKey: 'register_by',
     header: 'Registrado por',
     cell: ({ row }) => (

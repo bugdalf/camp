@@ -59,12 +59,16 @@ const deletePaymentRecipe = async (url: string): Promise<void> => {
 
 type InscripcionesStore = {
   inscripciones: Inscripcion[]
+
   fetchInscripciones: () => Promise<void>
+  fetchInscripcionesCount: () => Promise<number>
   fetchInscripcionById: (id: string) => Promise<Inscripcion | null>
   createInscripcion: (values: any) => Promise<Inscripcion | null>
   updateInscripcion: (values: any, id: string) => Promise<void>
   deleteInscripcion: (id: string) => Promise<void>
   deleteSoftInscripcion: (id: string) => Promise<void>
+
+  handleCheckInInscripcion: (id: string) => Promise<void>
 
   subscribeToInscripciones: () => void
   unsubscribeFromInscripciones: () => void
@@ -72,6 +76,21 @@ type InscripcionesStore = {
 
 export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
   inscripciones: [],
+
+  fetchInscripcionesCount: async () => {
+    try {
+      const { count, error } = await supabase
+        .from('inscripciones')
+        .select('*', { count: 'exact', head: true });
+
+      if (error) throw error;
+
+      return count ?? 0;
+    } catch (error) {
+      toast.error('No se pudo cargar el conteo de inscripciones');
+      return 0;
+    }
+  },
 
   fetchInscripciones: async () => {
     try {
@@ -150,15 +169,12 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         return null;
       };
 
-      if (data) {
-        toast.success('Inscripción creada correctamente');
-        return data;
-      }
-
       // El realtime se encargará de actualizar el estado
       // Pero mantenemos esto por si acaso el realtime no está activo
       if (data && !inscripcionesChannel) {
+        toast.success('Inscripción creada correctamente');
         set({ inscripciones: [data, ...get().inscripciones] });
+        return data;
       }
     } catch (error) {
       toast.error('La inscripción no se pudo crear');
@@ -292,6 +308,86 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
     } catch (error) {
       console.error('Error al cancelar inscripción:', error);
       toast.error('La inscripción no se pudo cancelar');
+    }
+  },
+
+  handleCheckInInscripcion: async (id) => {
+    try {
+      // Verificar que el ID sea válido
+      if (!id) {
+        toast.error('ID de inscripción no válido');
+        return;
+      }
+
+      // Intentar buscar la inscripción en el estado local
+      let inscripcionToCheckIn = get().inscripciones.find(i => i.id === id);
+
+      // Si no está en el estado local, buscarla en la base de datos
+      if (!inscripcionToCheckIn) {
+        const { data: inscripcionDb, error: fetchError } = await supabase
+          .from('inscripciones')
+          .select()
+          .eq('id', id)
+          .single();
+
+        if (fetchError || !inscripcionDb) {
+          toast.error('Inscripción no encontrada');
+          console.error('Error al buscar inscripción:', fetchError);
+          return;
+        }
+
+        inscripcionToCheckIn = inscripcionDb;
+      }
+
+      // Realizar la actualización
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .update({ check_in: !inscripcionToCheckIn?.check_in })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error de Supabase al realizar check-in:', error);
+        throw error;
+      }
+
+      // Verificar que se recuperó la inscripción actualizada
+      if (!data) {
+        throw new Error('No se recibieron datos de la inscripción actualizada');
+      }
+
+      toast.success(data.check_in ? 'Check-in realizado correctamente' : 'Check-in cancelado correctamente');
+
+      // Actualizar el estado local solo si no hay canal de realtime activo
+      if (!inscripcionesChannel) {
+        const inscripcionExisteEnEstado = get().inscripciones.some(i => i.id === id);
+
+        if (inscripcionExisteEnEstado) {
+          // Actualizar inscripción existente
+          set({
+            inscripciones: get().inscripciones.map(
+              inscripcion => inscripcion.id === id ? data : inscripcion
+            )
+          });
+        } else {
+          // Agregar inscripción nueva al estado
+          set({
+            inscripciones: [...get().inscripciones, data]
+          });
+        }
+      }
+
+      return data;
+
+    } catch (error) {
+      console.error('Error al realizar check-in:', error);
+      toast.error(
+        error instanceof Error
+          ? `Error: ${error.message}`
+          : 'El check-in no se pudo realizar'
+      );
+      throw error;
     }
   },
 

@@ -211,24 +211,9 @@ export default function VoluntarioPage() {
                 </div>
               </div>
 
-              {/* Barcode simulation */}
-              <div className="mt-4 bg-white p-3 rounded-lg">
-                <div className="flex justify-center gap-px h-12 items-end">
-                  {[...Array(40)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-gray-900 flex-1"
-                      style={{
-                        height: `${Math.random() * 60 + 40}%`,
-                        minWidth: '2px'
-                      }}
-                    />
-                  ))}
-                </div>
-                <p className="text-center text-xs text-gray-400 font-mono mt-2 tracking-wider">
-                  VOL-{voluntarioData.id?.toUpperCase()}
-                </p>
-              </div>
+              <p className="text-center text-xs text-gray-400 font-mono mt-2 tracking-wider">
+                {voluntarioData.id?.toUpperCase()}
+              </p>
 
               {/* Status badge */}
               {voluntarioData.is_active && (

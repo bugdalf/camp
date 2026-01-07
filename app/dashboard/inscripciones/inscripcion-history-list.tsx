@@ -47,6 +47,8 @@ export function InscripcionHistoryList({
     const fieldNames: Record<string, string> = {
       name: 'Nombre',
       age: 'Edad',
+      dni: 'DNI',
+      check_in: 'Check-in',
       is_under_18: 'Es menor de 18',
       cellphone_number: 'Teléfono',
       payment_method: 'Método de pago',
