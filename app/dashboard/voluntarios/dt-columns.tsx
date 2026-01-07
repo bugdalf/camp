@@ -28,6 +28,24 @@ export const columns: ColumnDef<Voluntario>[] = [
     }
   },
   {
+    accessorKey: 'age',
+    header: 'Edad',
+    cell: ({ row }) => (
+      <div>
+        {row.original.age} años
+      </div>
+    )
+  },
+  {
+    accessorKey: 'dni',
+    header: 'DNI',
+    cell: ({ row }) => (
+      <div>
+        {row.original.dni}
+      </div>
+    )
+  },
+  {
     accessorKey: 'cellphone_number',
     header: 'Teléfono',
     cell: ({ row }) => (
@@ -42,6 +60,9 @@ export const columns: ColumnDef<Voluntario>[] = [
         )}
       </div>
     ),
+    meta: {
+      visible: false
+    }
   },
   {
     accessorKey: 'commission',
@@ -50,17 +71,21 @@ export const columns: ColumnDef<Voluntario>[] = [
       <div>
         {row.original.commission}
       </div>
-    )
+    ),
+    meta: {
+      filterable: {
+        type: 'select',
+        placeholder: '',
+        label: 'Buscar por comisión',
+        options: [
+          { label: 'Cocina', value: 'cocina' },
+          { label: 'Limpieza', value: 'limpieza' },
+          { label: 'Producción', value: 'produccion' },
+        ]
+      }
+    }
   },
-  {
-    accessorKey: 'age',
-    header: 'Edad',
-    cell: ({ row }) => (
-      <div>
-        {row.original.age} años
-      </div>
-    )
-  },
+
   {
     accessorKey: 'payment_method',
     header: 'Pago',
@@ -124,6 +149,45 @@ export const columns: ColumnDef<Voluntario>[] = [
     },
   },
   {
+    accessorKey: 'check_in',
+    header: 'Check-in',
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        {row.original.check_in ? (
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle2 className="h-4 w-4" />
+            <span className="text-sm">Check-in</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 text-orange-600">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm">Pendiente</span>
+          </div>
+        )}
+      </div>
+    ),
+    meta: {
+      filterable: {
+        type: 'select',
+        options: [
+          { label: 'Check-in', value: true },
+          { label: 'Pendiente', value: false }
+        ],
+        label: 'Check-in',
+        placeholder: 'Check-in'
+      }
+    },
+  },
+  {
+    accessorKey: 'register_by',
+    header: 'Registrado por',
+    cell: ({ row }) => (
+      <div>
+        {row.original.register_by}
+      </div>
+    )
+  },
+  {
     accessorKey: 'terms_accepted',
     header: 'Términos',
     cell: ({ row }) => (
@@ -135,6 +199,9 @@ export const columns: ColumnDef<Voluntario>[] = [
         )}
       </div>
     ),
+    meta: {
+      visible: false
+    }
   },
   {
     accessorKey: 'created_at',
