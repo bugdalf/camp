@@ -23,6 +23,9 @@ export default function LandingPage() {
       {/* Hero Section - Full Screen */}
       <section className="relative min-h-screen w-full flex flex-col items-center px-4 bg-slate-950">
         <div className="w-full h-screen flex flex-col items-center gap-8 relative">
+          <div className="h-40">
+            aqui la otra imagen del anterior campeon
+          </div>
           <p className="font-display text-xl md:text-2xl text-white text-center p-3">
             22 al 26 FEBRERO
           </p>
@@ -32,7 +35,7 @@ export default function LandingPage() {
             <figure className="w-full max-w-lg relative flex items-center justify-center h-2/3">
               {/* Logo principal (por defecto) */}
               <div
-                className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${currentTeam ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                className={`absolute inset-0 flex flex-col items-center justify-center gap-8 transition-opacity duration-500 ${currentTeam ? 'opacity-0 pointer-events-none' : 'opacity-100'
                   }`}
               >
                 <img
@@ -40,42 +43,47 @@ export default function LandingPage() {
                   alt="Logo del evento"
                   className="w-full h-auto max-h-[300px] object-contain"
                 />
+                {/* CTA Section */}
+                <div className="flex flex-col items-center gap-4">
+                  <p className="font-display text-xl md:text-2xl text-white">
+                    Cupos: 200/200
+                  </p>
+                  <Button variant="cta" size="cta">
+                    Regístrate hoy
+                  </Button>
+                </div>
               </div>
 
               {/* Imágenes dinámicas de los equipos */}
               <div
-                className={`absolute inset-0 flex flex-col items-center justify-center gap-4 transition-opacity duration-500 ${currentTeam ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                className={`absolute flex justify-center items-center inset-0 transition-opacity duration-500 ${currentTeam ? 'opacity-100' : 'opacity-0 pointer-events-none'
                   }`}
               >
                 {currentTeam && (
-                  <>
-                    {/* Título del equipo en hover */}
-                    {/* <img
-                      src={currentTeam.titleHoverImg}
-                      alt={`${currentTeam.name} título`}
-                      className="w-full max-w-md h-auto object-contain"
-                    /> */}
+                  <div className="w-169 h-160 relative flex flex-col items-center justify-center gap-4">
                     {/* Imagen del grupo */}
-                    <img
-                      src={currentTeam.groupImg}
-                      alt={`${currentTeam.name} grupo`}
-                      className="w-full max-w-sm h-auto object-contain"
-                    />
-                  </>
+                    <figure className="w-full h-full absolute inset-0">
+                      <img
+                        src={currentTeam.groupImg}
+                        alt={`${currentTeam.name} grupo`}
+                        className="w-full h-full object-cover"
+                      />
+                    </figure>
+                    {/* Título del equipo en hover */}
+                    <figure className="w-full h-50 absolute -bottom-10 z-10 scale-200">
+                      <img
+                        src={currentTeam.titleHoverImg}
+                        alt={`${currentTeam.name} título`}
+                        className="w-full h-full object-cover"
+                      />
+                    </figure>
+                  </div>
                 )}
               </div>
             </figure>
           </div>
 
-          {/* CTA Section */}
-          <div className="flex flex-col items-center gap-4 z-10 absolute bottom-[20%]">
-            <p className="font-display text-xl md:text-2xl text-white">
-              Cupos: 200/200
-            </p>
-            <Button variant="cta" size="cta">
-              Regístrate hoy
-            </Button>
-          </div>
+
 
           {/* Grid de Equipos */}
           <TeamsGrid
