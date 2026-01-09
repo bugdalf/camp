@@ -26,7 +26,7 @@ export const columns: ColumnDef<Precio>[] = [
     header: 'Precio',
     cell: ({ row }) => (
       <div>
-        {row.original.price} años
+        S/ {row.original.price}
       </div>
     )
   },

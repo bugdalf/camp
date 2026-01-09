@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   BackpackIcon,
+  CoinsIcon,
   ContactIcon,
   FrameIcon,
   NotebookPenIcon,
@@ -80,6 +81,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton tooltip="Voluntarios">
                   <ContactIcon />
                   <span>Voluntarios</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Configuraciones</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Link href="/dashboard/precios">
+                <SidebarMenuButton tooltip="Precios">
+                  <CoinsIcon />
+                  <span>Precios</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>

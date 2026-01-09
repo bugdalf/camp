@@ -14,6 +14,8 @@ type PreciosStore = {
   createPrecio: (values: any) => Promise<Precio | null>
   updatePrecio: (values: any, id: string) => Promise<void>
   deletePrecio: (id: string) => Promise<void>
+
+  getDefaultPrecio: () => Promise<Precio | null>
 }
 
 export const usePreciosStore = create<PreciosStore>((set, get) => ({
@@ -62,6 +64,19 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
         default: values.default || false
       };
 
+      // Si el nuevo precio será default, primero removemos el default de los demás
+      if (precioData.default) {
+        const { error: updateError } = await supabase
+          .from('precios')
+          .update({ default: false })
+          .eq('default', true);
+
+        if (updateError) {
+          toast.error('Error al actualizar precios existentes');
+          return null;
+        }
+      }
+
       const { data, error } = await supabase
         .from('precios')
         .insert(precioData)
@@ -71,13 +86,22 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
       if (error) {
         toast.error('El precio no se pudo crear, verifica que los datos sean correctos');
         return null;
-      };
+      }
 
-      // El realtime se encargará de actualizar el estado
-      // Pero mantenemos esto por si acaso el realtime no está activo
       if (data) {
         toast.success('Precio creado correctamente');
-        set({ precios: [data, ...get().precios] });
+
+        // Actualizar el estado local: si el nuevo precio es default, quitar default de los demás
+        if (data.default) {
+          const updatedPrecios = get().precios.map(p => ({
+            ...p,
+            default: false
+          }));
+          set({ precios: [data, ...updatedPrecios] });
+        } else {
+          set({ precios: [data, ...get().precios] });
+        }
+
         return data;
       }
     } catch (error) {
@@ -95,6 +119,20 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
         default: values.default || false
       };
 
+      // Si el precio actualizado será default, primero removemos el default de los demás
+      if (precioData.default) {
+        const { error: updateError } = await supabase
+          .from('precios')
+          .update({ default: false })
+          .eq('default', true)
+          .neq('id', id); // Excluir el precio que estamos actualizando
+
+        if (updateError) {
+          toast.error('Error al actualizar precios existentes');
+          return;
+        }
+      }
+
       const { data, error } = await supabase
         .from('precios')
         .update(precioData)
@@ -105,11 +143,20 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
       if (error) throw error;
 
       if (data) {
-        set({
-          precios: get().precios.map(
-            precio => precio.id === id ? data : precio
-          )
-        });
+        // Actualizar el estado local: si el precio actualizado es default, quitar default de los demás
+        if (data.default) {
+          const updatedPrecios = get().precios.map(p =>
+            p.id === id ? data : { ...p, default: false }
+          );
+          set({ precios: updatedPrecios });
+        } else {
+          set({
+            precios: get().precios.map(
+              precio => precio.id === id ? data : precio
+            )
+          });
+        }
+
         toast.success('Precio actualizado correctamente');
       }
     } catch (error) {
@@ -120,9 +167,6 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
 
   deletePrecio: async (id) => {
     try {
-      // 🗑️ Obtener la inscripción para eliminar su imagen si existe
-      const precioToDelete = get().precios.find(i => i.id === id);
-
       const { data, error } = await supabase
         .from('precios')
         .delete()
@@ -132,7 +176,6 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
 
       if (error) throw error;
 
-      // El realtime se encargará de actualizar el estado
       if (data) {
         toast.success('Precio eliminado correctamente');
         set({
@@ -144,6 +187,25 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
     } catch (error) {
       console.error('Error al eliminar precio:', error);
       toast.error('El precio no se pudo eliminar');
+    }
+  },
+
+  getDefaultPrecio: () => {
+    try {
+      const { data, error } = supabase
+        .from('precios')
+        .select('*')
+        .eq('default', true)
+        .single();
+
+      if (error) {
+        toast.error('No se pudo obtener el precio por defecto');
+      };
+
+      return data;
+    } catch (error) {
+      toast.error('No se pudo obtener el precio por defecto');
+      return null;
     }
   }
 }))

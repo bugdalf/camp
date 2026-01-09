@@ -36,7 +36,6 @@ export function PreciosForm({ dialogHandlers, onCreate, onEdit }: PreciosFormPro
       label: 'Nombre',
       type: 'text',
       required: true,
-      className: 'col-span-2',
       placeholder: 'Ingresa el nombre para el precio'
     },
     {
@@ -44,7 +43,6 @@ export function PreciosForm({ dialogHandlers, onCreate, onEdit }: PreciosFormPro
       label: 'Precio',
       type: 'integer',
       required: true,
-      className: 'col-span-1',
       placeholder: 'Ingresa el precio',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -55,7 +53,6 @@ export function PreciosForm({ dialogHandlers, onCreate, onEdit }: PreciosFormPro
       label: 'Descripción',
       type: 'textarea',
       required: false,
-      className: 'col-span-1',
       placeholder: 'Ingresa la descripción del precio',
     },
     {
@@ -63,7 +60,6 @@ export function PreciosForm({ dialogHandlers, onCreate, onEdit }: PreciosFormPro
       label: '¿Es el precio por defecto?',
       type: 'checkbox',
       required: true,
-      className: 'col-span-1',
       placeholder: 'Ej: 25',
     }
   ];
@@ -74,7 +70,7 @@ export function PreciosForm({ dialogHandlers, onCreate, onEdit }: PreciosFormPro
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='grid-cols-2 px-2'
+      className='px-2 h-fit'
     />
   )
 }

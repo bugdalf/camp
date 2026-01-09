@@ -14,6 +14,7 @@ function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
   const [openDialogDelete, setOpenDialogDelete] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [customAction, setCustomAction] = useState<string | undefined>(undefined);
 
   return useMemo(() => ({
     openDialog,
@@ -22,7 +23,9 @@ function useDialogHandlers(): DialogHandlers {
     setOpenDialogDelete,
     selectedItem,
     setSelectedItem,
-  }), [openDialog, setOpenDialog, openDialogDelete, setOpenDialogDelete, selectedItem, setSelectedItem]);
+    customAction,
+    setCustomAction
+  }), [openDialog, setOpenDialog, openDialogDelete, setOpenDialogDelete, selectedItem, setSelectedItem, customAction, setCustomAction]);
 }
 
 
@@ -55,7 +58,6 @@ export default function PreciosPage() {
         openDeleteDialog={dialogHandlers.openDialogDelete}
         setOpenDeleteDialog={dialogHandlers.setOpenDialogDelete}
         selectedItem={dialogHandlers.selectedItem}
-        title="Eliminar Precio"
         action={deletePrecio}
       />
     </div>
