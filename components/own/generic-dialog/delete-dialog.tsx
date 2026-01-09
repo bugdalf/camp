@@ -12,12 +12,12 @@ import {
 interface DeleteDialogProps {
   openDeleteDialog: boolean
   setOpenDeleteDialog: (open: boolean) => void
-  title?: string
   selectedItem?: any
   action: (id: string) => Promise<void>;
+  customAction?: string;
 }
 
-export default function DeleteDialog({ openDeleteDialog, setOpenDeleteDialog, title, selectedItem, action }: DeleteDialogProps) {
+export default function DeleteDialog({ openDeleteDialog, setOpenDeleteDialog, selectedItem, action, customAction }: DeleteDialogProps) {
 
   const handleDelete = async () => {
     if (selectedItem && selectedItem.id) {
@@ -30,14 +30,14 @@ export default function DeleteDialog({ openDeleteDialog, setOpenDeleteDialog, ti
     <AlertDialog open={openDeleteDialog} onOpenChange={(open) => setOpenDeleteDialog(open)}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogTitle>{customAction || "Eliminar"}</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no podra ser recuperada, se cancelara la inscripción de {selectedItem?.name}
+            ¿Esta seguro de realizar la acción para {selectedItem?.name}?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Regresar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">Cancelar Inscripción</AlertDialogAction>
+          <AlertDialogAction onClick={handleDelete} >{customAction || "Eliminar"}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

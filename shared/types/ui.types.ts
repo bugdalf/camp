@@ -7,6 +7,8 @@ export type DialogHandlers = {
   setOpenDialogDelete: React.Dispatch<React.SetStateAction<boolean>>;
   selectedItem: any;
   setSelectedItem: React.Dispatch<React.SetStateAction<any>>;
+  customAction: string | undefined;
+  setCustomAction: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 export type FieldType =
@@ -62,6 +64,7 @@ export interface ExtraAction {
   label: string;
   handler: (item: any) => void;
   icon: LucideIcon;
+  variant?: 'default' | 'destructive'
 }
 
 // Cosas para el check-in
