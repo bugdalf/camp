@@ -7,6 +7,23 @@ import { es } from "date-fns/locale";
 
 export const columns: ColumnDef<Inscripcion>[] = [
   {
+    accessorKey: 'is_active',
+    header: 'Estado',
+    cell: ({ row }) => (
+      <div>
+        {row.original.is_active ? (
+          <Badge variant="outline" className="bg-green-500 text-white">
+            Activo
+          </Badge>
+        ) : (
+          <Badge variant="outline" className="bg-red-500 text-white">
+            Inactivo
+          </Badge>
+        )}
+      </div>
+    )
+  },
+  {
     accessorKey: 'name',
     header: 'Nombre',
     cell: ({ row }) => (

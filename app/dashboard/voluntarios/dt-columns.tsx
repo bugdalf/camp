@@ -21,18 +21,7 @@ export const columns: ColumnDef<Voluntario>[] = [
           </Badge>
         )}
       </div>
-    ),
-    meta: {
-      filterable: {
-        type: 'select',
-        placeholder: '',
-        label: 'Buscar por estado',
-        options: [
-          { label: 'Activo', value: true },
-          { label: 'Inactivo', value: false }
-        ]
-      }
-    }
+    )
   },
   {
     accessorKey: 'name',

@@ -1,7 +1,7 @@
 "use client"
 
 import { DataTable } from "@/components/own/table/data-table";
-import { DialogHandlers } from "@/shared/types/ui.types";
+import { DialogHandlers, ExtraAction } from "@/shared/types/ui.types";
 import { useState, useMemo, useEffect } from "react";
 import { columns } from "./dt-columns";
 import GenericDialog from "@/components/own/generic-dialog/generic-dialog";
@@ -9,7 +9,7 @@ import DeleteDialog from "@/components/own/generic-dialog/delete-dialog";
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store";
 import { InscripcionesForm } from "./inscripciones-form";
 import { toast } from "sonner";
-import { EyeIcon, Link2Icon } from "lucide-react";
+import { BanIcon, EyeIcon, Link2Icon, PlusIcon } from "lucide-react";
 import { Inscripcion } from "@/shared/types/supabase.types";
 import { InscripcionHistoryList } from "./inscripcion-history-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -18,6 +18,7 @@ function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
   const [openDialogDelete, setOpenDialogDelete] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [customAction, setCustomAction] = useState<string | undefined>(undefined);
 
   return useMemo(() => ({
     openDialog,
@@ -26,7 +27,9 @@ function useDialogHandlers(): DialogHandlers {
     setOpenDialogDelete,
     selectedItem,
     setSelectedItem,
-  }), [openDialog, setOpenDialog, openDialogDelete, setOpenDialogDelete, selectedItem, setSelectedItem]);
+    customAction,
+    setCustomAction
+  }), [openDialog, setOpenDialog, openDialogDelete, setOpenDialogDelete, selectedItem, setSelectedItem, customAction, setCustomAction]);
 }
 
 export default function InscripcionesPage() {
@@ -37,6 +40,55 @@ export default function InscripcionesPage() {
     fetchInscripciones();
   }, []);
 
+  const extraActionsBuilder = (voluntario: Inscripcion) => {
+    const extraActions: ExtraAction[] = [
+      {
+        label: "Compartir Ticket",
+        handler: async (voluntario: Inscripcion) => {
+          const url = `${window.location.origin}/campista/${voluntario.id}`;
+          try {
+            await navigator.clipboard.writeText(url);
+            toast.info(`${url} copiado al portapapeles`);
+          } catch (err) {
+            toast.error("Error al copiar");
+          }
+        },
+        icon: Link2Icon
+      },
+      {
+        label: "Ver Ticket",
+        handler: (voluntario: Inscripcion) => {
+          const url = `${window.location.origin}/campista/${voluntario.id}`;
+          window.open(url, "_blank");
+        },
+        icon: EyeIcon
+      },
+    ];
+    if (voluntario.is_active) {
+      extraActions.push({
+        label: "Cancelar Inscripción",
+        handler: (voluntario: Inscripcion) => {
+          dialogHandlers.setSelectedItem(voluntario)
+          dialogHandlers.setOpenDialogDelete(true)
+          dialogHandlers.setCustomAction("Cancelar Inscripción")
+        },
+        icon: BanIcon,
+        variant: 'destructive'
+      })
+    } else {
+      extraActions.push({
+        label: "Re-inscribir",
+        handler: (voluntario: Inscripcion) => {
+          dialogHandlers.setSelectedItem(voluntario)
+          dialogHandlers.setOpenDialogDelete(true)
+          dialogHandlers.setCustomAction("Re-inscribir")
+        },
+        icon: PlusIcon
+      })
+    }
+    return extraActions;
+  }
+
   return (
     <div className="h-full flex flex-col overflow-auto">
       <h2 className="text-2xl font-bold">Inscripciones</h2>
@@ -46,29 +98,8 @@ export default function InscripcionesPage() {
         data={inscripciones || []}
         entity=""
         dialogHandlers={dialogHandlers}
-        extraActions={[
-          {
-            label: "Compartir Ticket",
-            handler: async (inscripcion: Inscripcion) => {
-              const url = `${window.location.origin}/campista/${inscripcion.id}`;
-              try {
-                await navigator.clipboard.writeText(url);
-                toast.info(`${url} copiado al portapapeles`);
-              } catch (err) {
-                toast.error("Error al copiar");
-              }
-            },
-            icon: Link2Icon
-          },
-          {
-            label: "Ver Ticket",
-            handler: (inscripcion: Inscripcion) => {
-              const url = `${window.location.origin}/campista/${inscripcion.id}`;
-              window.open(url, "_blank");
-            },
-            icon: EyeIcon
-          }
-        ]}
+        disableDelete={true}
+        extraActionsBuilder={extraActionsBuilder}
       />
       <GenericDialog
         openDialog={dialogHandlers.openDialog}
@@ -98,8 +129,8 @@ export default function InscripcionesPage() {
         openDeleteDialog={dialogHandlers.openDialogDelete}
         setOpenDeleteDialog={dialogHandlers.setOpenDialogDelete}
         selectedItem={dialogHandlers.selectedItem}
-        title="Cancelar Inscripción"
         action={deleteSoftInscripcion}
+        customAction={dialogHandlers.customAction}
       />
     </div>
   )
