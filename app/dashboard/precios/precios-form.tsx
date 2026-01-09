@@ -7,7 +7,7 @@ import { z } from "zod";
 
 const preciosFormSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
-  price: z.number().min(1, 'El precio es requerido'),
+  price: z.number().min(0, 'El precio es requerido'),
   description: z.string().min(1, 'La descripción es requerida'),
   default: z.boolean().default(false),
 });
