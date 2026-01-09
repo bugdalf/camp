@@ -8,6 +8,7 @@ import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 import { Inscripcion } from "@/shared/types/supabase.types"
 import { CopyIcon } from "lucide-react"
 import { toast } from "sonner"
+import Link from "next/link"
 
 const steps = [
   { id: 1, label: "Datos" },
@@ -40,9 +41,9 @@ export default function InscripcionCampistaPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 flex flex-col items-center gap-4 justify-center">
-      <figure className="mb-4">
+      <Link href="/" className="mb-4">
         <img src="/main-logo.png" alt="Campamento Desafío 2026" className="w-72 m-auto" />
-      </figure>
+      </Link>
       <h1 className="text-2xl font-bold mb-4">Inscripción -  Campista</h1>
       <Stepper steps={steps} currentStep={step} />
 

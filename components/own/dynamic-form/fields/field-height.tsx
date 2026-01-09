@@ -85,7 +85,9 @@ export default function FieldHeight({ fieldConfig, formField }: FormFieldProps) 
           onBlur={handleBlur}
           disabled={formField.disabled}
           name={formField.name}
-          maxLength={6}
+          maxLength={fieldConfig.maxLength}
+          pattern={fieldConfig.pattern}
+          inputMode={fieldConfig.inputMode}
         />
       </FormControl>
       <FormMessage />

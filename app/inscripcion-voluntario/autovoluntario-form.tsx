@@ -13,7 +13,26 @@ const autovoluntarioFormSchema = z.object({
     .refine(isValidPeruDni, {
       message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
     }),
-  age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
+  age: z
+    .union([z.number(), z.string()])
+    .transform((val) => {
+      // Si es string, convertir a número
+      if (typeof val === 'string') {
+        // Si está vacío, retornar null
+        if (val.trim() === '') return null;
+        const numValue = parseInt(val, 10);
+        return isNaN(numValue) ? null : numValue;
+      }
+      return val;
+    })
+    .pipe(
+      z.number({
+        required_error: 'La edad es requerida',
+        invalid_type_error: 'La edad debe ser un número válido'
+      })
+        .min(14, 'La edad mínima es de 14 años')
+        .max(120, 'La edad no puede superar 120 años')
+    ),
   commission: z.enum(['cocina', 'limpieza', 'produccion']),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().min(9, 'Número inválido').optional(),

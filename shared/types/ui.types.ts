@@ -39,6 +39,9 @@ export interface FieldConfig {
   }
   onChange?: (value: any, setValue: any, getValues: any) => void // ⬅️ Callback cuando cambia el valor
   disabled?: boolean // ⬅️ Para deshabilitar campos
+  inputMode?: 'text' | 'numeric' | 'tel' | 'email' | 'url' | 'search' | 'decimal' | 'none' // ⬅️ Tipo de teclado en móviles
+  pattern?: string // ⬅️ Patrón HTML5 de validación (ej: '[0-9]*')
+  maxLength?: number // ⬅️ Longitud máxima del input
 }
 
 export interface FormConfig {

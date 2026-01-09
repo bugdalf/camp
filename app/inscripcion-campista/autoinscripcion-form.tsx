@@ -13,7 +13,26 @@ const autoinscripcionesFormSchema = z.object({
     .refine(isValidPeruDni, {
       message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
     }),
-  age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
+  age: z
+    .union([z.number(), z.string()])
+    .transform((val) => {
+      // Si es string, convertir a número
+      if (typeof val === 'string') {
+        // Si está vacío, retornar null
+        if (val.trim() === '') return null;
+        const numValue = parseInt(val, 10);
+        return isNaN(numValue) ? null : numValue;
+      }
+      return val;
+    })
+    .pipe(
+      z.number({
+        required_error: 'La edad es requerida',
+        invalid_type_error: 'La edad debe ser un número válido'
+      })
+        .min(14, 'La edad mínima es de 14 años')
+        .max(30, 'La edad no puede superar 30 años')
+    ),
   height: z
     .union([z.number(), z.string()])
     .transform((val) => {
@@ -44,7 +63,7 @@ const autoinscripcionesFormSchema = z.object({
       message: 'El comprobante de pago es obligatorio',
     }),
   parent_name: z.string().optional(),
-  parent_cellphone_number: z.string().optional(),
+  parent_cellphone_number: z.string().min(9, 'Número inválido').optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
@@ -105,7 +124,10 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       type: 'text',
       required: true,
       className: 'col-span-1',
-      placeholder: 'Ingresa tu DNI'
+      placeholder: 'Ingresa tu DNI',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 8,
     },
     {
       name: 'cellphone_number',
@@ -113,7 +135,10 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       type: 'text',
       required: false,
       className: 'col-span-1',
-      placeholder: '987654321'
+      placeholder: '987654321',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 9,
     },
     {
       name: 'age',
@@ -122,7 +147,7 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       required: true,
       className: 'col-span-1',
       placeholder: 'Ej: 25',
-      onChange: handleAgeChange // 🎯 Añadir handler
+      onChange: handleAgeChange
     },
     {
       name: 'height',
@@ -131,15 +156,18 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       required: true,
       className: 'col-span-1',
       placeholder: 'Ej: 170',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 3,
     },
     {
       name: 'is_under_18',
       label: '¿Es menor de 18 años?',
       type: 'checkbox',
       required: false,
-      className: 'col-span-1 items-end border-none',
+      className: 'col-span-1 items-end border-none hidden',
       defaultValue: false,
-      disabled: true // 🔒 Deshabilitar porque se calcula automáticamente
+      disabled: true
     },
     {
       name: 'parent_name',
@@ -148,7 +176,7 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       required: true,
       className: 'col-span-2',
       placeholder: 'Requerido si es menor de 18 años',
-      dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
+      dependsOn: { field: 'is_under_18', value: true }
     },
     {
       name: 'parent_cellphone_number',
@@ -156,8 +184,11 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       type: 'text',
       required: true,
       className: 'col-span-2',
-      placeholder: 'Requerido si es menor de 18 años',
-      dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
+      placeholder: '987654321',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 9,
+      dependsOn: { field: 'is_under_18', value: true },
     },
     {
       name: 'payment_recipe_url',
