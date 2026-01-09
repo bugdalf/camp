@@ -142,7 +142,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Comisión',
       type: 'select',
       required: false,
-      className: 'col-span-2',
+      className: 'col-span-1',
       options: [
         { label: 'Cocina', value: 'cocina' },
         { label: 'Limpieza', value: 'limpieza' },

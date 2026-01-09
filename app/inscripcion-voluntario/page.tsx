@@ -10,6 +10,7 @@ import { CopyIcon } from "lucide-react"
 import { toast } from "sonner"
 import { useVoluntariosStore } from "@/lib/store/voluntarios.store"
 import { AutovoluntarioForm } from "./autovoluntario-form"
+import Link from "next/link"
 
 const steps = [
   { id: 1, label: "Datos" },
@@ -26,7 +27,6 @@ export default function InscripcionVoluntarioPage() {
     toast.info("Número copiado al portapapeles");
   }
 
-
   const handleCreate = async (data: Record<string, any>) => {
     const valuesToCreate = {
       ...data,
@@ -42,9 +42,9 @@ export default function InscripcionVoluntarioPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 flex flex-col items-center gap-4 justify-center">
-      <figure className="mb-4">
+      <Link href="/" className="mb-4">
         <img src="/main-logo.png" alt="Campamento Desafío 2026" className="w-72 m-auto" />
-      </figure>
+      </Link>
       <h1 className="text-2xl font-bold mb-4">Inscripción -  Voluntario</h1>
       <Stepper steps={steps} currentStep={step} />
 

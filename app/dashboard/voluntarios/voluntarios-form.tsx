@@ -2,6 +2,7 @@
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
+import { Voluntario } from "@/shared/types/supabase.types";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
 import { z } from "zod";
 
@@ -70,7 +71,7 @@ const voluntariosFormSchema = z.object({
 
 interface VoluntariosFormProps {
   dialogHandlers: DialogHandlers;
-  onCreate: (data: Record<string, any>) => Promise<void>;
+  onCreate: (data: Record<string, any>) => Promise<Voluntario | null>;
   onEdit: (data: Record<string, any>, id: string) => Promise<void>;
 }
 
@@ -143,7 +144,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Comisión',
       type: 'select',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-1',
       options: [
         { label: 'Cocina', value: 'cocina' },
         { label: 'Limpieza', value: 'limpieza' },
