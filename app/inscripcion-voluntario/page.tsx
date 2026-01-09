@@ -2,10 +2,8 @@
 
 import { useState } from "react"
 import { Stepper } from "@/components/own/stepper"
-import { AutoinscripcionForm } from "../inscripcion-campista/autoinscripcion-form"
 import { RegistroCompletado } from "@/components/own/registro-completo"
-import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
-import { Inscripcion, Voluntario } from "@/shared/types/supabase.types"
+import { Voluntario } from "@/shared/types/supabase.types"
 import { CopyIcon } from "lucide-react"
 import { toast } from "sonner"
 import { useVoluntariosStore } from "@/lib/store/voluntarios.store"

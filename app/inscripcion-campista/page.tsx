@@ -25,7 +25,6 @@ export default function InscripcionCampistaPage() {
     toast.info("Número copiado al portapapeles");
   }
 
-
   const handleCreate = async (data: Record<string, any>) => {
     const valuesToCreate = {
       ...data,
