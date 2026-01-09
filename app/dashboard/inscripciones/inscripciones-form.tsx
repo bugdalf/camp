@@ -16,6 +16,19 @@ const inscripcionesFormSchema = z.object({
       message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
     }),
   age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
+  height: z
+    .union([z.number(), z.string()])
+    .transform((val) => {
+      if (typeof val === 'string') {
+        const numValue = parseInt(val.replace(/[^\d]/g, ''), 10);
+        return isNaN(numValue) ? null : numValue;
+      }
+      return val;
+    })
+    .refine((val) => val !== null && val >= 50 && val <= 250, {
+      message: 'La estatura debe estar entre 50cm y 250cm'
+    })
+    .transform((val) => val as number),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().min(9, 'Número inválido').optional(),
   payment_method: z.enum(['yape', 'efectivo']),
@@ -117,16 +130,24 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       required: true,
       className: 'col-span-1',
       placeholder: 'Ej: 25',
-      onChange: handleAgeChange // 🎯 Añadir handler
+      onChange: handleAgeChange
+    },
+    {
+      name: 'height',
+      label: 'Estatura en centimetros',
+      type: 'height', // 📏 Cambiar tipo a 'height'
+      required: true,
+      className: 'col-span-1',
+      placeholder: 'Ej: 170',
     },
     {
       name: 'is_under_18',
       label: '¿Es menor de 18 años?',
       type: 'checkbox',
       required: false,
-      className: 'col-span-1 items-end border-none',
+      className: 'col-span-1 items-end border-none hidden',
       defaultValue: false,
-      disabled: true // 🔒 Deshabilitar porque se calcula automáticamente
+      disabled: true
     },
     {
       name: 'parent_name',
@@ -135,7 +156,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       required: true,
       className: 'col-span-2',
       placeholder: 'Requerido si es menor de 18 años',
-      dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
+      dependsOn: { field: 'is_under_18', value: true }
     },
     {
       name: 'parent_cellphone_number',
@@ -144,7 +165,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       required: true,
       className: 'col-span-2',
       placeholder: 'Requerido si es menor de 18 años',
-      dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
+      dependsOn: { field: 'is_under_18', value: true }
     },
     {
       name: 'payment_method',

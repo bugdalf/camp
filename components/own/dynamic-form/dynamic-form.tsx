@@ -16,6 +16,7 @@ import FieldPassword from './fields/field-password'
 import FieldDatePicker from './fields/field-date-picker'
 import FieldColor from './fields/field-color'
 import FieldImage from './fields/field-image'
+import FieldHeight from './fields/field-height'
 
 export function DynamicForm({
   buttonLabel,
@@ -94,6 +95,8 @@ export function DynamicForm({
               return <FieldDatePicker fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'image':
               return <FieldImage fieldConfig={fieldConfig} formField={enhancedFormField} />
+            case 'height':
+              return <FieldHeight fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'email':
             case 'text':
             default:

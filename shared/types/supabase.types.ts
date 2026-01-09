@@ -14,6 +14,7 @@ export type Inscripcion = {
   is_active?: boolean;
   register_by?: string; // quien registro la inscripcion
   check_in?: boolean;
+  height?: number;
   created_at?: string;
   updated_at?: string;
 }

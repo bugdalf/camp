@@ -19,7 +19,8 @@ export type FieldType =
   | 'checkbox'
   | 'date'
   | 'color'
-  | 'image' // ⬅️ Nuevo tipo
+  | 'image'
+  | 'height'
 
 export interface FieldConfig {
   name: string

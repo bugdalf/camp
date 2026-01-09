@@ -66,8 +66,8 @@ export default function LandingPage() {
 
                 {/* CTA Section */}
                 <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-                  <p className="font-display text-xl md:text-2xl text-white">
-                    Cupos: {inscripcionesCount}/200
+                  <p className="font-display md:text-2xl text-white">
+                    Cupos Limitados: {inscripcionesCount}/200
                   </p>
                   <Link href="/inscripcion-campista">
                     <Button variant="cta" size="cta" className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
@@ -108,17 +108,6 @@ export default function LandingPage() {
                         alt={`${currentTeam.name} título`}
                         className="w-full h-full object-cover drop-shadow-2xl"
                       />
-
-                      {/* Brillo automático al aparecer */}
-                      {/* <div
-                        className="
-                          absolute inset-0
-                          bg-linear-to-r from-transparent via-white/30 to-transparent
-                          skew-x-12
-                          animate-shine
-                          pointer-events-none
-                        "
-                      /> */}
                     </figure>
                   </div>
                 )}
@@ -127,12 +116,11 @@ export default function LandingPage() {
           </div>
 
           {/* Grid de Equipos con animación */}
-
-          <TeamsGrid
+          {/* <TeamsGrid
             teams={teams}
             hoveredTeam={hoveredTeam}
             setHoveredTeam={setHoveredTeam}
-          />
+          /> */}
 
         </div>
       </section>

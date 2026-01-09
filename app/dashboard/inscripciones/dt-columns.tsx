@@ -182,6 +182,18 @@ export const columns: ColumnDef<Inscripcion>[] = [
     }
   },
   {
+    accessorKey: 'height',
+    header: 'Talla',
+    cell: ({ row }) => (
+      <div>
+        {row.original.height}cm
+      </div>
+    ),
+    meta: {
+      visible: false,
+    }
+  },
+  {
     accessorKey: 'created_at',
     header: 'Registrado',
     cell: ({ row }) => {

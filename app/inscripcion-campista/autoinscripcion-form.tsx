@@ -14,6 +14,19 @@ const autoinscripcionesFormSchema = z.object({
       message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
     }),
   age: z.number().min(1, 'La edad debe ser mayor a 0').max(120, 'Edad inválida'),
+  height: z
+    .union([z.number(), z.string()])
+    .transform((val) => {
+      if (typeof val === 'string') {
+        const numValue = parseInt(val.replace(/[^\d]/g, ''), 10);
+        return isNaN(numValue) ? null : numValue;
+      }
+      return val;
+    })
+    .refine((val) => val !== null && val >= 50 && val <= 250, {
+      message: 'La estatura debe estar entre 50 y 250 centimetros'
+    })
+    .transform((val) => val as number),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().min(9, 'Número inválido').optional(),
   payment_recipe_url: z
@@ -110,6 +123,14 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       className: 'col-span-1',
       placeholder: 'Ej: 25',
       onChange: handleAgeChange // 🎯 Añadir handler
+    },
+    {
+      name: 'height',
+      label: 'Estatura',
+      type: 'height',
+      required: true,
+      className: 'col-span-1',
+      placeholder: 'Ej: 170',
     },
     {
       name: 'is_under_18',

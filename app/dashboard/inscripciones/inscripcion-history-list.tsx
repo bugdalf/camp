@@ -57,6 +57,7 @@ export function InscripcionHistoryList({
       parent_name: 'Nombre del padre',
       parent_cellphone_number: 'Teléfono del padre',
       terms_accepted: 'Términos aceptados',
+      height: 'Talla',
       is_active: 'Estado de la inscripción',
     };
     return fieldNames[field] || field;
