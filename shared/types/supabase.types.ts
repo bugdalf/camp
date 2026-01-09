@@ -40,6 +40,16 @@ export type Voluntario = {
   updated_at?: string;
 }
 
+export type Precio = {
+  id?: string;
+  name?: string;
+  price?: number;
+  description?: string;
+  default?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE';
 
 export interface InscripcionAudit {
