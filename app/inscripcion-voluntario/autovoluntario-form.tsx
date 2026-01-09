@@ -31,7 +31,7 @@ const autovoluntarioFormSchema = z.object({
         invalid_type_error: 'La edad debe ser un número válido'
       })
         .min(14, 'La edad mínima es de 14 años')
-        .max(120, 'La edad no puede superar 120 años')
+        .max(80, 'La edad no puede superar 30 años')
     ),
   commission: z.enum(['cocina', 'limpieza', 'produccion']),
   is_under_18: z.boolean().default(false),
@@ -51,7 +51,7 @@ const autovoluntarioFormSchema = z.object({
       message: 'El comprobante de pago es obligatorio',
     }),
   parent_name: z.string().optional(),
-  parent_cellphone_number: z.string().optional(),
+  parent_cellphone_number: z.string().min(9, 'Número inválido').optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
@@ -104,7 +104,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       type: 'text',
       required: true,
       className: 'col-span-2',
-      placeholder: 'Ingresa el nombre completo del voluntario'
+      placeholder: 'Ingresa el nombre completo'
     },
     {
       name: 'dni',
@@ -112,7 +112,10 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       type: 'text',
       required: true,
       className: 'col-span-1',
-      placeholder: 'Ingresa tu DNI'
+      placeholder: 'Ingresa tu DNI',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 8,
     },
     {
       name: 'cellphone_number',
@@ -120,7 +123,19 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       type: 'text',
       required: false,
       className: 'col-span-1',
-      placeholder: '987654321'
+      placeholder: '987654321',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 9,
+    },
+    {
+      name: 'age',
+      label: 'Edad',
+      type: 'integer',
+      required: true,
+      className: 'col-span-1',
+      placeholder: 'Ej: 25',
+      onChange: handleAgeChange // 🎯 Añadir handler
     },
     {
       name: 'commission',
@@ -135,20 +150,11 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       ]
     },
     {
-      name: 'age',
-      label: 'Edad',
-      type: 'integer',
-      required: true,
-      className: 'col-span-1',
-      placeholder: 'Ej: 25',
-      onChange: handleAgeChange // 🎯 Añadir handler
-    },
-    {
       name: 'is_under_18',
       label: '¿Es menor de 18 años?',
       type: 'checkbox',
       required: false,
-      className: 'col-span-1 items-end border-none',
+      className: 'col-span-1 items-end border-none hidden',
       defaultValue: false,
       disabled: true // 🔒 Deshabilitar porque se calcula automáticamente
     },
@@ -167,8 +173,11 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       type: 'text',
       required: true,
       className: 'col-span-2',
-      placeholder: 'Requerido si es menor de 18 años',
-      dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
+      placeholder: '987654321',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 9,
+      dependsOn: { field: 'is_under_18', value: true },
     },
     {
       name: 'payment_recipe_url',

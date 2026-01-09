@@ -58,7 +58,7 @@ const inscripcionesFormSchema = z.object({
   ]).optional(),
   payment_checked: z.boolean().default(false),
   parent_name: z.string().optional(),
-  parent_cellphone_number: z.string().optional(),
+  parent_cellphone_number: z.string().min(9, 'Número inválido').optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
