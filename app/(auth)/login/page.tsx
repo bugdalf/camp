@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      router.push("/dashboard/inscripciones")
+      router.push("/dashboard/")
     }
   }, [user, router])
 
