@@ -2,9 +2,11 @@
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
 import { useAuthStore } from "@/lib/store/auth.store";
+import { usePreciosStore } from "@/lib/store/precios.store";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
 import { Inscripcion } from "@/shared/types/supabase.types";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
+import { useMemo } from "react";
 import { z } from "zod";
 
 const inscripcionesFormSchema = z.object({
@@ -18,9 +20,7 @@ const inscripcionesFormSchema = z.object({
   age: z
     .union([z.number(), z.string()])
     .transform((val) => {
-      // Si es string, convertir a número
       if (typeof val === 'string') {
-        // Si está vacío, retornar null
         if (val.trim() === '') return null;
         const numValue = parseInt(val, 10);
         return isNaN(numValue) ? null : numValue;
@@ -32,36 +32,49 @@ const inscripcionesFormSchema = z.object({
         required_error: 'La edad es requerida',
         invalid_type_error: 'La edad debe ser un número válido'
       })
+        .int('La edad debe ser un número entero')
         .min(14, 'La edad mínima es de 14 años')
         .max(30, 'La edad no puede superar 30 años')
     ),
   height: z
-    .union([z.number(), z.string()])
+    .union([z.number(), z.string(), z.bigint()])
     .transform((val) => {
       if (typeof val === 'string') {
+        if (val.trim() === '') return null;
         const numValue = parseInt(val.replace(/[^\d]/g, ''), 10);
         return isNaN(numValue) ? null : numValue;
       }
+      if (typeof val === 'bigint') {
+        return Number(val);
+      }
       return val;
     })
-    .refine((val) => val !== null && val >= 50 && val <= 250, {
-      message: 'La estatura debe estar entre 50cm y 250cm'
-    })
-    .transform((val) => val as number),
+    .pipe(
+      z.number({
+        required_error: 'La estatura es requerida',
+        invalid_type_error: 'La estatura debe ser un número válido'
+      })
+        .int('La estatura debe ser un número entero')
+        .min(50, 'La estatura debe estar entre 50cm y 250cm')
+        .max(250, 'La estatura debe estar entre 50cm y 250cm')
+    ),
   is_under_18: z.boolean().default(false),
-  cellphone_number: z.string().min(9, 'Número inválido').optional(),
-  payment_method: z.enum(['yape', 'efectivo']),
-  payment_recipe_url: z.union([
-    z.instanceof(File),
-    z.string(),
-    z.undefined()
-  ]).optional(),
-  payment_checked: z.boolean().default(false),
-  parent_name: z.string().optional(),
-  parent_cellphone_number: z.string().min(9, 'Número inválido').optional(),
+  cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+  // payment_method: z.enum(['yape', 'efectivo']),
+  // payment_recipe_url: z.union([
+  //   z.instanceof(File),
+  //   z.string(),
+  //   z.null(),
+  //   z.undefined()
+  // ]).optional().nullable(),
+  // payment_checked: z.boolean().default(false),
+  parent_name: z.string().optional().nullable().transform(val => val || undefined),
+  parent_cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
+  // Campos opcionales que pueden venir de la BD pero no se editan directamente
+  price_id: z.string().uuid().optional().nullable(),
 }).superRefine((data, ctx) => {
   // Validar campos del padre si es menor de 18
   if (data.is_under_18) {
@@ -78,7 +91,22 @@ const inscripcionesFormSchema = z.object({
         message: 'El número del padre/tutor es requerido para menores de 18 años',
         path: ['parent_cellphone_number'],
       });
+    } else if (data.parent_cellphone_number.length < 9) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'El número del padre/tutor debe tener al menos 9 dígitos',
+        path: ['parent_cellphone_number'],
+      });
     }
+  }
+
+  // Validar cellphone_number si está presente
+  if (data.cellphone_number && data.cellphone_number.length > 0 && data.cellphone_number.length < 9) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'El número de celular debe tener al menos 9 dígitos',
+      path: ['cellphone_number'],
+    });
   }
 });
 
@@ -90,18 +118,29 @@ interface InscripcionesFormProps {
 
 export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: InscripcionesFormProps) {
   const { user } = useAuthStore();
+  const { precios } = usePreciosStore();
+
+  const preciosOptions = useMemo(() => {
+    return precios.map((precio) => ({
+      label: `${precio.name} - S/ ${precio.price}` || '',
+      value: precio.id || '',
+    }));
+  }, [precios]);
+
+  const precioDefault = useMemo(() => {
+    return precios.find((precio) => precio.default);
+  }, [precios]);
+
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
     const valuesToCreate = {
       ...values,
       register_by: user?.email
     }
     await onCreate(valuesToCreate);
-    dialogHandlers.setOpenDialog(false);
   }
 
   const handleEdit = async (values: Record<string, any>): Promise<void> => {
     await onEdit(values, dialogHandlers.selectedItem.id);
-    dialogHandlers.setOpenDialog(false);
   }
 
   // 🎯 Función para manejar cambio de edad
@@ -159,7 +198,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
     },
     {
       name: 'height',
-      label: 'Estatura',
+      label: 'Estatura (cm)',
       type: 'height',
       required: true,
       className: 'col-span-1',
@@ -199,33 +238,42 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       dependsOn: { field: 'is_under_18', value: true },
     },
     {
-      name: 'payment_method',
-      label: 'Método de pago',
+      name: 'price_id',
+      label: 'Precio',
       type: 'select',
-      required: true,
-      className: 'col-span-2',
-      options: [
-        { label: 'Yape', value: 'yape' },
-        { label: 'Efectivo', value: 'efectivo' }
-      ]
-    },
-    {
-      name: 'payment_recipe_url',
-      label: 'Comprobante de pago (imagen)',
-      type: 'image',
       required: false,
       className: 'col-span-2',
-      accept: 'image/*',
-      helpText: 'Sube una captura de tu comprobante de pago'
+      options: preciosOptions,
+      defaultValue: precioDefault?.id,
     },
-    {
-      name: 'payment_checked',
-      label: 'Pago verificado (solo admin)',
-      type: 'checkbox',
-      required: false,
-      className: 'col-span-2',
-      defaultValue: false
-    },
+    // {
+    //   name: 'payment_method',
+    //   label: 'Método de pago',
+    //   type: 'select',
+    //   required: true,
+    //   className: 'col-span-2',
+    //   options: [
+    //     { label: 'Yape', value: 'yape' },
+    //     { label: 'Efectivo', value: 'efectivo' }
+    //   ]
+    // },
+    // {
+    //   name: 'payment_recipe_url',
+    //   label: 'Comprobante de pago (imagen)',
+    //   type: 'image',
+    //   required: false,
+    //   className: 'col-span-2',
+    //   accept: 'image/*',
+    //   helpText: 'Sube una captura de tu comprobante de pago'
+    // },
+    // {
+    //   name: 'payment_checked',
+    //   label: 'Pago verificado (solo admin)',
+    //   type: 'checkbox',
+    //   required: false,
+    //   className: 'col-span-2',
+    //   defaultValue: false
+    // },
     {
       name: 'terms_accepted',
       label: 'Acepto los términos y condiciones',

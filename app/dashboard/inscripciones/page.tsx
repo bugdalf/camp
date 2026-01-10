@@ -13,6 +13,8 @@ import { BanIcon, EyeIcon, Link2Icon, PlusIcon } from "lucide-react";
 import { Inscripcion } from "@/shared/types/supabase.types";
 import { InscripcionHistoryList } from "./inscripcion-history-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { usePreciosStore } from "@/lib/store/precios.store";
+import PagosTable from "./pagos/pagos-table";
 
 function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
@@ -35,9 +37,11 @@ function useDialogHandlers(): DialogHandlers {
 export default function InscripcionesPage() {
   const dialogHandlers = useDialogHandlers();
   const { inscripciones, fetchInscripciones, createInscripcion, updateInscripcion, deleteSoftInscripcion } = useInscripcionesStore();
+  const { fetchPrecios } = usePreciosStore();
 
   useEffect(() => {
     fetchInscripciones();
+    fetchPrecios();
   }, []);
 
   const extraActionsBuilder = (voluntario: Inscripcion) => {
@@ -109,10 +113,20 @@ export default function InscripcionesPage() {
         <Tabs defaultValue="form" className="w-lg overflow-auto">
           <TabsList className="w-full">
             <TabsTrigger value="form">Formulario</TabsTrigger>
+            <TabsTrigger value="pagos">Pagos</TabsTrigger>
             <TabsTrigger value="history">Historial</TabsTrigger>
           </TabsList>
           <TabsContent value="form" className="w-full overflow-auto">
             <InscripcionesForm dialogHandlers={dialogHandlers} onCreate={createInscripcion} onEdit={updateInscripcion} />
+          </TabsContent>
+          <TabsContent value="pagos" className="w-full overflow-auto">
+            {dialogHandlers.selectedItem ? (
+              <PagosTable inscripcion={dialogHandlers.selectedItem} />
+            ) : (
+              <p className="text-center py-10 text-gray-500">
+                Una vez inscrito un campista, puedes ver sus pagos aquí
+              </p>
+            )}
           </TabsContent>
           <TabsContent value="history" className="w-full overflow-auto">
             {dialogHandlers.selectedItem ? (

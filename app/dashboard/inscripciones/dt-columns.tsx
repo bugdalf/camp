@@ -51,7 +51,10 @@ export const columns: ColumnDef<Inscripcion>[] = [
       <div>
         {row.original.age} años
       </div>
-    )
+    ),
+    meta: {
+      visible: false
+    }
   },
   {
     accessorKey: 'dni',
@@ -80,6 +83,15 @@ export const columns: ColumnDef<Inscripcion>[] = [
     meta: {
       visible: false,
     }
+  },
+  {
+    accessorKey: 'price_id',
+    header: 'Precio',
+    cell: ({ row }) => (
+      <div>
+        S/ {row.original.price_amount} - {row.original.price_name}
+      </div>
+    )
   },
   {
     accessorKey: 'payment_method',
