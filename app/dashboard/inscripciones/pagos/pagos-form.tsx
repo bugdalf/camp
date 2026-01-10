@@ -21,7 +21,7 @@ interface PagosFormProps {
   dialogHandlers: DialogHandlers;
   selectedInscripcion: Inscripcion | null;
   onCreate: (data: Record<string, any>, inscripcionId?: string) => Promise<void>;
-  onEdit: (data: Record<string, any>, id: string) => Promise<void>;
+  onEdit: (data: Record<string, any>, paymentId: string, inscripcionId?: string) => Promise<void>;
 }
 
 export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdit }: PagosFormProps) {
@@ -31,7 +31,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
   }
 
   const handleEdit = async (values: Record<string, any>): Promise<void> => {
-    await onEdit(values, dialogHandlers.selectedItem.id);
+    await onEdit(values, dialogHandlers.selectedItem.id, selectedInscripcion?.id);
     dialogHandlers.setOpenDialog(false);
   }
 

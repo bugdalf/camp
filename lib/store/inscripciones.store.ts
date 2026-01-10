@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import { toast } from "sonner"
+import { v4 as uuidv4 } from 'uuid';
 import { createClient } from "../supabase/client"
 import { Inscripcion } from "@/shared/types/supabase.types";
 import { usePreciosStore } from "./precios.store";
@@ -19,7 +20,6 @@ const uploadPaymentRecipe = async (file: File): Promise<string | null> => {
       .upload(filePath, file);
 
     if (uploadError) {
-      console.error('Error al subir imagen:', uploadError);
       toast.error('No se pudo subir el comprobante');
       return null;
     }
@@ -61,6 +61,9 @@ const deletePaymentRecipe = async (url: string): Promise<void> => {
 type InscripcionesStore = {
   inscripciones: Inscripcion[]
 
+  selectedInscripcion: Inscripcion | null
+  setSelectedInscripcion: (inscripcion: Inscripcion | null) => void
+
   fetchInscripciones: () => Promise<void>
   fetchInscripcionesCount: () => Promise<number>
   fetchInscripcionById: (id: string) => Promise<Inscripcion | null>
@@ -73,8 +76,8 @@ type InscripcionesStore = {
 
   //payments actions
   createPayment: (values: Record<string, any>, inscripcionId?: string) => Promise<void>
-  updatePayment: (values: Record<string, any>, id: string) => Promise<void>
-  deletePayment: (id: string) => Promise<void>
+  updatePayment: (values: Record<string, any>, paymentId: string, inscripcionId?: string) => Promise<void>
+  deletePayment: (paymentId: string, inscripcionId?: string) => Promise<void>
 
   subscribeToInscripciones: () => void
   unsubscribeFromInscripciones: () => void
@@ -82,6 +85,8 @@ type InscripcionesStore = {
 
 export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
   inscripciones: [],
+  selectedInscripcion: null,
+  setSelectedInscripcion: (inscripcion: Inscripcion | null) => set({ selectedInscripcion: inscripcion }),
 
   fetchInscripcionesCount: async () => {
     try {
@@ -133,7 +138,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
   },
 
   createInscripcion: async (values) => {
-    console.log(values)
     try {
       let paymentRecipeUrl = values.payment_recipe_url;
 
@@ -193,6 +197,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       if (data && !inscripcionesChannel) {
         toast.success('Inscripción creada correctamente');
         set({ inscripciones: [data, ...get().inscripciones] });
+        set({ selectedInscripcion: data });
         return data;
       }
     } catch (error) {
@@ -337,7 +342,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         });
       }
     } catch (error) {
-      console.error('Error al cancelar inscripción:', error);
       toast.error('La inscripción no se pudo cancelar');
     }
   },
@@ -363,7 +367,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
 
         if (fetchError || !inscripcionDb) {
           toast.error('Inscripción no encontrada');
-          console.error('Error al buscar inscripción:', fetchError);
+
           return;
         }
 
@@ -412,7 +416,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       return data;
 
     } catch (error) {
-      console.error('Error al realizar check-in:', error);
       toast.error(
         error instanceof Error
           ? `Error: ${error.message}`
@@ -422,9 +425,8 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
     }
   },
 
-  // crear un pago para un inscripcion
-  // luego manejar las imagenes
   createPayment: async (values: any, inscripcionId?: string) => {
+    // crear el reciepment si hubiere
     try {
       if (!inscripcionId) {
         toast.error('No se proporcionó una inscripción');
@@ -438,7 +440,11 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       }
 
       const payments = inscripcion.payments || [];
-      const newPayments = [...payments, values];
+      const newPayment = {
+        id: uuidv4(),
+        ...values,
+      };
+      const newPayments = [...payments, newPayment];
 
       const { data, error } = await supabase
         .from('inscripciones')
@@ -455,21 +461,79 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         set({
           inscripciones: get().inscripciones.map(
             inscripcion => inscripcion.id === inscripcionId ? data : inscripcion
-          )
+          ),
+          selectedInscripcion: data,
         });
         toast.success('Pago creado correctamente');
 
       }
     } catch (error) {
-      console.error('Error al crear pago:', error);
       toast.error('El pago no se pudo crear');
     }
   },
 
-  updatePayment: async (values: any, id: string) => {
+  updatePayment: async (values: any, paymentId: string, inscripcionId?: string) => {
+    // eliminar ell reciepment anterior si hubiere y subir el nuevo si hubiere
+    try {
+      if (!inscripcionId) {
+        toast.error('No se proporcionó una inscripción');
+        return;
+      }
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .update({
+          payments: get().inscripciones.find(i => i.id === inscripcionId)?.payments?.map(p => p.id === paymentId ? values : p),
+        })
+        .eq('id', inscripcionId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        set({
+          inscripciones: get().inscripciones.map(
+            inscripcion => inscripcion.id === inscripcionId ? data : inscripcion
+          ),
+          selectedInscripcion: data,
+        });
+        toast.success('Pago actualizado correctamente');
+      }
+    } catch (error) {
+      toast.error('El pago no se pudo actualizar');
+    }
   },
 
-  deletePayment: async (id: string) => {
+  deletePayment: async (paymentId: string, inscripcionId?: string) => {
+    // eliminar el reciepment si hubiere
+    try {
+      if (!inscripcionId) {
+        toast.error('No se proporcionó una inscripción');
+        return;
+      }
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .update({
+          payments: get().inscripciones.find(i => i.id === inscripcionId)?.payments?.filter(p => p.id !== paymentId),
+        })
+        .eq('id', inscripcionId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        set({
+          inscripciones: get().inscripciones.map(
+            inscripcion => inscripcion.id === inscripcionId ? data : inscripcion
+          ),
+          selectedInscripcion: data,
+        });
+        toast.success('Pago eliminado correctamente');
+      }
+    } catch (error) {
+      toast.error('El pago no se pudo eliminar');
+    }
   },
 
   subscribeToInscripciones: () => {

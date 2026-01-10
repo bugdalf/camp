@@ -30,20 +30,14 @@ function useDialogHandlers(): DialogHandlers {
 
 export default function PagosTable({ inscripcion }: { inscripcion: Inscripcion }) {
   const dialogHandlers = useDialogHandlers();
-  const [selectedInscripcion, setSelectedInscripcion] = useState<Inscripcion | null>(null);
   const { createPayment, updatePayment, deletePayment } = useInscripcionesStore();
-
-  useEffect(() => {
-    console.log(inscripcion);
-    setSelectedInscripcion(inscripcion);
-  }, [inscripcion]);
 
   return (
     <div className="h-full flex flex-col overflow-auto">
       <h2 className="text-lg font-bold">Pagos registrados</h2>
       <DataTable
         columns={columns}
-        data={selectedInscripcion?.payments || []}
+        data={inscripcion?.payments || []}
         entity=""
         dialogHandlers={dialogHandlers}
       />
@@ -52,13 +46,13 @@ export default function PagosTable({ inscripcion }: { inscripcion: Inscripcion }
         setOpenDialog={dialogHandlers.setOpenDialog}
         title="Nuevo Precio"
       >
-        <PagosForm dialogHandlers={dialogHandlers} selectedInscripcion={selectedInscripcion} onCreate={createPayment} onEdit={updatePayment} />
+        <PagosForm dialogHandlers={dialogHandlers} selectedInscripcion={inscripcion} onCreate={createPayment} onEdit={updatePayment} />
       </GenericDialog>
       <DeleteDialog
         openDeleteDialog={dialogHandlers.openDialogDelete}
         setOpenDeleteDialog={dialogHandlers.setOpenDialogDelete}
         selectedItem={dialogHandlers.selectedItem}
-        action={deletePayment}
+        action={(paymentId: string) => deletePayment(paymentId, inscripcion.id)}
       />
     </div>
   )

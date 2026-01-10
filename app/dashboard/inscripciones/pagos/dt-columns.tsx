@@ -1,11 +1,11 @@
-import { Payment, Precio } from "@/shared/types/supabase.types";
+import { Pago, Precio } from "@/shared/types/supabase.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { ExternalLink } from "lucide-react";
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Pago>[] = [
   {
     accessorKey: 'payment_amount',
     header: 'Monto',

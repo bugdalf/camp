@@ -36,13 +36,19 @@ function useDialogHandlers(): DialogHandlers {
 
 export default function InscripcionesPage() {
   const dialogHandlers = useDialogHandlers();
-  const { inscripciones, fetchInscripciones, createInscripcion, updateInscripcion, deleteSoftInscripcion } = useInscripcionesStore();
+  const { inscripciones, fetchInscripciones, createInscripcion, updateInscripcion, deleteSoftInscripcion, selectedInscripcion, setSelectedInscripcion } = useInscripcionesStore();
   const { fetchPrecios } = usePreciosStore();
 
   useEffect(() => {
     fetchInscripciones();
     fetchPrecios();
   }, []);
+
+  useEffect(() => {
+    //selectedItem solo cambia cuando se selecciona un item de la tabla y da inicio a selectedInscription
+    // al crear o editar un item de la tabla se actualiza selectedInscripcion en el store por cada accion
+    setSelectedInscripcion(dialogHandlers.selectedItem);
+  }, [dialogHandlers.selectedItem]);
 
   const extraActionsBuilder = (voluntario: Inscripcion) => {
     const extraActions: ExtraAction[] = [
@@ -120,8 +126,8 @@ export default function InscripcionesPage() {
             <InscripcionesForm dialogHandlers={dialogHandlers} onCreate={createInscripcion} onEdit={updateInscripcion} />
           </TabsContent>
           <TabsContent value="pagos" className="w-full overflow-auto">
-            {dialogHandlers.selectedItem ? (
-              <PagosTable inscripcion={dialogHandlers.selectedItem} />
+            {selectedInscripcion ? (
+              <PagosTable inscripcion={selectedInscripcion} />
             ) : (
               <p className="text-center py-10 text-gray-500">
                 Una vez inscrito un campista, puedes ver sus pagos aquí

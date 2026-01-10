@@ -9,7 +9,7 @@ export type Inscripcion = {
   price_id?: string;
   price_amount?: number;
   price_name?: string;
-  payments?: Payment[];
+  payments?: Pago[];
   payment_completed?: boolean;
 
   payment_method?: 'yape' | 'efectivo';
@@ -59,7 +59,8 @@ export type Precio = {
 }
 
 // este es el json
-export type Payment = {
+export type Pago = {
+  id?: string;
   payment_amount?: number;
   payment_method?: 'yape' | 'efectivo';
   payment_recipe_url?: string;

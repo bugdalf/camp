@@ -32,7 +32,7 @@ export default function DeleteDialog({ openDeleteDialog, setOpenDeleteDialog, se
         <AlertDialogHeader>
           <AlertDialogTitle>{customAction || "Eliminar"}</AlertDialogTitle>
           <AlertDialogDescription>
-            ¿Esta seguro de realizar la acción para {selectedItem?.name}?
+            ¿Esta seguro de realizar la acción para {selectedItem?.name || selectedItem?.payment_amount || selectedItem?.title || selectedItem?.description}?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
