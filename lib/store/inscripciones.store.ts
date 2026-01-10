@@ -2,6 +2,7 @@ import { create } from "zustand"
 import { toast } from "sonner"
 import { createClient } from "../supabase/client"
 import { Inscripcion } from "@/shared/types/supabase.types";
+import { usePreciosStore } from "./precios.store";
 
 let inscripcionesChannel: ReturnType<typeof supabase.channel> | null = null
 const supabase = createClient();
@@ -70,6 +71,11 @@ type InscripcionesStore = {
 
   handleCheckInInscripcion: (id: string) => Promise<void>
 
+  //payments actions
+  createPayment: (values: Record<string, any>, inscripcionId?: string) => Promise<void>
+  updatePayment: (values: Record<string, any>, id: string) => Promise<void>
+  deletePayment: (id: string) => Promise<void>
+
   subscribeToInscripciones: () => void
   unsubscribeFromInscripciones: () => void
 }
@@ -127,6 +133,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
   },
 
   createInscripcion: async (values) => {
+    console.log(values)
     try {
       let paymentRecipeUrl = values.payment_recipe_url;
 
@@ -138,6 +145,14 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         }
       }
 
+      const precios = usePreciosStore.getState().precios;
+      const precio = precios.find(p => p.id === values.price_id);
+
+      if (!precio) {
+        toast.error('El precio no existe');
+        return;
+      }
+
       // 📝 Preparar datos para insertar
       const inscripcionData: Partial<Inscripcion> = {
         name: values.name,
@@ -146,6 +161,9 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         height: values.height,
         is_under_18: values.is_under_18 || false,
         cellphone_number: values.cellphone_number || null,
+        price_id: precio.id,
+        price_name: precio.name,
+        price_amount: precio.price,
         payment_method: values.payment_method,
         payment_recipe_url: paymentRecipeUrl || null,
         payment_checked: values.payment_checked || false,
@@ -201,6 +219,14 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         }
       }
 
+      const precios = usePreciosStore.getState().precios;
+      const precio = precios.find(p => p.id === values.price_id);
+
+      if (!precio) {
+        toast.error('El precio no existe');
+        return;
+      }
+
       // 📝 Preparar datos para actualizar
       const inscripcionData: Partial<Inscripcion> = {
         name: values.name,
@@ -209,6 +235,9 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         height: values.height,
         is_under_18: values.is_under_18 || false,
         cellphone_number: values.cellphone_number || null,
+        price_id: precio.id,
+        price_name: precio.name,
+        price_amount: precio.price,
         payment_method: values.payment_method,
         payment_recipe_url: paymentRecipeUrl || null,
         payment_checked: values.payment_checked || false,
@@ -391,6 +420,56 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       );
       throw error;
     }
+  },
+
+  // crear un pago para un inscripcion
+  // luego manejar las imagenes
+  createPayment: async (values: any, inscripcionId?: string) => {
+    try {
+      if (!inscripcionId) {
+        toast.error('No se proporcionó una inscripción');
+        return;
+      }
+      // prepare
+      const inscripcion = get().inscripciones.find(i => i.id === inscripcionId);
+      if (!inscripcion) {
+        toast.error('Inscripción no encontrada');
+        return;
+      }
+
+      const payments = inscripcion.payments || [];
+      const newPayments = [...payments, values];
+
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .update({
+          payments: newPayments,
+        })
+        .eq('id', inscripcionId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        set({
+          inscripciones: get().inscripciones.map(
+            inscripcion => inscripcion.id === inscripcionId ? data : inscripcion
+          )
+        });
+        toast.success('Pago creado correctamente');
+
+      }
+    } catch (error) {
+      console.error('Error al crear pago:', error);
+      toast.error('El pago no se pudo crear');
+    }
+  },
+
+  updatePayment: async (values: any, id: string) => {
+  },
+
+  deletePayment: async (id: string) => {
   },
 
   subscribeToInscripciones: () => {
