@@ -65,7 +65,10 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
           .max(250, 'La estatura debe estar entre 50cm y 250cm')
       ),
     is_under_18: z.boolean().default(false),
-    cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+    cellphone_number: z
+      .string()
+      .min(1, "El número de celular es requerido")
+      .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
     payment_amount: z
       .union([z.number(), z.string()])
       .transform((val) => {
@@ -103,7 +106,10 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
         message: 'El comprobante de pago es obligatorio',
       }),
     parent_name: z.string().optional().nullable().transform(val => val || undefined),
-    parent_cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+    parent_cellphone_number: z
+      .string()
+      .min(1, "El número de celular es requerido")
+      .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
     terms_accepted: z.boolean().refine(val => val === true, {
       message: 'Debes aceptar los términos y condiciones'
     }),

@@ -59,9 +59,15 @@ const inscripcionesFormSchema = z.object({
         .max(250, 'La estatura debe estar entre 50cm y 250cm')
     ),
   is_under_18: z.boolean().default(false),
-  cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+  cellphone_number: z
+    .string()
+    .min(1, "El número de celular es requerido")
+    .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
   parent_name: z.string().optional().nullable().transform(val => val || undefined),
-  parent_cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+  parent_cellphone_number: z
+    .string()
+    .min(1, "El número de celular es requerido")
+    .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
@@ -175,7 +181,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       name: 'cellphone_number',
       label: 'Número de celular',
       type: 'text',
-      required: false,
+      required: true,
       className: 'col-span-1',
       placeholder: '987654321',
       inputMode: 'numeric',

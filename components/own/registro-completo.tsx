@@ -1,4 +1,4 @@
-import { CheckCircle } from "lucide-react"
+import { CheckCircle, TicketIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Inscripcion } from "@/shared/types/supabase.types"
 
@@ -34,12 +34,12 @@ export function RegistroCompletado({ onReset, inscription, type }: RegistroCompl
       <div>
         <p>En el siguiente enlace podras ver tu {type === 'campista' ? 'inscripción' : 'registro'} con el estado de tu pago, guarda el enlace o tomale una captura de pantalla</p>
         <Button variant="outline" onClick={handleOpenInscription}>
-          Ver {type === 'campista' ? 'inscripción' : 'registro'} - {inscription?.name}
+          <TicketIcon /> Ver ticket - {inscription?.name}
         </Button>
       </div>
 
       {onReset && (
-        <Button variant="outline" onClick={onReset}>
+        <Button variant="link" onClick={onReset}>
           Registrar otra persona
         </Button>
       )}

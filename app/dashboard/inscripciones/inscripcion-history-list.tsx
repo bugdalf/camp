@@ -1,6 +1,7 @@
 'use client';
 
 import { useInscripcionAudit } from '@/lib/hooks/use-inscripcion-audit';
+import { Pago } from '@/shared/types/supabase.types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -51,16 +52,78 @@ export function InscripcionHistoryList({
       check_in: 'Check-in',
       is_under_18: 'Es menor de 18',
       cellphone_number: 'Teléfono',
-      parent_name: 'Nombre del padre',
-      parent_cellphone_number: 'Teléfono del padre',
+      parent_name: 'Nombre del padre/tutor',
+      parent_cellphone_number: 'Teléfono del padre/tutor',
       terms_accepted: 'Términos aceptados',
       height: 'Talla',
-      is_active: 'Estado de la inscripción',
+      is_active: 'Estado activo',
+      payments: 'Pagos',
+      price_id: 'ID del precio',
+      price_amount: 'Monto del precio',
+      price_name: 'Nombre del precio',
+      payment_completed: 'Pago completado',
+      register_by: 'Registrado por',
     };
     return fieldNames[field] || field;
   };
 
-  const formatValue = (value: unknown) => {
+  const formatPaymentMethod = (method: string) => {
+    const methods: Record<string, string> = {
+      yape: 'Yape',
+      plin: 'Plin',
+      cash: 'Efectivo',
+      transfer: 'Transferencia',
+      card: 'Tarjeta',
+    };
+    return methods[method] || method;
+  };
+
+  const formatPayments = (payments: Pago[] | null | undefined) => {
+    if (!payments || payments.length === 0) {
+      return '(sin pagos)';
+    }
+
+    return payments.map((p, idx) => (
+      <div key={idx} className="border-l-2 border-blue-300 pl-3 py-1 space-y-1">
+        <p className="text-sm">
+          <span className="font-medium">Monto:</span> S/ {p.payment_amount?.toFixed(2) ?? '0.00'}
+        </p>
+        <p className="text-sm">
+          <span className="font-medium">Método:</span> {formatPaymentMethod(p.payment_method ?? '')}
+        </p>
+        <p className="text-sm">
+          <span className="font-medium">Verificado:</span> {p.payment_checked ? '✓ Sí' : '✗ No'}
+        </p>
+        {p.payment_recipe_url && (
+          <a
+            href={p.payment_recipe_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 hover:text-blue-800 underline inline-block"
+          >
+            Ver comprobante →
+          </a>
+        )}
+      </div>
+    ));
+  };
+
+  const formatValue = (field: string, value: unknown) => {
+    // Manejo especial para payments
+    if (field === 'payments') {
+      return formatPayments(value as Pago[] | null | undefined);
+    }
+
+    // Manejo especial para payment_completed
+    if (field === 'payment_completed') {
+      return value ? '✓ Completado' : '✗ Pendiente';
+    }
+
+    // Manejo especial para price_amount
+    if (field === 'price_amount' && typeof value === 'number') {
+      return `S/ ${value.toFixed(2)}`;
+    }
+
     if (typeof value === 'boolean') {
       return value ? 'Sí' : 'No';
     }
@@ -70,6 +133,27 @@ export function InscripcionHistoryList({
     }
 
     return String(value);
+  };
+
+  const renderFieldValue = (field: string, value: unknown, label: string) => {
+    if (field === 'payments') {
+      const payments = value as Pago[] | null | undefined;
+      if (!payments || payments.length === 0) {
+        return <p className="text-slate-400">{label} (sin pagos)</p>;
+      }
+      return (
+        <div className="space-y-2">
+          <p className="font-medium text-sm">{label}</p>
+          {formatPayments(payments)}
+        </div>
+      );
+    }
+
+    return (
+      <p className={value === undefined ? 'text-slate-400' : ''}>
+        <span className="font-medium">{label}</span> {formatValue(field, value)}
+      </p>
+    );
   };
 
   return (
@@ -135,40 +219,31 @@ export function InscripcionHistoryList({
                     <p className="text-xs font-semibold text-gray-600 uppercase">
                       Campos modificados
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                       {(log.changed_fields ?? []).map((field) => {
                         const oldValue = log.old_data?.[field];
                         const newValue = log.new_data?.[field];
+                        const isPayments = field === 'payments';
 
                         return (
                           <div
                             key={field}
-                            className="rounded-md bg-gray-50 p-3 text-sm"
+                            className={`rounded-md bg-gray-50 p-3 text-sm ${isPayments ? 'md:col-span-2' : ''}`}
                           >
-                            <p className="font-medium text-gray-700 mb-1">
+                            <p className="font-medium text-gray-700 mb-2">
                               {formatFieldName(field)}
                             </p>
 
-                            {oldValue !== undefined && (
-                              <p className="text-slate-400">
-                                <span className="font-medium">Antes:</span>{' '}
-                                {formatValue(oldValue)}
-                              </p>
-                            )}
-
-                            {newValue !== undefined && (
-                              <p>
-                                <span className="font-medium">Actual:</span>{' '}
-                                {formatValue(newValue)}
-                              </p>
-                            )}
+                            <div className="space-y-3">
+                              {oldValue !== undefined && renderFieldValue(field, oldValue, 'Antes:')}
+                              {newValue !== undefined && renderFieldValue(field, newValue, 'Actual:')}
+                            </div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
                 )}
-
 
                 {/* INSERT / DELETE payload */}
                 {log.action === 'INSERT' && log.new_data && (

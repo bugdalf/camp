@@ -9,7 +9,7 @@ import DeleteDialog from "@/components/own/generic-dialog/delete-dialog";
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store";
 import { InscripcionesForm } from "./inscripciones-form";
 import { toast } from "sonner";
-import { BanIcon, EyeIcon, Link2Icon, PlusIcon } from "lucide-react";
+import { BanIcon, EyeIcon, PlusIcon, SendIcon } from "lucide-react";
 import { Inscripcion } from "@/shared/types/supabase.types";
 import { InscripcionHistoryList } from "./inscripcion-history-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -56,14 +56,28 @@ export default function InscripcionesPage() {
         label: "Compartir Ticket",
         handler: async (voluntario: Inscripcion) => {
           const url = `${window.location.origin}/campista/${voluntario.id}`;
-          try {
-            await navigator.clipboard.writeText(url);
-            toast.info(`${url} copiado al portapapeles`);
-          } catch (err) {
-            toast.error("Error al copiar");
+          const mensaje = `Hola ${voluntario.name || ''}, aquí está tu ticket de inscripción: ${url}`;
+
+          // Usar el número del campista o del padre si es menor de edad
+          const numero = voluntario.is_under_18 && voluntario.parent_cellphone_number
+            ? voluntario.parent_cellphone_number
+            : voluntario.cellphone_number;
+
+          if (!numero) {
+            toast.error("No hay número de teléfono registrado");
+            return;
           }
+
+          // Limpiar el número (remover espacios, guiones, etc.)
+          const numeroLimpio = numero.replace(/\D/g, '');
+
+          // Agregar código de país de Perú (+51)
+          const numeroCompleto = `51${numeroLimpio}`;
+
+          const whatsappUrl = `https://wa.me/${numeroCompleto}?text=${encodeURIComponent(mensaje)}`;
+          window.open(whatsappUrl, "_blank");
         },
-        icon: Link2Icon
+        icon: SendIcon
       },
       {
         label: "Ver Ticket",
