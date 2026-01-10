@@ -239,7 +239,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
           // actualizar la inscripcion con el url del recibo
           const inscripcionData: Partial<Inscripcion> = {
             payments: [{
-              payment_amount: 50,
+              payment_amount: Number(values.payment_amount),
               payment_method: 'yape',
               payment_recipe_url: paymentRecipeUrl,
               payment_checked: false,

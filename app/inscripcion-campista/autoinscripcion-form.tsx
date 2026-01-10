@@ -8,121 +8,125 @@ import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { z } from "zod";
 
-const autoinscripcionesFormSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido'),
-  dni: z
-    .string()
-    .trim()
-    .refine(isValidPeruDni, {
-      message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
-    }),
-  age: z
-    .union([z.number(), z.string()])
-    .transform((val) => {
-      if (typeof val === 'string') {
-        if (val.trim() === '') return null;
-        const numValue = parseInt(val, 10);
-        return isNaN(numValue) ? null : numValue;
-      }
-      return val;
-    })
-    .pipe(
-      z.number({
-        required_error: 'La edad es requerida',
-        invalid_type_error: 'La edad debe ser un número válido'
-      })
-        .int('La edad debe ser un número entero')
-        .min(14, 'La edad mínima es de 14 años')
-        .max(30, 'La edad no puede superar 30 años')
-    ),
-  height: z
-    .union([z.number(), z.string(), z.bigint()])
-    .transform((val) => {
-      if (typeof val === 'string') {
-        if (val.trim() === '') return null;
-        const numValue = parseInt(val.replace(/[^\d]/g, ''), 10);
-        return isNaN(numValue) ? null : numValue;
-      }
-      if (typeof val === 'bigint') {
-        return Number(val);
-      }
-      return val;
-    })
-    .pipe(
-      z.number({
-        required_error: 'La estatura es requerida',
-        invalid_type_error: 'La estatura debe ser un número válido'
-      })
-        .int('La estatura debe ser un número entero')
-        .min(50, 'La estatura debe estar entre 50cm y 250cm')
-        .max(250, 'La estatura debe estar entre 50cm y 250cm')
-    ),
-  is_under_18: z.boolean().default(false),
-  cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
-  payment_amount: z
-    .union([z.number(), z.string()])
-    .transform((val) => {
-      if (typeof val === 'string') {
-        if (val.trim() === '') return null;
-        const numValue = parseInt(val, 10);
-        return isNaN(numValue) ? null : numValue;
-      }
-      return val;
-    })
-    .pipe(
-      z.number({
-        required_error: 'El monto a pagar es requerido',
-        invalid_type_error: 'El monto a pagar debe ser un número válido'
-      })
-        .int('El monto a pagar debe ser un número entero')
-        .min(50, 'El monto a pagar debe ser mayor a 50 soles')
-        .max(220, 'El monto a pagar debe ser menor a 220 soles')
-    ),
-  payment_recipe_url: z
-    .union([
-      z.instanceof(File),
-      z.string(),
-      z.undefined(),
-    ])
-    .refine((val) => {
-      if (!val) return false
-      if (val instanceof File) return true
-      if (typeof val === 'string') return val.trim().length > 0
-      return false
-    }, {
-      message: 'El comprobante de pago es obligatorio',
-    }),
-  parent_name: z.string().optional().nullable().transform(val => val || undefined),
-  parent_cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
-  terms_accepted: z.boolean().refine(val => val === true, {
-    message: 'Debes aceptar los términos y condiciones'
-  }),
-}).superRefine((data, ctx) => {
-  // Validar campos del padre si es menor de 18
-  if (data.is_under_18) {
-    if (!data.parent_name || data.parent_name.trim() === '') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'El nombre del padre/tutor es requerido para menores de 18 años',
-        path: ['parent_name'],
-      });
-    }
-    if (!data.parent_cellphone_number || data.parent_cellphone_number.trim() === '') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'El número del padre/tutor es requerido para menores de 18 años',
-        path: ['parent_cellphone_number'],
-      });
-    }
-  }
-});
-
 interface AutoinscripcionFormProps {
   onCreate: (data: Record<string, any>) => Promise<void>;
   defaultPrecio: Precio | null;
 }
 
 export function AutoinscripcionForm({ onCreate, defaultPrecio }: AutoinscripcionFormProps) {
+  // Schema dentro del componente para acceder a defaultPrecio
+  const autoinscripcionesFormSchema = z.object({
+    name: z.string().min(1, 'El nombre es requerido'),
+    dni: z
+      .string()
+      .trim()
+      .refine(isValidPeruDni, {
+        message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
+      }),
+    age: z
+      .union([z.number(), z.string()])
+      .transform((val) => {
+        if (typeof val === 'string') {
+          if (val.trim() === '') return null;
+          const numValue = parseInt(val, 10);
+          return isNaN(numValue) ? null : numValue;
+        }
+        return val;
+      })
+      .pipe(
+        z.number({
+          required_error: 'La edad es requerida',
+          invalid_type_error: 'La edad debe ser un número válido'
+        })
+          .int('La edad debe ser un número entero')
+          .min(14, 'La edad mínima es de 14 años')
+          .max(30, 'La edad no puede superar 30 años')
+      ),
+    height: z
+      .union([z.number(), z.string(), z.bigint()])
+      .transform((val) => {
+        if (typeof val === 'string') {
+          if (val.trim() === '') return null;
+          const numValue = parseInt(val.replace(/[^\d]/g, ''), 10);
+          return isNaN(numValue) ? null : numValue;
+        }
+        if (typeof val === 'bigint') {
+          return Number(val);
+        }
+        return val;
+      })
+      .pipe(
+        z.number({
+          required_error: 'La estatura es requerida',
+          invalid_type_error: 'La estatura debe ser un número válido'
+        })
+          .int('La estatura debe ser un número entero')
+          .min(50, 'La estatura debe estar entre 50cm y 250cm')
+          .max(250, 'La estatura debe estar entre 50cm y 250cm')
+      ),
+    is_under_18: z.boolean().default(false),
+    cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+    payment_amount: z
+      .union([z.number(), z.string()])
+      .transform((val) => {
+        if (typeof val === 'string') {
+          if (val.trim() === '') return null;
+          const numValue = parseInt(val, 10);
+          return isNaN(numValue) ? null : numValue;
+        }
+        return val;
+      })
+      .pipe(
+        z.number({
+          required_error: 'El monto a pagar es requerido',
+          invalid_type_error: 'El monto a pagar debe ser un número válido'
+        })
+          .int('El monto a pagar debe ser un número entero')
+          .min(50, 'El monto a pagar debe ser mayor a 50 soles')
+          .max(
+            defaultPrecio?.price ?? 220,
+            `El monto a pagar debe ser menor o igual a ${defaultPrecio?.price ?? 220} soles`
+          )
+      ),
+    payment_recipe_url: z
+      .union([
+        z.instanceof(File),
+        z.string(),
+        z.undefined(),
+      ])
+      .refine((val) => {
+        if (!val) return false
+        if (val instanceof File) return true
+        if (typeof val === 'string') return val.trim().length > 0
+        return false
+      }, {
+        message: 'El comprobante de pago es obligatorio',
+      }),
+    parent_name: z.string().optional().nullable().transform(val => val || undefined),
+    parent_cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+    terms_accepted: z.boolean().refine(val => val === true, {
+      message: 'Debes aceptar los términos y condiciones'
+    }),
+  }).superRefine((data, ctx) => {
+    // Validar campos del padre si es menor de 18
+    if (data.is_under_18) {
+      if (!data.parent_name || data.parent_name.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'El nombre del padre/tutor es requerido para menores de 18 años',
+          path: ['parent_name'],
+        });
+      }
+      if (!data.parent_cellphone_number || data.parent_cellphone_number.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'El número del padre/tutor es requerido para menores de 18 años',
+          path: ['parent_cellphone_number'],
+        });
+      }
+    }
+  });
+
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
     await onCreate(values);
   }
@@ -222,13 +226,15 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       dependsOn: { field: 'is_under_18', value: true },
     },
     {
-      name: 'payment_amount',
-      label: 'Monto a pagar',
-      type: 'integer',
+      name: "payment_amount",
+      label: "Selecciona el monto",
+      type: "radio", // o el tipo que uses para radio
       required: true,
       className: 'col-span-2',
-      placeholder: 'Ej: 50',
-      helpText: `Monto mínimo: S/50 - Monto máximo: S/${defaultPrecio?.price ?? 220}`
+      options: [
+        { label: "Reserva S/50", value: "50" },
+        { label: `Total S/${defaultPrecio?.price ?? 220}`, value: `${defaultPrecio?.price ?? 220}` },
+      ]
     },
     {
       name: 'payment_recipe_url',

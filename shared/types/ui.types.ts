@@ -23,6 +23,7 @@ export type FieldType =
   | 'color'
   | 'image'
   | 'height'
+  | 'radio'
 
 export interface FieldConfig {
   name: string

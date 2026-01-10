@@ -17,6 +17,7 @@ import FieldDatePicker from './fields/field-date-picker'
 import FieldColor from './fields/field-color'
 import FieldImage from './fields/field-image'
 import FieldHeight from './fields/field-height'
+import FieldRadio from './fields/field-radio'
 
 export function DynamicForm({
   buttonLabel,
@@ -83,6 +84,8 @@ export function DynamicForm({
               return <FieldTextarea fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'select':
               return <FieldSelect fieldConfig={fieldConfig} formField={enhancedFormField} />
+            case 'radio':
+              return <FieldRadio fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'color':
               return <FieldColor fieldConfig={fieldConfig} formField={enhancedFormField} />
             case 'checkbox':

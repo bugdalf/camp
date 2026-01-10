@@ -3,7 +3,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { ExternalLink } from "lucide-react";
+import { CheckCircle2, ExternalLink, XCircle } from "lucide-react";
 
 export const columns: ColumnDef<Pago>[] = [
   {
@@ -17,16 +17,7 @@ export const columns: ColumnDef<Pago>[] = [
   },
   {
     accessorKey: 'payment_method',
-    header: 'Método',
-    cell: ({ row }) => (
-      <div>
-        {row.original.payment_method}
-      </div>
-    )
-  },
-  {
-    accessorKey: 'payment_checked',
-    header: 'Verificado',
+    header: 'Método de pago',
     cell: ({ row }) => (
       <div className="flex flex-col gap-1">
         <Badge variant='outline' className={row.original.payment_method === 'yape' ? 'bg-purple-500 text-white' : 'bg-green-500 text-white'}>
@@ -44,6 +35,25 @@ export const columns: ColumnDef<Pago>[] = [
         )}
       </div>
     ),
+  },
+  {
+    accessorKey: 'payment_checked',
+    header: 'Verificado',
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        {row.original.payment_checked ? (
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle2 className="h-4 w-4" />
+            <span className="text-sm">Verificado</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 text-orange-600">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm">Pendiente</span>
+          </div>
+        )}
+      </div>
+    )
   },
   {
     accessorKey: 'created_at',
