@@ -60,14 +60,6 @@ const inscripcionesFormSchema = z.object({
     ),
   is_under_18: z.boolean().default(false),
   cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
-  // payment_method: z.enum(['yape', 'efectivo']),
-  // payment_recipe_url: z.union([
-  //   z.instanceof(File),
-  //   z.string(),
-  //   z.null(),
-  //   z.undefined()
-  // ]).optional().nullable(),
-  // payment_checked: z.boolean().default(false),
   parent_name: z.string().optional().nullable().transform(val => val || undefined),
   parent_cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
   terms_accepted: z.boolean().refine(val => val === true, {
@@ -136,7 +128,10 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       ...values,
       register_by: user?.email
     }
-    await onCreate(valuesToCreate);
+    const result = await onCreate(valuesToCreate);
+    if (result) {
+      dialogHandlers.setSelectedItem(result);
+    }
   }
 
   const handleEdit = async (values: Record<string, any>): Promise<void> => {
@@ -246,34 +241,6 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       options: preciosOptions,
       defaultValue: precioDefault?.id,
     },
-    // {
-    //   name: 'payment_method',
-    //   label: 'Método de pago',
-    //   type: 'select',
-    //   required: true,
-    //   className: 'col-span-2',
-    //   options: [
-    //     { label: 'Yape', value: 'yape' },
-    //     { label: 'Efectivo', value: 'efectivo' }
-    //   ]
-    // },
-    // {
-    //   name: 'payment_recipe_url',
-    //   label: 'Comprobante de pago (imagen)',
-    //   type: 'image',
-    //   required: false,
-    //   className: 'col-span-2',
-    //   accept: 'image/*',
-    //   helpText: 'Sube una captura de tu comprobante de pago'
-    // },
-    // {
-    //   name: 'payment_checked',
-    //   label: 'Pago verificado (solo admin)',
-    //   type: 'checkbox',
-    //   required: false,
-    //   className: 'col-span-2',
-    //   defaultValue: false
-    // },
     {
       name: 'terms_accepted',
       label: 'Acepto los términos y condiciones',

@@ -89,71 +89,9 @@ export const columns: ColumnDef<Inscripcion>[] = [
     header: 'Precio',
     cell: ({ row }) => (
       <div>
-        S/ {row.original.price_amount} - {row.original.price_name}
+        S/ {row.original.price_amount} ({row.original.price_name})
       </div>
     )
-  },
-  {
-    accessorKey: 'payment_method',
-    header: 'Pago',
-    cell: ({ row }) => (
-      <div className="flex flex-col gap-1">
-        <Badge variant='outline' className={row.original.payment_method === 'yape' ? 'bg-purple-500 text-white' : 'bg-green-500 text-white'}>
-          {row.original.payment_method === 'yape' ? '📱 Yape' : '💵 Efectivo'}
-        </Badge>
-        {row.original.payment_recipe_url && (
-          <a
-            href={row.original.payment_recipe_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-          >
-            Ver comprobante <ExternalLink className="h-3 w-3" />
-          </a>
-        )}
-      </div>
-    ),
-    meta: {
-      filterable: {
-        type: 'select',
-        placeholder: 'Pago',
-        label: 'Tipo de pago',
-        options: [
-          { label: 'Yape', value: 'yape' },
-          { label: 'Efectivo', value: 'efectivo' },
-        ]
-      }
-    }
-  },
-  {
-    accessorKey: 'payment_checked',
-    header: 'Estado de pago',
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        {row.original.payment_checked ? (
-          <div className="flex items-center gap-1 text-green-600">
-            <CheckCircle2 className="h-4 w-4" />
-            <span className="text-sm">Verificado</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1 text-orange-600">
-            <XCircle className="h-4 w-4" />
-            <span className="text-sm">Pendiente</span>
-          </div>
-        )}
-      </div>
-    ),
-    meta: {
-      filterable: {
-        type: 'select',
-        options: [
-          { label: 'Verificado', value: true },
-          { label: 'Pendiente', value: false }
-        ],
-        label: 'Estado de pago',
-        placeholder: 'Estado de pago'
-      }
-    },
   },
   {
     accessorKey: 'check_in',

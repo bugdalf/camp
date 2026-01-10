@@ -12,10 +12,6 @@ export type Inscripcion = {
   payments?: Pago[];
   payment_completed?: boolean;
 
-  payment_method?: 'yape' | 'efectivo';
-  payment_recipe_url?: string;
-  payment_checked?: boolean;
-
   parent_name?: string;
   parent_cellphone_number?: string;
   terms_accepted?: boolean;

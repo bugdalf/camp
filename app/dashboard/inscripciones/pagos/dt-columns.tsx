@@ -1,4 +1,4 @@
-import { Pago, Precio } from "@/shared/types/supabase.types";
+import { Pago } from "@/shared/types/supabase.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";

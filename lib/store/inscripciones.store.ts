@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from 'uuid';
 import { createClient } from "../supabase/client"
-import { Inscripcion } from "@/shared/types/supabase.types";
+import { Inscripcion, Pago } from "@/shared/types/supabase.types";
 import { usePreciosStore } from "./precios.store";
 
 let inscripcionesChannel: ReturnType<typeof supabase.channel> | null = null
@@ -139,16 +139,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
 
   createInscripcion: async (values) => {
     try {
-      let paymentRecipeUrl = values.payment_recipe_url;
-
-      // 📤 Si hay un archivo File, subirlo primero
-      if (values.payment_recipe_url instanceof File) {
-        paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
-        if (!paymentRecipeUrl) {
-          return null; // Ya se mostró el error en uploadPaymentRecipe
-        }
-      }
-
       const precios = usePreciosStore.getState().precios;
       const precio = precios.find(p => p.id === values.price_id);
 
@@ -168,9 +158,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         price_id: precio.id,
         price_name: precio.name,
         price_amount: precio.price,
-        payment_method: values.payment_method,
-        payment_recipe_url: paymentRecipeUrl || null,
-        payment_checked: values.payment_checked || false,
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
         terms_accepted: values.terms_accepted || false,
@@ -208,22 +195,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
 
   updateInscripcion: async (values, id) => {
     try {
-      let paymentRecipeUrl = values.payment_recipe_url;
-
-      // 📤 Si hay un nuevo archivo File, subirlo
-      if (values.payment_recipe_url instanceof File) {
-        // 🗑️ Obtener la inscripción actual para eliminar la imagen anterior
-        const currentInscripcion = get().inscripciones.find(i => i.id === id);
-        if (currentInscripcion?.payment_recipe_url) {
-          await deletePaymentRecipe(currentInscripcion.payment_recipe_url);
-        }
-
-        paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
-        if (!paymentRecipeUrl) {
-          return; // Ya se mostró el error en uploadPaymentRecipe
-        }
-      }
-
       const precios = usePreciosStore.getState().precios;
       const precio = precios.find(p => p.id === values.price_id);
 
@@ -243,9 +214,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         price_id: precio.id,
         price_name: precio.name,
         price_amount: precio.price,
-        payment_method: values.payment_method,
-        payment_recipe_url: paymentRecipeUrl || null,
-        payment_checked: values.payment_checked || false,
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
         terms_accepted: values.terms_accepted || false,
@@ -293,11 +261,6 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         .single();
 
       if (error) throw error;
-
-      // 🗑️ Eliminar imagen asociada si existe
-      if (inscripcionToDelete?.payment_recipe_url) {
-        await deletePaymentRecipe(inscripcionToDelete.payment_recipe_url);
-      }
 
       if (data) {
         toast.success('Inscripción eliminada correctamente');
@@ -426,13 +389,23 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
   },
 
   createPayment: async (values: any, inscripcionId?: string) => {
-    // crear el reciepment si hubiere
     try {
       if (!inscripcionId) {
         toast.error('No se proporcionó una inscripción');
         return;
       }
-      // prepare
+
+      let paymentRecipeUrl = values.payment_recipe_url;
+
+      // 📤 Si hay un archivo File, subirlo primero
+      if (values.payment_recipe_url instanceof File) {
+        paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
+        if (!paymentRecipeUrl) {
+          toast.error('El recibo no se pudo subir');
+          return;
+        }
+      }
+
       const inscripcion = get().inscripciones.find(i => i.id === inscripcionId);
       if (!inscripcion) {
         toast.error('Inscripción no encontrada');
@@ -443,7 +416,9 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       const newPayment = {
         id: uuidv4(),
         ...values,
+        payment_recipe_url: paymentRecipeUrl,
       };
+
       const newPayments = [...payments, newPayment];
 
       const { data, error } = await supabase
@@ -479,10 +454,42 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         toast.error('No se proporcionó una inscripción');
         return;
       }
+      let paymentRecipeUrl = values.payment_recipe_url;
+
+
+      // 📤 Si hay un nuevo archivo File, subirlo
+      if (values.payment_recipe_url instanceof File) {
+        // 🗑️ Obtener el pago actual para eliminar la imagen anterior
+        const currentInscripcion = get().inscripciones.find(i => i.id === inscripcionId);
+        const currentPayment = currentInscripcion?.payments?.find(p => p.id === paymentId);
+
+        if (currentPayment?.payment_recipe_url) {
+          await deletePaymentRecipe(currentPayment.payment_recipe_url);
+        }
+
+        paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
+        if (!paymentRecipeUrl) {
+          return; // Ya se mostró el error en uploadPaymentRecipe
+        }
+      } else {
+        paymentRecipeUrl = values.payment_recipe_url;
+        const currentInscripcion = get().inscripciones.find(i => i.id === inscripcionId);
+        const currentPayment = currentInscripcion?.payments?.find(p => p.id === paymentId);
+        if (currentPayment?.payment_recipe_url) {
+          await deletePaymentRecipe(currentPayment.payment_recipe_url);
+        }
+      }
+
+      const updatedPayment = {
+        id: paymentId,
+        ...values,
+        payment_recipe_url: paymentRecipeUrl,
+      };
+
       const { data, error } = await supabase
         .from('inscripciones')
         .update({
-          payments: get().inscripciones.find(i => i.id === inscripcionId)?.payments?.map(p => p.id === paymentId ? values : p),
+          payments: get().inscripciones.find(i => i.id === inscripcionId)?.payments?.map(p => p.id === paymentId ? updatedPayment : p),
         })
         .eq('id', inscripcionId)
         .select()
@@ -511,16 +518,24 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         toast.error('No se proporcionó una inscripción');
         return;
       }
+      const inscripcion = get().inscripciones.find(i => i.id === inscripcionId);
+      const payment = inscripcion?.payments?.find(p => p.id === paymentId);
+
       const { data, error } = await supabase
         .from('inscripciones')
         .update({
-          payments: get().inscripciones.find(i => i.id === inscripcionId)?.payments?.filter(p => p.id !== paymentId),
+          payments: inscripcion?.payments?.filter(p => p.id !== paymentId),
         })
         .eq('id', inscripcionId)
         .select()
         .single();
 
       if (error) throw error;
+
+      // 🗑️ Eliminar imagen asociada si existe
+      if (payment?.payment_recipe_url) {
+        await deletePaymentRecipe(payment?.payment_recipe_url);
+      }
 
       if (data) {
         set({
