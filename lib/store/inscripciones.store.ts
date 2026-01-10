@@ -68,6 +68,7 @@ type InscripcionesStore = {
   fetchInscripcionesCount: () => Promise<number>
   fetchInscripcionById: (id: string) => Promise<Inscripcion | null>
   createInscripcion: (values: any) => Promise<Inscripcion | null>
+  createAutoInscripcion: (values: any) => Promise<Inscripcion | null>
   updateInscripcion: (values: any, id: string) => Promise<void>
   deleteInscripcion: (id: string) => Promise<void>
   deleteSoftInscripcion: (id: string) => Promise<void>
@@ -178,6 +179,83 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         toast.error('La inscripción no se pudo registrar, verifica que los datos sean correctos');
         return null;
       };
+
+      // El realtime se encargará de actualizar el estado
+      // Pero mantenemos esto por si acaso el realtime no está activo
+      if (data && !inscripcionesChannel) {
+        toast.success('Inscripción creada correctamente');
+        set({ inscripciones: [data, ...get().inscripciones] });
+        set({ selectedInscripcion: data });
+        return data;
+      }
+    } catch (error) {
+      toast.error('La inscripción no se pudo crear');
+      return null;
+    }
+  },
+
+  createAutoInscripcion: async (values) => {
+    try {
+      // 📝 Preparar datos para insertar
+      const inscripcionData: Partial<Inscripcion> = {
+        name: values.name,
+        dni: values.dni,
+        age: values.age,
+        height: values.height,
+        is_under_18: values.is_under_18 || false,
+        cellphone_number: values.cellphone_number || null,
+        price_id: values.precio_id,
+        price_name: values.precio_name,
+        price_amount: values.precio_price,
+        parent_name: values.parent_name || null,
+        parent_cellphone_number: values.parent_cellphone_number || null,
+        terms_accepted: values.terms_accepted || false,
+        register_by: values.register_by || null,
+      };
+
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .insert(inscripcionData)
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code == '23505') {
+          toast.error('Ya existe una inscripción con el mismo DNI');
+          return null;
+        }
+        toast.error('La inscripción no se pudo registrar, verifica que los datos sean correctos');
+        return null;
+      };
+
+      if (data) {
+        // 📤 Si hay un archivo File, subirlo
+        if (values.payment_recipe_url instanceof File) {
+          const paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
+          if (!paymentRecipeUrl) {
+            toast.error('El recibo no se pudo subir');
+            return;
+          }
+          // actualizar la inscripcion con el url del recibo
+          const inscripcionData: Partial<Inscripcion> = {
+            payments: [{
+              payment_amount: 50,
+              payment_method: 'yape',
+              payment_recipe_url: paymentRecipeUrl,
+              payment_checked: false,
+            }],
+          };
+
+          const { error } = await supabase
+            .from('inscripciones')
+            .update(inscripcionData)
+            .eq('id', data.id);
+          if (error) {
+            toast.error('El recibo no se pudo actualizar');
+            return;
+          }
+        }
+      }
 
       // El realtime se encargará de actualizar el estado
       // Pero mantenemos esto por si acaso el realtime no está activo

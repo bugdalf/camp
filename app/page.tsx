@@ -141,11 +141,11 @@ export default function LandingPage() {
                 Iniciar sesión
               </Link>
             </div>
-            <div className="flex gap-6 text-sm">
+            {/* <div className="flex gap-6 text-sm">
               <Link href="/inscripcion-voluntario" className="text-slate-400 hover:text-white transition-all duration-300 hover:scale-110">
                 ¿Quieres ser voluntario?
               </Link>
-            </div>
+            </div> */}
 
             {/* Copyright */}
             <div className="text-center md:text-right">

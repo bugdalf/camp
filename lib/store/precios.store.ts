@@ -10,6 +10,7 @@ type PreciosStore = {
   precios: Precio[]
   fetchPrecios: () => Promise<void>
   fetchPrecioById: (id: string) => Promise<Precio | null>
+  fetchDefaultPrecio: () => Promise<Precio | null>
   createPrecio: (values: any) => Promise<Precio | null>
   updatePrecio: (values: any, id: string) => Promise<void>
   deletePrecio: (id: string) => Promise<void>
@@ -38,6 +39,24 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
         .from('precios')
         .select('*')
         .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Error al obtener precio por ID:', error);
+      toast.error('No se pudo cargar el precio');
+      return null;
+    }
+  },
+
+  fetchDefaultPrecio: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('precios')
+        .select('*')
+        .eq('default', true)
         .single();
 
       if (error) throw error;

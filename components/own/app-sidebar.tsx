@@ -60,7 +60,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Link href="/dashboard">
                 <SidebarMenuButton tooltip="Dashboard / check-in">
                   <FrameIcon />
-                  <span>Dashboard / check-in</span>
+                  <span>Check-in</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Link href="/dashboard/inscripciones">
                 <SidebarMenuButton tooltip="Inscripciones">
                   <BackpackIcon />
-                  <span>Inscripciones</span>
+                  <span>Campistas</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>

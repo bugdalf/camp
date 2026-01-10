@@ -2,7 +2,10 @@
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
+import { Precio } from "@/shared/types/supabase.types";
 import type { FieldConfig } from "@/shared/types/ui.types";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { z } from "zod";
 
 const autoinscripcionesFormSchema = z.object({
@@ -16,9 +19,7 @@ const autoinscripcionesFormSchema = z.object({
   age: z
     .union([z.number(), z.string()])
     .transform((val) => {
-      // Si es string, convertir a número
       if (typeof val === 'string') {
-        // Si está vacío, retornar null
         if (val.trim() === '') return null;
         const numValue = parseInt(val, 10);
         return isNaN(numValue) ? null : numValue;
@@ -30,24 +31,53 @@ const autoinscripcionesFormSchema = z.object({
         required_error: 'La edad es requerida',
         invalid_type_error: 'La edad debe ser un número válido'
       })
+        .int('La edad debe ser un número entero')
         .min(14, 'La edad mínima es de 14 años')
         .max(30, 'La edad no puede superar 30 años')
     ),
   height: z
+    .union([z.number(), z.string(), z.bigint()])
+    .transform((val) => {
+      if (typeof val === 'string') {
+        if (val.trim() === '') return null;
+        const numValue = parseInt(val.replace(/[^\d]/g, ''), 10);
+        return isNaN(numValue) ? null : numValue;
+      }
+      if (typeof val === 'bigint') {
+        return Number(val);
+      }
+      return val;
+    })
+    .pipe(
+      z.number({
+        required_error: 'La estatura es requerida',
+        invalid_type_error: 'La estatura debe ser un número válido'
+      })
+        .int('La estatura debe ser un número entero')
+        .min(50, 'La estatura debe estar entre 50cm y 250cm')
+        .max(250, 'La estatura debe estar entre 50cm y 250cm')
+    ),
+  is_under_18: z.boolean().default(false),
+  cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
+  payment_amount: z
     .union([z.number(), z.string()])
     .transform((val) => {
       if (typeof val === 'string') {
-        const numValue = parseInt(val.replace(/[^\d]/g, ''), 10);
+        if (val.trim() === '') return null;
+        const numValue = parseInt(val, 10);
         return isNaN(numValue) ? null : numValue;
       }
       return val;
     })
-    .refine((val) => val !== null && val >= 50 && val <= 250, {
-      message: 'La estatura debe estar entre 50 y 250 centimetros'
-    })
-    .transform((val) => val as number),
-  is_under_18: z.boolean().default(false),
-  cellphone_number: z.string().min(9, 'Número inválido').optional(),
+    .pipe(
+      z.number({
+        required_error: 'El monto a pagar es requerido',
+        invalid_type_error: 'El monto a pagar debe ser un número válido'
+      })
+        .int('El monto a pagar debe ser un número entero')
+        .min(50, 'El monto a pagar debe ser mayor a 50 soles')
+        .max(220, 'El monto a pagar debe ser menor a 220 soles')
+    ),
   payment_recipe_url: z
     .union([
       z.instanceof(File),
@@ -62,8 +92,8 @@ const autoinscripcionesFormSchema = z.object({
     }, {
       message: 'El comprobante de pago es obligatorio',
     }),
-  parent_name: z.string().optional(),
-  parent_cellphone_number: z.string().min(9, 'Número inválido').optional(),
+  parent_name: z.string().optional().nullable().transform(val => val || undefined),
+  parent_cellphone_number: z.string().optional().nullable().transform(val => val || undefined),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
@@ -89,9 +119,10 @@ const autoinscripcionesFormSchema = z.object({
 
 interface AutoinscripcionFormProps {
   onCreate: (data: Record<string, any>) => Promise<void>;
+  defaultPrecio: Precio | null;
 }
 
-export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
+export function AutoinscripcionForm({ onCreate, defaultPrecio }: AutoinscripcionFormProps) {
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
     await onCreate(values);
   }
@@ -191,17 +222,29 @@ export function AutoinscripcionForm({ onCreate }: AutoinscripcionFormProps) {
       dependsOn: { field: 'is_under_18', value: true },
     },
     {
+      name: 'payment_amount',
+      label: 'Monto a pagar',
+      type: 'integer',
+      required: true,
+      className: 'col-span-2',
+      placeholder: 'Ej: 50',
+      helpText: `Monto mínimo: S/50 - Monto máximo: S/${defaultPrecio?.price ?? 220}`
+    },
+    {
       name: 'payment_recipe_url',
       label: 'Comprobante de pago yape (imagen)',
       type: 'image',
       required: true,
       className: 'col-span-2',
       accept: 'image/*',
-      helpText: 'Sube una captura de tu comprobante de pago'
+      helpText: 'Sube una captura de tu comprobante de pago, recuerda que el monto que pusiste debe ser igual al monto que aparece en tu comprobante'
     },
     {
       name: 'terms_accepted',
-      label: 'Acepto los términos y condiciones',
+      label: <div className="w-full flex gap-1">
+        <span>Acepto los términos y Condiciones</span>
+        <Link href="/terminos-condiciones" target="_blank" className="flex items-center gap-1 hover:underline"><ExternalLink size={14} /></Link>
+      </div>,
       type: 'checkbox',
       required: true,
       className: 'col-span-2',

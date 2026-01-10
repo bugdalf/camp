@@ -26,7 +26,7 @@ export type FieldType =
 
 export interface FieldConfig {
   name: string
-  label: string
+  label: string | React.ReactNode
   type: FieldType
   options?: Array<{ label: string; value: string }>
   defaultValue?: any
