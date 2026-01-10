@@ -108,8 +108,9 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
     parent_name: z.string().optional().nullable().transform(val => val || undefined),
     parent_cellphone_number: z
       .string()
-      .min(1, "El número de celular es requerido")
-      .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
+      .optional()
+      .nullable()
+      .transform(val => val || undefined),
     terms_accepted: z.boolean().refine(val => val === true, {
       message: 'Debes aceptar los términos y condiciones'
     }),

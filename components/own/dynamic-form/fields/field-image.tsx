@@ -54,6 +54,7 @@ export default function FieldImage({ fieldConfig, formField }: FormFieldProps) {
         {fieldConfig.label}
         {fieldConfig.required && <span className="text-red-400">*</span>}
       </FormLabel>
+      {fieldConfig.helpText && <FormDescription>{fieldConfig.helpText}</FormDescription>}
 
       <FormControl>
         <div className="space-y-4">
@@ -117,10 +118,6 @@ export default function FieldImage({ fieldConfig, formField }: FormFieldProps) {
           )}
         </div>
       </FormControl>
-
-      {fieldConfig.helpText && (
-        <FormDescription>{fieldConfig.helpText}</FormDescription>
-      )}
 
       <FormMessage />
     </FormItem>

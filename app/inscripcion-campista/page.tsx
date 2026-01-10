@@ -6,10 +6,13 @@ import { AutoinscripcionForm } from "./autoinscripcion-form"
 import { RegistroCompletado } from "@/components/own/registro-completo"
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 import { Inscripcion, Precio } from "@/shared/types/supabase.types"
-import { CopyIcon } from "lucide-react"
+import { CopyIcon, Download, PhoneIcon } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { usePreciosStore } from "@/lib/store/precios.store"
+import { createClient } from "@/lib/supabase/client" // Ajusta la ruta según tu proyecto
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
 
 const steps = [
   { id: 1, label: "Datos" },
@@ -38,6 +41,42 @@ export default function InscripcionCampistaPage() {
   const handleCopyNumber = (number: string) => {
     navigator.clipboard.writeText(number);
     toast.info("Número copiado al portapapeles");
+  }
+
+  const handleDownloadPDF = async () => {
+    try {
+      const supabase = createClient();
+
+      // Descarga el archivo desde Storage
+      const { data, error } = await supabase.storage
+        .from('inscripciones')
+        .download('docs/autorizacionMenor.pdf')
+
+      if (error) {
+        toast.error("Error al descargar el archivo");
+        console.error(error);
+        return;
+      }
+
+      // Crea una URL temporal para el blob
+      const url = window.URL.createObjectURL(data);
+
+      // Crea un link temporal y simula el click para descargar
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'autorizacionMenor.pdf';
+      document.body.appendChild(link);
+      link.click();
+
+      // Limpia
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Archivo descargado correctamente");
+    } catch (error) {
+      toast.error("Error al descargar el archivo");
+      console.error(error);
+    }
   }
 
   const handleCreate = async (data: Record<string, any>) => {
@@ -72,13 +111,15 @@ export default function InscripcionCampistaPage() {
               <li className="flex flex-col justify-center items-center gap-2">
                 <span>Estos son los números de Yape para pagar: </span>
                 <div className="flex gap-2">
-                  <div onClick={() => handleCopyNumber("987654321")} className="flex items-center gap-2 bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
-                    987654321
-                    <CopyIcon />
+                  <div onClick={() => handleCopyNumber("950569436")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+                    {/* <div>qr</div> */}
+                    <div>José Mamani - plin</div>
+                    <div className="flex gap-2 items-center">950569436 <CopyIcon /></div>
                   </div>
-                  <div onClick={() => handleCopyNumber("987654321")} className="flex items-center gap-2 bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
-                    987654321
-                    <CopyIcon />
+                  <div onClick={() => handleCopyNumber("956890060")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+                    {/* <div>qr</div> */}
+                    <div>Victor Atamari - yape</div>
+                    <div className="flex gap-2 items-center">956890060 <CopyIcon /></div>
                   </div>
                 </div>
               </li>
@@ -86,7 +127,15 @@ export default function InscripcionCampistaPage() {
               <li>Puedes reservar tu inscripción desde <strong>S/ 50</strong></li>
               <li>Adjunta en el formulario una captura de tu comprobante de pago (imagen) clara</li>
               <li>Debes tener entre 14 y 30 años de edad para poder participar</li>
-              <li>Si eres menor de edad debes tener <strong>la autorización de tus padres o tutor legal firmada</strong> (se proporciona el documento para descargar en el siguiente paso)</li>
+              <li>
+                Si eres menor de edad debes tener <strong>la autorización de tus padres o tutor legal firmada</strong>{' '}
+                <button
+                  onClick={handleDownloadPDF}
+                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 underline"
+                >
+                  <Download size={16} />
+                </button>
+              </li>
             </ul>
           </div>
           <AutoinscripcionForm
