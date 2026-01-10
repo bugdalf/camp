@@ -8,14 +8,11 @@ const supabase = createClient();
 
 type PreciosStore = {
   precios: Precio[]
-
   fetchPrecios: () => Promise<void>
   fetchPrecioById: (id: string) => Promise<Precio | null>
   createPrecio: (values: any) => Promise<Precio | null>
   updatePrecio: (values: any, id: string) => Promise<void>
   deletePrecio: (id: string) => Promise<void>
-
-  getDefaultPrecio: () => Promise<Precio | null>
 }
 
 export const usePreciosStore = create<PreciosStore>((set, get) => ({
@@ -29,10 +26,8 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
         .order('created_at', { ascending: false }); // Ordenar por más reciente
 
       if (error) throw error;
-
       set({ precios: data ?? [] });
     } catch (error) {
-      console.error('Error al obtener precios:', error);
       toast.error('No se pudieron cargar los precios');
     }
   },
@@ -187,25 +182,6 @@ export const usePreciosStore = create<PreciosStore>((set, get) => ({
     } catch (error) {
       console.error('Error al eliminar precio:', error);
       toast.error('El precio no se pudo eliminar');
-    }
-  },
-
-  getDefaultPrecio: () => {
-    try {
-      const { data, error } = supabase
-        .from('precios')
-        .select('*')
-        .eq('default', true)
-        .single();
-
-      if (error) {
-        toast.error('No se pudo obtener el precio por defecto');
-      };
-
-      return data;
-    } catch (error) {
-      toast.error('No se pudo obtener el precio por defecto');
-      return null;
     }
   }
 }))

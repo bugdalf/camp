@@ -5,9 +5,17 @@ export type Inscripcion = {
   age?: number;
   is_under_18?: boolean;
   cellphone_number?: string;
+  // pagos y precio cobrado
+  price_id?: string;
+  price_amount?: number;
+  price_name?: string;
+  payments?: Payment[];
+  payment_completed?: boolean;
+
   payment_method?: 'yape' | 'efectivo';
   payment_recipe_url?: string;
   payment_checked?: boolean;
+
   parent_name?: string;
   parent_cellphone_number?: string;
   terms_accepted?: boolean;
@@ -46,6 +54,16 @@ export type Precio = {
   price?: number;
   description?: string;
   default?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// este es el json
+export type Payment = {
+  payment_amount?: number;
+  payment_method?: 'yape' | 'efectivo';
+  payment_recipe_url?: string;
+  payment_checked?: boolean;
   created_at?: string;
   updated_at?: string;
 }
