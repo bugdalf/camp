@@ -130,7 +130,7 @@ export default function InscripcionesPage() {
         setOpenDialog={dialogHandlers.setOpenDialog}
         title="Inscribir"
       >
-        <Tabs defaultValue="form" className="w-lg overflow-auto">
+        <Tabs defaultValue="form" className="w-full overflow-auto">
           <TabsList className="w-full">
             <TabsTrigger value="form">Formulario</TabsTrigger>
             <TabsTrigger value="pagos">Pagos</TabsTrigger>

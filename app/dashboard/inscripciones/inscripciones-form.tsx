@@ -66,8 +66,9 @@ const inscripcionesFormSchema = z.object({
   parent_name: z.string().optional().nullable().transform(val => val || undefined),
   parent_cellphone_number: z
     .string()
-    .min(1, "El número de celular es requerido")
-    .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
+    .optional()
+    .nullable()
+    .transform(val => val || undefined),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
@@ -171,7 +172,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'DNI',
       type: 'text',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       placeholder: 'Ingresa tu DNI',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -182,7 +183,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Número de celular',
       type: 'text',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -193,7 +194,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Edad',
       type: 'integer',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       placeholder: 'Ej: 25',
       onChange: handleAgeChange
     },
@@ -202,7 +203,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Estatura (cm)',
       type: 'height',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       placeholder: 'Ej: 170',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -213,7 +214,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: '¿Es menor de 18 años?',
       type: 'checkbox',
       required: false,
-      className: 'col-span-1 items-end border-none hidden',
+      className: 'col-span-2 md:col-span-1 items-end border-none hidden',
       defaultValue: false,
       disabled: true
     },
