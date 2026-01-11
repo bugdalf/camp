@@ -35,7 +35,10 @@ const autovoluntarioFormSchema = z.object({
     ),
   commission: z.enum(['cocina', 'limpieza', 'produccion']),
   is_under_18: z.boolean().default(false),
-  cellphone_number: z.string().min(9, 'Número inválido').optional(),
+  cellphone_number: z
+    .string()
+    .min(1, "El número de celular es requerido")
+    .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
   payment_recipe_url: z
     .union([
       z.instanceof(File),
@@ -51,7 +54,11 @@ const autovoluntarioFormSchema = z.object({
       message: 'El comprobante de pago es obligatorio',
     }),
   parent_name: z.string().optional(),
-  parent_cellphone_number: z.string().min(9, 'Número inválido').optional(),
+  parent_cellphone_number: z
+    .string()
+    .optional()
+    .nullable()
+    .transform(val => val || undefined),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
@@ -111,7 +118,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'DNI',
       type: 'text',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       placeholder: 'Ingresa tu DNI',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -122,7 +129,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Número de celular',
       type: 'text',
       required: false,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -133,7 +140,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Edad',
       type: 'integer',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       placeholder: 'Ej: 25',
       onChange: handleAgeChange // 🎯 Añadir handler
     },
@@ -142,7 +149,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Comisión',
       type: 'select',
       required: false,
-      className: 'col-span-1',
+      className: 'col-span-2 md:col-span-1',
       options: [
         { label: 'Cocina', value: 'cocina' },
         { label: 'Limpieza', value: 'limpieza' },

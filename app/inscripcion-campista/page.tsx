@@ -6,13 +6,11 @@ import { AutoinscripcionForm } from "./autoinscripcion-form"
 import { RegistroCompletado } from "@/components/own/registro-completo"
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 import { Inscripcion, Precio } from "@/shared/types/supabase.types"
-import { CopyIcon, Download, PhoneIcon } from "lucide-react"
+import { CopyIcon, Download } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { usePreciosStore } from "@/lib/store/precios.store"
 import { createClient } from "@/lib/supabase/client" // Ajusta la ruta según tu proyecto
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
 
 const steps = [
   { id: 1, label: "Datos" },
@@ -72,7 +70,7 @@ export default function InscripcionCampistaPage() {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success("Archivo descargado correctamente");
+      toast.success("Archivo descargado correctamente, revisa tus descargas");
     } catch (error) {
       toast.error("Error al descargar el archivo");
       console.error(error);
