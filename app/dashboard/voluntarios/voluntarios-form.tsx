@@ -36,7 +36,10 @@ const voluntariosFormSchema = z.object({
     ),
   commission: z.enum(['cocina', 'limpieza', 'produccion']),
   is_under_18: z.boolean().default(false),
-  cellphone_number: z.string().min(9, 'Número inválido').optional(),
+  cellphone_number: z
+    .string()
+    .min(1, "El número de celular es requerido")
+    .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
   payment_method: z.enum(['yape', 'efectivo']),
   payment_recipe_url: z.union([
     z.instanceof(File),
@@ -44,11 +47,14 @@ const voluntariosFormSchema = z.object({
     z.undefined()
   ]).optional(),
   payment_checked: z.boolean().default(false),
-  parent_name: z.string().optional(),
-  parent_cellphone_number: z.string().min(9, 'Número inválido').optional(),
-  terms_accepted: z.boolean().refine(val => val === true, {
-    message: 'Debes aceptar los términos y condiciones'
-  }),
+  parent_name: z.string().optional().nullable().transform(val => val || undefined),
+  parent_cellphone_number: z
+    .string()
+    .optional()
+    .nullable()
+    .transform(val => val || undefined), terms_accepted: z.boolean().refine(val => val === true, {
+      message: 'Debes aceptar los términos y condiciones'
+    }),
 }).superRefine((data, ctx) => {
   // Validar campos del padre si es menor de 18
   if (data.is_under_18) {
