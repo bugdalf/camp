@@ -534,49 +534,61 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
   },
 
   updatePayment: async (values: any, paymentId: string, inscripcionId?: string) => {
-    // eliminar ell reciepment anterior si hubiere y subir el nuevo si hubiere
     try {
       if (!inscripcionId) {
         toast.error('No se proporcionó una inscripción');
         return;
       }
-      let paymentRecipeUrl = values.payment_recipe_url;
 
+      // Obtener inscripción y pago actual una sola vez
+      const currentInscripcion = get().inscripciones.find(i => i.id === inscripcionId);
 
-      // 📤 Si hay un nuevo archivo File, subirlo
+      if (!currentInscripcion) {
+        toast.error('Inscripción no encontrada');
+        return;
+      }
+
+      const currentPayment = currentInscripcion.payments?.find(p => p.id === paymentId);
+
+      if (!currentPayment) {
+        toast.error('Pago no encontrado');
+        return;
+      }
+
+      let paymentRecipeUrl = currentPayment.payment_recipe_url;
+
+      // 📤 Solo procesar si hay un nuevo archivo File
       if (values.payment_recipe_url instanceof File) {
-        // 🗑️ Obtener el pago actual para eliminar la imagen anterior
-        const currentInscripcion = get().inscripciones.find(i => i.id === inscripcionId);
-        const currentPayment = currentInscripcion?.payments?.find(p => p.id === paymentId);
-
-        if (currentPayment?.payment_recipe_url) {
+        // 🗑️ Eliminar imagen anterior si existe
+        if (currentPayment.payment_recipe_url) {
           await deletePaymentRecipe(currentPayment.payment_recipe_url);
         }
 
-        paymentRecipeUrl = await uploadPaymentRecipe(values.payment_recipe_url);
-        if (!paymentRecipeUrl) {
+        // Subir nuevo archivo
+        const uploadedUrl = await uploadPaymentRecipe(values.payment_recipe_url);
+        if (!uploadedUrl) {
           return; // Ya se mostró el error en uploadPaymentRecipe
         }
-      } else {
+        paymentRecipeUrl = uploadedUrl;
+      } else if (values.payment_recipe_url && typeof values.payment_recipe_url === 'string') {
+        // Si es una URL string, mantenerla
         paymentRecipeUrl = values.payment_recipe_url;
-        const currentInscripcion = get().inscripciones.find(i => i.id === inscripcionId);
-        const currentPayment = currentInscripcion?.payments?.find(p => p.id === paymentId);
-        if (currentPayment?.payment_recipe_url) {
-          await deletePaymentRecipe(currentPayment.payment_recipe_url);
-        }
       }
 
       const updatedPayment = {
-        id: paymentId,
+        ...currentPayment,
         ...values,
+        id: paymentId,
         payment_recipe_url: paymentRecipeUrl,
       };
 
+      const updatedPayments = currentInscripcion.payments?.map(p =>
+        p.id === paymentId ? updatedPayment : p
+      );
+
       const { data, error } = await supabase
         .from('inscripciones')
-        .update({
-          payments: get().inscripciones.find(i => i.id === inscripcionId)?.payments?.map(p => p.id === paymentId ? updatedPayment : p),
-        })
+        .update({ payments: updatedPayments })
         .eq('id', inscripcionId)
         .select()
         .single();
@@ -593,6 +605,7 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         toast.success('Pago actualizado correctamente');
       }
     } catch (error) {
+      console.error('Error actualizando pago:', error);
       toast.error('El pago no se pudo actualizar');
     }
   },

@@ -55,7 +55,7 @@ export default function LoginPage() {
 
   return (
     <main className="flex flex-col gap-12 py-12 items-center justify-center px-4 bg-background">
-      <img src="/main-logo-webp" alt="Logo" className="w-60 h-auto m-auto" />
+      <img src="/main-logo.webp" alt="Logo" className="w-60 h-auto m-auto" />
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>

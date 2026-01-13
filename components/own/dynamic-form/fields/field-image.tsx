@@ -26,8 +26,8 @@ export default function FieldImage({ fieldConfig, formField }: FormFieldProps) {
       }
 
       // Validar tamaño (máximo 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('El archivo debe pesar menos de 2MB');
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('El archivo debe pesar menos de 5MB');
         return;
       }
 
@@ -112,7 +112,7 @@ export default function FieldImage({ fieldConfig, formField }: FormFieldProps) {
                 <div className="text-sm">
                   <span className="font-semibold">Click para subir</span> o arrastra aquí
                 </div>
-                <div className="text-xs">PNG, JPG hasta 2MB</div>
+                <div className="text-xs">PNG, JPG hasta 5MB</div>
               </div>
             </Button>
           )}

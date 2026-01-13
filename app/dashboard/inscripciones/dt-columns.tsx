@@ -1,39 +1,32 @@
 import { Inscripcion } from "@/shared/types/supabase.types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { CheckCircle2, CheckIcon, XCircle, XIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 export const columns: ColumnDef<Inscripcion>[] = [
-  {
-    accessorKey: 'is_active',
-    header: 'Estado',
-    cell: ({ row }) => (
-      <div>
-        {row.original.is_active ? (
-          <Badge variant="outline" className="bg-green-500 text-white">
-            Activo
-          </Badge>
-        ) : (
-          <Badge variant="outline" className="bg-red-500 text-white">
-            Inactivo
-          </Badge>
-        )}
-      </div>
-    )
-  },
   {
     accessorKey: 'name',
     header: 'Nombre',
     cell: ({ row }) => (
-      <div className="flex flex-col">
-        <span className="font-medium">{row.original.name}</span>
-        {row.original.is_under_18 && (
-          <span className="text-xs text-muted-foreground">
-            Menor de edad
-          </span>
+      <div className="flex items-center gap-2">
+        {row.original.is_active ? (
+          <div className="h-2 w-2 border rounded-full bg-green-500"></div>
+        ) : (
+          <div className="h-2 w-2 border rounded-full bg-red-500"></div>
         )}
+        <div className="flex flex-col">
+          <span className="font-medium">{row.original.name}</span>
+          {row.original.is_under_18 && (
+            <span className="text-xs text-muted-foreground">
+              Menor de edad
+            </span>
+          )}
+          <div className="text-xs text-muted-foreground italic">
+            {row.original.dni} - {row.original.gender}
+          </div>
+        </div>
       </div>
     ),
     meta: {
@@ -55,15 +48,6 @@ export const columns: ColumnDef<Inscripcion>[] = [
     meta: {
       visible: false
     }
-  },
-  {
-    accessorKey: 'dni',
-    header: 'DNI',
-    cell: ({ row }) => (
-      <div>
-        {row.original.dni}
-      </div>
-    ),
   },
   {
     accessorKey: 'cellphone_number',
@@ -88,8 +72,70 @@ export const columns: ColumnDef<Inscripcion>[] = [
     accessorKey: 'price_id',
     header: 'Precio',
     cell: ({ row }) => (
+      <div className="flex flex-col">
+        <span>S/ {row.original.price_amount}</span>
+        <span className="text-xs text-muted-foreground">({row.original.price_name})</span>
+      </div>
+    )
+  },
+  {
+    accessorKey: 'payments',
+    accessorFn: (row) => row.payments,
+    header: 'Pagos',
+    cell: ({ row }) => {
+      const payments = row.original.payments ?? []
+      const total = payments.reduce((total, payment) => total + (payment.payment_amount || 0), 0)
+      const saldo = (row.original.price_amount || 0) - total
+      return (
+        <div>
+          <div><span className="font-medium">T: s/{total}</span>  <span className="text-xs text-muted-foreground">S: s/{saldo}</span></div>
+          {payments.length > 0 ? (
+            <div className="flex gap-px flex-wrap max-w-40">
+              {payments.map((payment, index) => (
+                <div key={`${payment.id}-${index}`} className={cn("flex items-center gap-px px-px rounded text-xs border-2", payment.payment_method === 'efectivo' ? 'border-green-500' : 'border-purple-500')}>
+                  {payment.payment_amount}
+                  {payment.payment_checked ? <CheckIcon className="h-3 w-3" /> : <XIcon className="h-3 w-3" />}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div>
+              No hay pagos
+            </div>
+          )}
+        </div>
+      )
+    }
+  },
+  {
+    accessorKey: 'height',
+    header: 'Talla',
+    cell: ({ row }) => (
+      <div className="flex flex-col gap-1">
+        <span>{row.original.height}cm</span>
+        <span className="text-muted-foreground">Polo: {row.original.shirt_size}</span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'observations',
+    header: 'Observaciones',
+    cell: ({ row }) => (
       <div>
-        S/ {row.original.price_amount} ({row.original.price_name})
+        {row.original.observations}
+      </div>
+    ),
+    meta: {
+      visible: false,
+    }
+  },
+
+  {
+    accessorKey: 'register_by',
+    header: 'Registrado por',
+    cell: ({ row }) => (
+      <div>
+        {row.original.register_by}
       </div>
     )
   },
@@ -122,43 +168,6 @@ export const columns: ColumnDef<Inscripcion>[] = [
         placeholder: 'Check-in'
       }
     },
-  },
-  {
-    accessorKey: 'register_by',
-    header: 'Registrado por',
-    cell: ({ row }) => (
-      <div>
-        {row.original.register_by}
-      </div>
-    )
-  },
-  {
-    accessorKey: 'terms_accepted',
-    header: 'Términos',
-    cell: ({ row }) => (
-      <div className="flex items-center justify-start gap-2">
-        {row.original.terms_accepted ? (
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-        ) : (
-          <XCircle className="h-4 w-4 text-red-600" />
-        )}
-      </div>
-    ),
-    meta: {
-      visible: false,
-    }
-  },
-  {
-    accessorKey: 'height',
-    header: 'Talla',
-    cell: ({ row }) => (
-      <div>
-        {row.original.height}cm
-      </div>
-    ),
-    meta: {
-      visible: false,
-    }
   },
   {
     accessorKey: 'created_at',

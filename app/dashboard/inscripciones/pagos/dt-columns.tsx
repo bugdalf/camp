@@ -17,7 +17,7 @@ export const columns: ColumnDef<Pago>[] = [
   },
   {
     accessorKey: 'payment_method',
-    header: 'Método de pago',
+    header: 'Método',
     cell: ({ row }) => (
       <div className="flex flex-col gap-1">
         <Badge variant='outline' className={row.original.payment_method === 'yape' ? 'bg-purple-500 text-white' : 'bg-green-500 text-white'}>
@@ -38,18 +38,16 @@ export const columns: ColumnDef<Pago>[] = [
   },
   {
     accessorKey: 'payment_checked',
-    header: 'Verificado',
+    header: 'VºBº',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         {row.original.payment_checked ? (
           <div className="flex items-center gap-1 text-green-600">
             <CheckCircle2 className="h-4 w-4" />
-            <span className="text-sm">Verificado</span>
           </div>
         ) : (
           <div className="flex items-center gap-1 text-orange-600">
             <XCircle className="h-4 w-4" />
-            <span className="text-sm">Pendiente</span>
           </div>
         )}
       </div>
