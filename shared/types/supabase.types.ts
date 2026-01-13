@@ -19,6 +19,10 @@ export type Inscripcion = {
   register_by?: string; // quien registro la inscripcion
   check_in?: boolean;
   height?: number;
+
+  shirt_size?: 's' | 'm' | 'l' | 'xl';
+  gender?: 'varon' | 'mujer';
+  observations?: string;
   created_at?: string;
   updated_at?: string;
 }

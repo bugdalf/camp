@@ -64,6 +64,8 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
           .min(50, 'La estatura debe estar entre 50cm y 250cm')
           .max(250, 'La estatura debe estar entre 50cm y 250cm')
       ),
+    gender: z.enum(['varon', 'mujer']),
+    shirt_size: z.enum(['s', 'm', 'l', 'xl']),
     is_under_18: z.boolean().default(false),
     cellphone_number: z
       .string()
@@ -157,15 +159,27 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: 'Nombre completo',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3',
       placeholder: 'Ingresa tu nombre completo'
+    },
+    {
+      name: 'gender',
+      label: 'Género',
+      type: 'radio',
+      required: true,
+      className: 'col-span-3',
+      placeholder: 'Selecciona el género',
+      options: [
+        { label: 'Varón', value: 'varon' },
+        { label: 'Mujer', value: 'mujer' },
+      ],
     },
     {
       name: 'dni',
       label: 'DNI',
       type: 'text',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-2',
       placeholder: 'Ingresa tu DNI',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -176,7 +190,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: 'Número de celular',
       type: 'text',
       required: false,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-1',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -187,7 +201,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: 'Edad',
       type: 'integer',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-1',
       placeholder: 'Ej: 25',
       onChange: handleAgeChange
     },
@@ -196,18 +210,32 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: 'Estatura',
       type: 'height',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-1',
       placeholder: 'Ej: 170',
       inputMode: 'numeric',
       pattern: '[0-9]*',
       maxLength: 3,
     },
     {
+      name: 'shirt_size',
+      label: 'Talla de polo',
+      type: 'select',
+      required: true,
+      className: 'col-span-3 md:col-span-1',
+      placeholder: 'Selecciona la talla',
+      options: [
+        { label: 'S', value: 's' },
+        { label: 'M', value: 'm' },
+        { label: 'L', value: 'l' },
+        { label: 'XL', value: 'xl' },
+      ],
+    },
+    {
       name: 'is_under_18',
       label: '¿Es menor de 18 años?',
       type: 'checkbox',
       required: false,
-      className: 'col-span-1 items-end border-none hidden',
+      className: 'col-span-3 items-end border-none hidden',
       defaultValue: false,
       disabled: true
     },
@@ -216,7 +244,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: 'Nombre del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3 md:col-span-2',
       placeholder: 'Requerido si es menor de 18 años',
       dependsOn: { field: 'is_under_18', value: true }
     },
@@ -225,7 +253,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: 'Celular del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3 md:col-span-1',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -237,7 +265,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: "Selecciona el monto",
       type: "radio", // o el tipo que uses para radio
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3',
       options: [
         { label: "Reserva S/50", value: "50" },
         { label: `Total S/${defaultPrecio?.price ?? 220}`, value: `${defaultPrecio?.price ?? 220}` },
@@ -248,9 +276,9 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       label: 'Comprobante de pago yape (imagen)',
       type: 'image',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3',
       accept: 'image/*',
-      helpText: 'Sube una captura de tu comprobante de pago, recuerda que el monto que pusiste debe ser igual al monto que aparece en tu comprobante'
+      helpText: 'Sube una captura de tu comprobante de pago, recuerda que el monto que seleccionaste debe ser igual al monto que aparece en tu comprobante'
     },
     {
       name: 'terms_accepted',
@@ -260,7 +288,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       </div>,
       type: 'checkbox',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3',
       defaultValue: false
     },
   ];
@@ -272,7 +300,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
       fields={fields}
       onSubmit={handleCreate}
       selectedItem={null}
-      className='grid-cols-2 px-2'
+      className='grid-cols-3'
     />
   )
 }

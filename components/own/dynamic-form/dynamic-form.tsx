@@ -112,7 +112,7 @@ export function DynamicForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmitHandler)} className={cn("w-full sm:min-w-md grid gap-2 grid-cols-1 h-full overflow-auto px-1 relative", className)} noValidate>
+      <form onSubmit={form.handleSubmit(onSubmitHandler)} className={cn("w-full grid gap-2 grid-cols-1 h-full overflow-y-auto px-1 relative", className)} noValidate>
         {fields.map((field) => renderField(field))}
 
         <div className="w-full col-span-full sticky bottom-0 bg-card">

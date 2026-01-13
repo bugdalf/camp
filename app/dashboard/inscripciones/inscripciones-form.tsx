@@ -58,6 +58,8 @@ const inscripcionesFormSchema = z.object({
         .min(50, 'La estatura debe estar entre 50cm y 250cm')
         .max(250, 'La estatura debe estar entre 50cm y 250cm')
     ),
+  gender: z.enum(['varon', 'mujer']),
+  shirt_size: z.enum(['s', 'm', 'l', 'xl']),
   is_under_18: z.boolean().default(false),
   cellphone_number: z
     .string()
@@ -72,6 +74,7 @@ const inscripcionesFormSchema = z.object({
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos y condiciones'
   }),
+  observations: z.string().optional().nullable().transform(val => val || undefined),
   // Campos opcionales que pueden venir de la BD pero no se editan directamente
   price_id: z.string().uuid().optional().nullable(),
 }).superRefine((data, ctx) => {
@@ -164,15 +167,27 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Nombre completo',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3',
       placeholder: 'Ingresa tu nombre completo'
+    },
+    {
+      name: 'gender',
+      label: 'Género',
+      type: 'radio',
+      required: true,
+      className: 'col-span-3',
+      placeholder: 'Selecciona el género',
+      options: [
+        { label: 'Varón', value: 'varon' },
+        { label: 'Mujer', value: 'mujer' },
+      ],
     },
     {
       name: 'dni',
       label: 'DNI',
       type: 'text',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-2',
       placeholder: 'Ingresa tu DNI',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -183,7 +198,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Número de celular',
       type: 'text',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-1',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -194,7 +209,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Edad',
       type: 'integer',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-1',
       placeholder: 'Ej: 25',
       onChange: handleAgeChange
     },
@@ -203,11 +218,25 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Estatura (cm)',
       type: 'height',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-3 md:col-span-1',
       placeholder: 'Ej: 170',
       inputMode: 'numeric',
       pattern: '[0-9]*',
       maxLength: 3,
+    },
+    {
+      name: 'shirt_size',
+      label: 'Talla de polo',
+      type: 'select',
+      required: true,
+      className: 'col-span-3 md:col-span-1',
+      placeholder: 'Selecciona la talla',
+      options: [
+        { label: 'S', value: 's' },
+        { label: 'M', value: 'm' },
+        { label: 'L', value: 'l' },
+        { label: 'XL', value: 'xl' },
+      ],
     },
     {
       name: 'is_under_18',
@@ -223,7 +252,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Nombre del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3 md:col-span-2',
       placeholder: 'Requerido si es menor de 18 años',
       dependsOn: { field: 'is_under_18', value: true }
     },
@@ -232,7 +261,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Celular del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3 md:col-span-1',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -244,7 +273,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Precio',
       type: 'select',
       required: false,
-      className: 'col-span-2',
+      className: 'col-span-3',
       options: preciosOptions,
       defaultValue: precioDefault?.id,
     },
@@ -253,9 +282,17 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       label: 'Acepto los términos y condiciones',
       type: 'checkbox',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-3',
       defaultValue: false
     },
+    {
+      name: 'observations',
+      label: 'Observaciones',
+      type: 'textarea',
+      required: false,
+      className: 'col-span-3',
+      placeholder: 'Anotar aqui incidencias',
+    }
   ];
 
   return (
@@ -264,7 +301,7 @@ export function InscripcionesForm({ dialogHandlers, onCreate, onEdit }: Inscripc
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='grid-cols-2 px-2'
+      className='w-full grid-cols-3'
     />
   )
 }

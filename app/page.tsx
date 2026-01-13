@@ -1,27 +1,17 @@
 "use client"
 
-import { teams } from "@/lib/constants/teams"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import TeamsGrid from "@/components/own/landing/teams-grid"
-import { useState, useMemo, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 
 export default function LandingPage() {
-  const [hoveredTeam, setHoveredTeam] = useState<string | null>(null);
   const [inscripcionesCount, setInscripcionesCount] = useState<number>(0);
   const { fetchInscripcionesCount } = useInscripcionesStore();
-
-  const currentTeam = useMemo(() => {
-    return hoveredTeam
-      ? teams.find(team => team.name === hoveredTeam)
-      : null;
-  }, [hoveredTeam]);
 
   useEffect(() => {
     const fetchCount = async () => {
       const count = await fetchInscripcionesCount();
-      console.log(count);
       setInscripcionesCount(count);
     };
     fetchCount();
@@ -68,7 +58,7 @@ export default function LandingPage() {
             <Button
               variant="cta"
               size="cta"
-              className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+              className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 animate-bounce"
             >
               <span>Regístrate</span>
               <span>hoy</span>
@@ -78,7 +68,7 @@ export default function LandingPage() {
           {/* PRECIOS */}
           <div className="mt-2 text-center">
             <p className="text-emerald-400 font-semibold text-sm md:text-base">
-              Preventa: S/ 190 <span className="text-xs">(Ahorra S/ 30)</span>
+              Preventa: S/ 190 <span className="text-xs">(Ahorra S/ 30) hasta el 8 de febrero</span>
             </p>
             <p className="text-slate-400 text-xs md:text-sm">
               Venta normal: S/ 220
@@ -98,14 +88,14 @@ export default function LandingPage() {
             </div>
 
             <div className="flex gap-6 text-sm">
-              <Link href="/login" className="text-slate-400 hover:text-white transition-all duration-300">
+              <Link href="/login" className="text-slate-800 hover:text-white transition-all duration-300">
                 Iniciar sesión
               </Link>
             </div>
 
             <div className="text-center md:text-right">
               <p className="text-slate-400 text-sm">
-                ©️ 2025 Todos los derechos reservados
+                Ministerio Juvenil GDF 🔥
               </p>
             </div>
           </div>

@@ -72,8 +72,6 @@ export function InscripcionHistoryList({
       yape: 'Yape',
       plin: 'Plin',
       cash: 'Efectivo',
-      transfer: 'Transferencia',
-      card: 'Tarjeta',
     };
     return methods[method] || method;
   };

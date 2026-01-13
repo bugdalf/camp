@@ -162,6 +162,9 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
         terms_accepted: values.terms_accepted || false,
+        shirt_size: values.shirt_size || null,
+        gender: values.gender || null,
+        observations: values.observations || null,
         register_by: values.register_by || null,
       };
 
@@ -210,6 +213,8 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
         terms_accepted: values.terms_accepted || false,
+        shirt_size: values.shirt_size || null,
+        gender: values.gender || null,
         register_by: values.register_by || null,
       };
 
@@ -295,6 +300,9 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
         terms_accepted: values.terms_accepted || false,
+        shirt_size: values.shirt_size || null,
+        gender: values.gender || null,
+        observations: values.observations || null,
       };
 
       const { data, error } = await supabase
