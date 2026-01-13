@@ -94,7 +94,7 @@ export default function InscripcionCampistaPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 flex flex-col items-center gap-4 justify-center">
       <Link href="/" className="mb-4">
-        <img src="/main-logo-webp" alt="Campamento Desafío 2026" className="w-72 m-auto" />
+        <img src="/main-logo.webp" alt="Campamento Desafío 2026" className="w-40 m-auto" />
       </Link>
       <h1 className="text-2xl font-bold mb-4">Inscripción -  Campista</h1>
       <Stepper steps={steps} currentStep={step} />
@@ -108,12 +108,16 @@ export default function InscripcionCampistaPage() {
                 <span>Estos son los números de Yape para pagar: </span>
                 <div className="flex gap-2">
                   <div onClick={() => handleCopyNumber("950569436")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
-                    {/* <div>qr</div> */}
+                    <figure className="w-24 h-24">
+                      <img src="/qrs/plin.jpg" alt="" className="w-full h-auto object-contain" />
+                    </figure>
                     <div>José Mamani - plin</div>
                     <div className="flex gap-2 items-center">950569436 <CopyIcon /></div>
                   </div>
                   <div onClick={() => handleCopyNumber("956890060")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
-                    {/* <div>qr</div> */}
+                    <figure className="w-24 h-24">
+                      <img src="/qrs/yape.jpg" alt="" className="w-full h-auto object-contain" />
+                    </figure>
                     <div>Victor Atamari - yape</div>
                     <div className="flex gap-2 items-center">956890060 <CopyIcon /></div>
                   </div>
