@@ -35,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${hanken.variable} ${protest.variable}`}>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased bg-[#040810]">
         <AuthProvider>
           {children}
         </AuthProvider>

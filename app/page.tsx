@@ -30,103 +30,57 @@ export default function LandingPage() {
   return (
     <>
       {/* Hero Section - Full Screen */}
-      <section className="relative min-h-screen w-full flex flex-col items-center px-4 bg-slate-950">
-        <div className="w-full h-screen flex flex-col items-center gap-8 relative">
-          {/* Imagen del campeón anterior */}
-          <div className="flex flex-col items-center gap-2 w-80 animate-in fade-in slide-in-from-top-4 duration-700 scale-60">
-            <span className="strong text-white text-center">Ultimo campeón</span>
-            <div className="w-full h-20 relative">
-              <img src="/champ-aura.png" alt="" className="w-full h-20 object-cover object-center absolute" />
-              <img src={teams[0].titleHoverImg} alt="" className="w-full absolute -top-15" />
-            </div>
+      <section className="min-h-screen w-full flex flex-col justify-center gap-4 items-center bg-[#040810] bg-[url('/fondo.webp')] bg-cover bg-center bg-no-repeat mask-fade-bottom">
+        {/* Fecha del evento */}
+        <p className="font-display text-2xl md:text-3xl text-white text-center p-3 animate-in fade-in slide-in-from-top-8 duration-700 delay-150">
+          2026
+        </p>
+
+        {/* Logo + CTA */}
+        <figure className="w-full max-w-lg relative flex items-center justify-center h-2/3">
+
+          {/* Logo principal */}
+          <div className="animate-in fade-in zoom-in duration-700 delay-300">
+            <img
+              src="/main-logo.webp"
+              alt="Logo del evento"
+              className="w-full h-auto max-h-[300px] object-contain drop-shadow-2xl"
+            />
+          </div>
+        </figure>
+        {/* CTA + Precios */}
+        <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+          <div className="flex flex-col items-center font-display text-white">
+            <span className="text-xs">Cupos Limitados:</span>
+            <span className="text-xl md:text-xl">{inscripcionesCount}/200</span>
           </div>
 
-          {/* Fecha del evento */}
-          <p className="font-display text-xl md:text-2xl text-white text-center p-3 animate-in fade-in slide-in-from-top-8 duration-700 delay-150">
-            22 al 26 FEBRERO
-          </p>
+          <Link href="/inscripcion-campista">
+            <Button
+              variant="cta"
+              size="cta"
+              className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              <span>Regístrate</span>
+              <span>hoy</span>
+            </Button>
+          </Link>
 
-          {/* Logo + CTA */}
-          <div className="w-full h-full flex flex-col items-center gap-6">
-            <figure className="w-full max-w-lg relative flex items-center justify-center h-2/3">
-
-              {/* Logo principal */}
-              <div
-                className={`absolute inset-0 flex flex-col items-center justify-center gap-8 transition-all duration-500 ${currentTeam ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
-                  }`}
-              >
-                <div className="animate-in fade-in zoom-in duration-700 delay-300">
-                  <img
-                    src="/main-logo.png"
-                    alt="Logo del evento"
-                    className="w-full h-auto max-h-[300px] object-contain drop-shadow-2xl"
-                  />
-                </div>
-
-                {/* CTA + Precios */}
-                <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-                  <p className="font-display md:text-2xl text-white">
-                    Cupos Limitados: {inscripcionesCount}/200
-                  </p>
-
-                  <Link href="/inscripcion-campista">
-                    <Button
-                      variant="cta"
-                      size="cta"
-                      className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-                    >
-                      Regístrate ahora
-                    </Button>
-                  </Link>
-
-                  {/* PRECIOS */}
-                  <div className="mt-2 text-center">
-                    <p className="text-emerald-400 font-semibold text-sm md:text-base">
-                      Preventa: S/ 190 <span className="text-xs">(Ahorra S/ 30)</span>
-                    </p>
-                    <p className="text-slate-400 text-xs md:text-sm">
-                      Venta normal: S/ 220
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hover equipos */}
-              <div
-                className={`absolute flex justify-center items-center inset-0 transition-all duration-500 ${currentTeam ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-                  }`}
-              >
-                {currentTeam && (
-                  <div className="w-169 h-160 relative flex flex-col items-center justify-center gap-4">
-                    <figure className="w-full h-full absolute inset-0 rounded-3xl overflow-hidden shadow-2xl">
-                      <img
-                        src={currentTeam.groupImg}
-                        alt={`${currentTeam.name} grupo`}
-                        className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
-                      />
-                      <div className="absolute inset-0 bg-linear-to-t from-slate-950/30 via-transparent to-slate-950/30 pointer-events-none" />
-                    </figure>
-
-                    <figure
-                      className="w-full h-50 -bottom-10 z-10 scale-150 animate-in fade-in slide-in-from-bottom-8 duration-500 absolute overflow-hidden"
-                    >
-                      <img
-                        src={currentTeam.titleHoverImg}
-                        alt={`${currentTeam.name} título`}
-                        className="w-full h-full object-cover drop-shadow-2xl"
-                      />
-                    </figure>
-                  </div>
-                )}
-              </div>
-
-            </figure>
+          {/* PRECIOS */}
+          <div className="mt-2 text-center">
+            <p className="text-emerald-400 font-semibold text-sm md:text-base">
+              Preventa: S/ 190 <span className="text-xs">(Ahorra S/ 30)</span>
+            </p>
+            <p className="text-slate-400 text-xs md:text-sm">
+              Venta normal: S/ 220
+            </p>
           </div>
         </div>
+
       </section>
 
       {/* Footer */}
-      <footer className="w-full bg-slate-900 border-t border-slate-800">
+      <footer className="w-full bg-[#040810]">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
