@@ -28,7 +28,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <>
+    <div className="bg-[#040810]">
       {/* Hero Section - Full Screen */}
       <section className="min-h-screen w-full flex flex-col justify-center gap-4 items-center bg-[#040810] bg-[url('/fondo.webp')] bg-cover bg-center bg-no-repeat mask-fade-bottom">
         {/* Fecha del evento */}
@@ -43,8 +43,17 @@ export default function LandingPage() {
           <div className="animate-in fade-in zoom-in duration-700 delay-300">
             <img
               src="/main-logo.webp"
-              alt="Logo del evento"
-              className="w-full h-auto max-h-[300px] object-contain drop-shadow-2xl"
+              alt="Logo principal del campamento"
+              className="w-full h-auto max-h-[220px] object-contain drop-shadow-2xl"
+            />
+          </div>
+        </figure>
+        <figure>
+          <div className="animate-in fade-in zoom-in duration-700 delay-300">
+            <img
+              src="/fecha.webp"
+              alt="Fecha del evento"
+              className="w-full h-auto max-h-[60px] object-contain drop-shadow-2xl"
             />
           </div>
         </figure>
@@ -102,6 +111,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   )
 }
