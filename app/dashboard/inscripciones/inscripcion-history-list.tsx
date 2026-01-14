@@ -62,6 +62,8 @@ export function InscripcionHistoryList({
       price_amount: 'Monto del precio',
       price_name: 'Nombre del precio',
       payment_completed: 'Pago completado',
+      gender: 'Género',
+      shirt_size: 'Talla de polo',
       register_by: 'Registrado por',
     };
     return fieldNames[field] || field;
