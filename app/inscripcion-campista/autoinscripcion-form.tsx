@@ -1,6 +1,7 @@
 'use client'
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
+import { Button } from "@/components/ui/button";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
 import { Precio } from "@/shared/types/supabase.types";
 import type { FieldConfig } from "@/shared/types/ui.types";
@@ -11,9 +12,10 @@ import { z } from "zod";
 interface AutoinscripcionFormProps {
   onCreate: (data: Record<string, any>) => Promise<void>;
   defaultPrecio: Precio | null;
+  setStep: (step: number) => void;
 }
 
-export function AutoinscripcionForm({ onCreate, defaultPrecio }: AutoinscripcionFormProps) {
+export function AutoinscripcionForm({ onCreate, defaultPrecio, setStep }: AutoinscripcionFormProps) {
   // Schema dentro del componente para acceder a defaultPrecio
   const autoinscripcionesFormSchema = z.object({
     name: z.string().min(1, 'El nombre es requerido'),
@@ -294,13 +296,16 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio }: Autoinscripcion
   ];
 
   return (
-    <DynamicForm
-      buttonLabel="Inscribirse"
-      schema={autoinscripcionesFormSchema}
-      fields={fields}
-      onSubmit={handleCreate}
-      selectedItem={null}
-      className='grid-cols-3'
-    />
+    <div className="w-full flex flex-col gap-2 items-center">
+      <DynamicForm
+        buttonLabel="Inscribirse"
+        schema={autoinscripcionesFormSchema}
+        fields={fields}
+        onSubmit={handleCreate}
+        selectedItem={null}
+        className='grid-cols-3'
+      />
+      <Button onClick={() => setStep(1)} variant="outline" className="w-fit">Volver</Button>
+    </div>
   )
 }

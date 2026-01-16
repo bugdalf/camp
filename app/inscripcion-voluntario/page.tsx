@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Stepper } from "@/components/own/stepper"
-import { RegistroCompletado } from "@/components/own/registro-completo"
+import { RegistroCompletado } from "@/components/own/inscripcion/registro-completo"
 import { Precio, Voluntario } from "@/shared/types/supabase.types"
 import { CopyIcon, Download } from "lucide-react"
 import { toast } from "sonner"

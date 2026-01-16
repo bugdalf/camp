@@ -84,19 +84,16 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
               <p className="text-white font-semibold mb-1">Campamento desafío 2026</p>
-              <p className="text-slate-400 text-sm">22 al 26 de Febrero</p>
-            </div>
-
-            <div className="flex gap-6 text-sm">
-              <Link href="/login" className="text-slate-800 hover:text-white transition-all duration-300">
-                Iniciar sesión
-              </Link>
+              <p className="text-slate-400 text-sm">La Última llamada</p>
             </div>
 
             <div className="text-center md:text-right">
               <p className="text-slate-400 text-sm">
-                Ministerio Juvenil GDF 🔥
+                Ministerio Juvenil Generación de fuego
               </p>
+              <Link href="/login" className="text-slate-800 hover:text-white transition-all duration-300">
+                Iniciar sesión
+              </Link>
             </div>
           </div>
         </div>
