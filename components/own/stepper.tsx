@@ -15,13 +15,21 @@ interface StepperProps {
 
 export function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <div className="w-fit flex items-center justify-between mb-8">
+    <div className="w-full flex items-center justify-between mb-8">
       {steps.map((step, index) => {
         const isCompleted = step.id < currentStep
         const isActive = step.id === currentStep
 
         return (
-          <div key={step.id} className="flex items-center w-full">
+          <div key={step.id} className="flex items-center justify-center w-full">
+            <div
+              className={cn(
+                "h-[2px] w-full",
+                step.id < currentStep ? "bg-primary" : "bg-muted",
+                index === 0 && "bg-transparent"
+              )}
+            />
+
             <div className="flex flex-col items-center">
               <div
                 className={cn(
@@ -36,14 +44,13 @@ export function Stepper({ steps, currentStep }: StepperProps) {
               <span className="mt-2 text-xs text-center">{step.label}</span>
             </div>
 
-            {index !== steps.length - 1 && (
-              <div
-                className={cn(
-                  "h-[2px] mx-2 min-w-40",
-                  step.id < currentStep ? "bg-primary" : "bg-muted"
-                )}
-              />
-            )}
+            <div
+              className={cn(
+                "h-[2px] w-full",
+                step.id < currentStep ? "bg-primary" : "bg-muted",
+                index === steps.length - 1 && "bg-transparent"
+              )}
+            />
           </div>
         )
       })}

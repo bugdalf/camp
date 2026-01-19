@@ -49,6 +49,8 @@ export interface FieldConfig {
 
 export interface FormConfig {
   buttonLabel?: string
+  buttonSize?: "default" | "cta" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg" | null | undefined
+  buttonVariant?: "default" | "cta" | "destructive" | "link" | "outline" | "secondary" | "ghost" | null | undefined
   fields: FieldConfig[]
   schema: any
   onSubmit: (data: Record<string, any>) => void | Promise<void>

@@ -1,9 +1,11 @@
 'use client'
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
+import { useAuthStore } from "@/lib/store/auth.store";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
 import { Voluntario } from "@/shared/types/supabase.types";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
+import { register } from "module";
 import { z } from "zod";
 
 const voluntariosFormSchema = z.object({
@@ -12,7 +14,7 @@ const voluntariosFormSchema = z.object({
     .string()
     .trim()
     .refine(isValidPeruDni, {
-      message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
+      message: 'DNI inválido (debe tener 8 dígitos)',
     }),
   age: z
     .union([z.number(), z.string()])
@@ -34,7 +36,9 @@ const voluntariosFormSchema = z.object({
         .min(14, 'La edad mínima es de 14 años')
         .max(30, 'La edad no puede superar 30 años')
     ),
-  commission: z.enum(['cocina', 'limpieza', 'produccion']),
+  gender: z.enum(['varon', 'mujer']),
+  shirt_size: z.enum(['s', 'm', 'l', 'xl']),
+  commission: z.enum(['logistica', 'recepcion', 'programacion-actividades', 'sonido-luces', 'publicidad', 'alimentacion-limpieza', 'finanzas', 'atencion-pastores', 'jueces', 'contenido-digital', 'lideres-equipo', 'dinamicas-souvenires']),
   is_under_18: z.boolean().default(false),
   cellphone_number: z
     .string()
@@ -52,9 +56,11 @@ const voluntariosFormSchema = z.object({
     .string()
     .optional()
     .nullable()
-    .transform(val => val || undefined), terms_accepted: z.boolean().refine(val => val === true, {
-      message: 'Debes aceptar los términos y condiciones'
-    }),
+    .transform(val => val || undefined),
+  terms_accepted: z.boolean().refine(val => val === true, {
+    message: 'Debes aceptar los términos y condiciones'
+  }),
+  observations: z.string().optional().nullable().transform(val => val || undefined),
 }).superRefine((data, ctx) => {
   // Validar campos del padre si es menor de 18
   if (data.is_under_18) {
@@ -82,8 +88,15 @@ interface VoluntariosFormProps {
 }
 
 export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: VoluntariosFormProps) {
+  const { user } = useAuthStore();
+
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
-    await onCreate(values);
+    const valuesToCreate = {
+      ...values,
+      register_by: user?.email
+    }
+
+    await onCreate(valuesToCreate);
     dialogHandlers.setOpenDialog(false);
   }
 
@@ -111,7 +124,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Nombre completo del voluntario',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       placeholder: 'Ingresa el nombre completo del voluntario'
     },
     {
@@ -119,7 +132,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'DNI',
       type: 'text',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-4',
       placeholder: 'Ingresa tu DNI',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -130,7 +143,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Número de celular',
       type: 'text',
       required: false,
-      className: 'col-span-1',
+      className: 'col-span-2',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -141,20 +154,53 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Edad',
       type: 'integer',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-2',
       placeholder: 'Ej: 25',
       onChange: handleAgeChange // 🎯 Añadir handler
+    },
+    {
+      name: 'gender',
+      label: 'Género',
+      type: 'radio',
+      required: true,
+      className: 'col-span-4',
+      options: [
+        { label: 'Masculino', value: 'varon' },
+        { label: 'Femenino', value: 'mujer' }
+      ]
+    },
+    {
+      name: 'shirt_size',
+      label: 'Talla de polo',
+      type: 'select',
+      required: true,
+      className: 'col-span-4',
+      options: [
+        { label: 'S', value: 's' },
+        { label: 'M', value: 'm' },
+        { label: 'L', value: 'l' },
+        { label: 'XL', value: 'xl' }
+      ]
     },
     {
       name: 'commission',
       label: 'Comisión',
       type: 'select',
       required: true,
-      className: 'col-span-1',
+      className: 'col-span-4',
       options: [
-        { label: 'Cocina', value: 'cocina' },
-        { label: 'Limpieza', value: 'limpieza' },
-        { label: 'Producción', value: 'produccion' }
+        { label: 'Logística', value: 'logistica' },
+        { label: 'Recepción', value: 'recepcion' },
+        { label: 'Programación y actividades', value: 'programacion-actividades' },
+        { label: 'Sonido y luces', value: 'sonido-luces' },
+        { label: 'Publicidad', value: 'publicidad' },
+        { label: 'Alimentación y limpieza', value: 'alimentacion-limpieza' },
+        { label: 'Finanzas', value: 'finanzas' },
+        { label: 'Atención de pastores', value: 'atencion-pastores' },
+        { label: 'Jueces', value: 'jueces' },
+        { label: 'Contenido digital', value: 'contenido-digital' },
+        { label: 'Líderes de equipo', value: 'lideres-equipo' },
+        { label: 'Dinámicas y Souvenires', value: 'dinamicas-souvenires' }
       ]
     },
     {
@@ -162,7 +208,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: '¿Es menor de 18 años?',
       type: 'checkbox',
       required: false,
-      className: 'col-span-1 items-end border-none hidden',
+      className: 'col-span-4 items-end border-none hidden',
       defaultValue: false,
       disabled: true // 🔒 Deshabilitar porque se calcula automáticamente
     },
@@ -171,7 +217,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Nombre del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       placeholder: 'Requerido si es menor de 18 años',
       dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
     },
@@ -180,7 +226,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Celular del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -192,7 +238,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Método de pago',
       type: 'select',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       options: [
         { label: 'Yape', value: 'yape' },
         { label: 'Efectivo', value: 'efectivo' }
@@ -203,7 +249,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Comprobante de pago (imagen)',
       type: 'image',
       required: false,
-      className: 'col-span-2',
+      className: 'col-span-4',
       accept: 'image/*',
       helpText: 'Sube una captura de tu comprobante de pago'
     },
@@ -212,7 +258,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Pago verificado (solo admin)',
       type: 'checkbox',
       required: false,
-      className: 'col-span-2',
+      className: 'col-span-4',
       defaultValue: false
     },
     {
@@ -220,9 +266,17 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       label: 'Acepto los términos y condiciones',
       type: 'checkbox',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       defaultValue: false
     },
+    {
+      name: 'observations',
+      label: 'Observaciones',
+      type: 'textarea',
+      required: false,
+      className: 'col-span-4',
+      placeholder: 'Anotar aqui incidencias',
+    }
   ];
 
   return (
@@ -231,7 +285,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='grid-cols-2 px-2'
+      className='w-full grid-cols-4'
     />
   )
 }

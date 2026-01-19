@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { CopyIcon, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CircleQuestionMark from "../../components/own/icons/circle-question-mark";
 
 export default function FirstInfo({ setStep }: { setStep: (step: number) => void }) {
   const { fetchDefaultPrecio } = usePreciosStore();
@@ -65,46 +66,53 @@ export default function FirstInfo({ setStep }: { setStep: (step: number) => void
       <p className="text-lg font-bold">Consideraciones e indicaciones para tu inscripción:</p>
       <ul className="list-disc list-inside pl-4">
         <li className="">
-          <span>Estos son los números de Yape para pagar, tambien los tendras en el siguiente paso: </span>
+          <span>Estos son los números de Yape y Plin. </span>
           <div className="flex w-full justify-center gap-2">
             <div onClick={() => handleCopyNumber("950569436")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
               <figure className="w-24 h-24">
                 <img src="/qrs/plin.jpg" alt="" className="w-full h-auto object-contain" />
               </figure>
-              <div>José Mamani - plin</div>
+              <div>José Mamani - Plin</div>
               <div className="flex gap-2 items-center">950569436 <CopyIcon /></div>
             </div>
             <div onClick={() => handleCopyNumber("956890060")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
               <figure className="w-24 h-24">
                 <img src="/qrs/yape.jpg" alt="" className="w-full h-auto object-contain" />
               </figure>
-              <div>Victor Atamari - yape</div>
+              <div>Victor Atamari - Yape</div>
               <div className="flex gap-2 items-center">956890060 <CopyIcon /></div>
             </div>
           </div>
         </li>
         <li>El monto total a pagar es de <strong>S/ {defaultPrecio?.price}</strong> ({defaultPrecio?.name}) </li>
         <li>Puedes reservar tu inscripción desde <strong>S/ 50</strong>.</li>
-        <li className="italic ml-4">¡Importante si solo reservas! El saldo debes pagarlo presencialmente Jr. Mariano Nuñes N° 345 antes del <strong>8 de febrero</strong> para mantener el precio de Pre-venta.</li>
-        <li>Adjunta en el formulario una captura de tu comprobante de pago (imagen) clara.</li>
-        <li>Debes tener entre 14 y 30 años de edad para poder participar</li>
+        <li className="italic ml-4 list-none border-2 border-amber-300 border-dashed p-2 rounded">¡Importante si solo reservas! El saldo debes pagarlo presencialmente en Jr. Mariano Nuñes N° 345 antes del <strong>8 de febrero</strong> para mantener el precio de Pre-venta.</li>
+        <li>Adjunta en el formulario una captura de tu comprobante de pago (imagen clara).</li>
+        <li>Debes ser mayor de 14 años para poder participar</li>
         <li>
-          Si eres menor de edad debes tener <strong>la autorización de tus padres o tutor legal firmada, aqui podras descargar el</strong>{' '}
+          Si eres menor de edad debes tener <strong>la autorización firmada de tus padres o tutor, aquí podras descargar el</strong>{' '}
           <button
             onClick={handleDownloadPDF}
             className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 underline"
           >
-            archivo
+            formato
             <Download size={16} />
           </button>
         </li>
-        <li className="flex flex-wrap gap-2">Si tienes alguna duda o consulta, puedes escribirnos al WhatsApp:
+        <li className="flex flex-wrap gap-2 my-4"><CircleQuestionMark size={14} /> Si tienes alguna duda o consulta, puedes escribirnos al WhatsApp:
           <a href="https://wa.me/51992180530" target="_blank" className="rounded border bg-slate-100 px-2 py-1">992180530</a>
           <a href="https://wa.me/51925632050" target="_blank" className="rounded border bg-slate-100 px-2 py-1">925632050</a>
         </li>
       </ul>
-      <div className="flex justify-end mt-4">
-        <Button onClick={() => setStep(2)} className="w-full">Continuar</Button>
+      <div className="flex justify-center mt-4">
+        <Button
+          onClick={() => setStep(2)}
+          variant="cta"
+          size="cta"
+          className="w-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+        >
+          Continuar
+        </Button>
       </div>
     </div>
   )

@@ -16,9 +16,18 @@ const formatDate = (dateString: string) => {
 // Commission labels
 const getCommissionLabel = (commission?: string) => {
   const labels = {
-    'cocina': { text: 'Cocina', icon: '👨‍🍳', color: 'bg-orange-100 text-orange-700 border-orange-200' },
-    'limpieza': { text: 'Limpieza', icon: '🧹', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-    'produccion': { text: 'Producción', icon: '🎬', color: 'bg-purple-100 text-purple-700 border-purple-200' }
+    'logistica': { text: 'Logística', icon: '👩🏻‍💻', color: 'bg-orange-100 text-orange-700 border-orange-200' },
+    'recepcion': { text: 'Recepción', icon: '👋🏻', color: 'bg-purple-100 text-purple-700 border-purple-200' },
+    'programacion-actividades': { text: 'Programación y actividades', icon: '📅', color: 'bg-green-100 text-green-700 border-green-200' },
+    'sonido-luces': { text: 'Sonido y luces', icon: '🔊', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+    'publicidad': { text: 'Publicidad', icon: '📸', color: 'bg-pink-100 text-pink-700 border-pink-200' },
+    'alimentacion-limpieza': { text: 'Alimentación y limpieza', icon: '🍽️', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+    'finanzas': { text: 'Finanzas', icon: '💰', color: 'bg-red-100 text-red-700 border-red-200' },
+    'atencion-pastores': { text: 'Atención de pastores', icon: '🙏', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+    'jueces': { text: 'Jueces', icon: '⚖️', color: 'bg-teal-100 text-teal-700 border-teal-200' },
+    'contenido-digital': { text: 'Contenido digital', icon: '📱', color: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
+    'lideres-equipo': { text: 'Líderes de equipo', icon: '🧗🏻‍♂️', color: 'bg-gray-100 text-gray-700 border-gray-200' },
+    'dinamicas-souvenires': { text: 'Dinámicas y Souvenires', icon: '🎁', color: 'bg-orange-100 text-orange-700 border-orange-200' },
   };
   return labels[commission as keyof typeof labels] || { text: '-', icon: '📋', color: 'bg-gray-100 text-gray-700 border-gray-200' };
 };

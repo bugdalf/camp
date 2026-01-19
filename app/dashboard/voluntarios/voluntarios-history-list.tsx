@@ -54,6 +54,9 @@ export function VoluntariosHistoryList({
       parent_cellphone_number: 'Teléfono del padre',
       terms_accepted: 'Términos aceptados',
       is_active: 'Estado de la inscripción',
+      shirt_size: 'Talla de polo',
+      gender: 'Género',
+      observations: 'Observaciones',
     };
     return fieldNames[field] || field;
   };

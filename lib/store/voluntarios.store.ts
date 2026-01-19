@@ -136,6 +136,9 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
         terms_accepted: values.terms_accepted || false,
+        shirt_size: values.shirt_size || null,
+        gender: values.gender || null,
+        observations: values.observations || null,
         register_by: values.register_by || null
       };
 
@@ -198,6 +201,9 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
         payment_checked: values.payment_checked || false,
         parent_name: values.parent_name || null,
         parent_cellphone_number: values.parent_cellphone_number || null,
+        shirt_size: values.shirt_size || null,
+        gender: values.gender || null,
+        observations: values.observations || null,
         terms_accepted: values.terms_accepted || false,
       };
 

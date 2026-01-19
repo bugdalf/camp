@@ -6,16 +6,13 @@ import { AutoinscripcionForm } from "./autoinscripcion-form"
 import { RegistroCompletado } from "@/components/own/inscripcion/registro-completo"
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 import { Inscripcion, Precio } from "@/shared/types/supabase.types"
-import { CopyIcon, Download } from "lucide-react"
-import { toast } from "sonner"
 import Link from "next/link"
 import { usePreciosStore } from "@/lib/store/precios.store"
-import { createClient } from "@/lib/supabase/client" // Ajusta la ruta según tu proyecto
-import FirstInfo from "@/components/own/inscripcion/first-info"
+import FirstInfo from "@/app/inscripcion-voluntario/first-info"
 
 const steps = [
-  { id: 1, label: "Información" },
-  { id: 2, label: "Pago" },
+  { id: 1, label: "Instrucciones" },
+  { id: 2, label: "Formulario" },
   { id: 3, label: "Confirmación" },
 ]
 
@@ -36,8 +33,6 @@ export default function InscripcionCampistaPage() {
     getDefaultPrecio();
 
   }, []);
-
-
 
   const handleCreate = async (data: Record<string, any>) => {
     const valuesToCreate = {
@@ -60,7 +55,7 @@ export default function InscripcionCampistaPage() {
       <Link href="/" className="mb-4">
         <img src="/main-logo.webp" alt="Campamento Desafío 2026" className="w-40 m-auto" />
       </Link>
-      <h1 className="text-2xl font-bold mb-4">Inscripción -  Campista</h1>
+      <h1 className="font-display text-2xl font-bold mb-4">Inscripción -  Campista</h1>
       <Stepper steps={steps} currentStep={step} />
       {step === 1 && (
         <div className="w-full">

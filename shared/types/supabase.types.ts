@@ -44,6 +44,9 @@ export type Voluntario = {
   is_active?: boolean;
   register_by?: string; // quien registro la inscripcion
   check_in?: boolean;
+  shirt_size?: 's' | 'm' | 'l' | 'xl';
+  gender?: 'varon' | 'mujer';
+  observations?: string;
   created_at?: string;
   updated_at?: string;
 }

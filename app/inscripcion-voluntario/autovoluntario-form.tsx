@@ -1,8 +1,11 @@
 'use client'
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
+import { Button } from "@/components/ui/button";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
 import type { FieldConfig } from "@/shared/types/ui.types";
+import { CopyIcon } from "lucide-react";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const autovoluntarioFormSchema = z.object({
@@ -11,7 +14,7 @@ const autovoluntarioFormSchema = z.object({
     .string()
     .trim()
     .refine(isValidPeruDni, {
-      message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
+      message: 'DNI inválido (debe tener 8 dígitos)',
     }),
   age: z
     .union([z.number(), z.string()])
@@ -33,7 +36,9 @@ const autovoluntarioFormSchema = z.object({
         .min(14, 'La edad mínima es de 14 años')
         .max(80, 'La edad no puede superar 30 años')
     ),
-  commission: z.enum(['cocina', 'limpieza', 'produccion']),
+  gender: z.enum(['varon', 'mujer']),
+  shirt_size: z.enum(['s', 'm', 'l', 'xl']),
+  commission: z.enum(['logistica', 'recepcion', 'programacion-actividades', 'sonido-luces', 'publicidad', 'alimentacion-limpieza', 'finanzas', 'atencion-pastores', 'jueces', 'contenido-digital', 'lideres-equipo', 'dinamicas-souvenires']),
   is_under_18: z.boolean().default(false),
   cellphone_number: z
     .string()
@@ -84,9 +89,10 @@ const autovoluntarioFormSchema = z.object({
 
 interface AutovoluntarioFormProps {
   onCreate: (data: Record<string, any>) => Promise<void>;
+  setStep: (step: number) => void;
 }
 
-export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
+export function AutovoluntarioForm({ onCreate, setStep }: AutovoluntarioFormProps) {
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
     await onCreate(values);
   }
@@ -103,6 +109,11 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
     }
   }
 
+  const handleCopyNumber = (number: string) => {
+    navigator.clipboard.writeText(number);
+    toast.info("Número copiado al portapapeles");
+  }
+
   // Configuración de formulario
   const fields: FieldConfig[] = [
     {
@@ -110,7 +121,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Nombre completo',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       placeholder: 'Ingresa el nombre completo'
     },
     {
@@ -118,7 +129,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'DNI',
       type: 'text',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-4 md:col-span-1',
       placeholder: 'Ingresa tu DNI',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -145,15 +156,48 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       onChange: handleAgeChange // 🎯 Añadir handler
     },
     {
+      name: 'gender',
+      label: 'Género',
+      type: 'radio',
+      required: true,
+      className: 'col-span-4',
+      options: [
+        { label: 'Masculino', value: 'varon' },
+        { label: 'Femenino', value: 'mujer' }
+      ]
+    },
+    {
+      name: 'shirt_size',
+      label: 'Talla de polo',
+      type: 'select',
+      required: true,
+      className: 'col-span-4 md:col-span-1',
+      options: [
+        { label: 'S', value: 's' },
+        { label: 'M', value: 'm' },
+        { label: 'L', value: 'l' },
+        { label: 'XL', value: 'xl' }
+      ]
+    },
+    {
       name: 'commission',
       label: 'Comisión',
       type: 'select',
-      required: false,
-      className: 'col-span-2 md:col-span-1',
+      required: true,
+      className: 'col-span-4',
       options: [
-        { label: 'Cocina', value: 'cocina' },
-        { label: 'Limpieza', value: 'limpieza' },
-        { label: 'Producción', value: 'produccion' }
+        { label: 'Logística', value: 'logistica' },
+        { label: 'Recepción', value: 'recepcion' },
+        { label: 'Programación y actividades', value: 'programacion-actividades' },
+        { label: 'Sonido y luces', value: 'sonido-luces' },
+        { label: 'Publicidad', value: 'publicidad' },
+        { label: 'Alimentación y limpieza', value: 'alimentacion-limpieza' },
+        { label: 'Finanzas', value: 'finanzas' },
+        { label: 'Atención de pastores', value: 'atencion-pastores' },
+        { label: 'Jueces', value: 'jueces' },
+        { label: 'Contenido digital', value: 'contenido-digital' },
+        { label: 'Líderes de equipo', value: 'lideres-equipo' },
+        { label: 'Dinámicas y Souvenires', value: 'dinamicas-souvenires' }
       ]
     },
     {
@@ -170,7 +214,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Nombre del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       placeholder: 'Requerido si es menor de 18 años',
       dependsOn: { field: 'is_under_18', value: true } // 👁️ Solo visible si es menor
     },
@@ -179,7 +223,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Celular del padre/tutor',
       type: 'text',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -191,7 +235,7 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Comprobante de pago (imagen)',
       type: 'image',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       accept: 'image/*',
       helpText: 'Sube una captura de tu comprobante de pago'
     },
@@ -200,18 +244,40 @@ export function AutovoluntarioForm({ onCreate }: AutovoluntarioFormProps) {
       label: 'Acepto los términos y condiciones',
       type: 'checkbox',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       defaultValue: false
     },
   ];
 
   return (
-    <DynamicForm
-      schema={autovoluntarioFormSchema}
-      fields={fields}
-      onSubmit={handleCreate}
-      selectedItem={null}
-      className='grid-cols-2 px-2'
-    />
+    <div className="w-full flex flex-col gap-2 items-center">
+      <div className="flex w-full justify-center gap-2">
+        <div onClick={() => handleCopyNumber("950569436")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+          <figure className="w-24 h-24">
+            <img src="/qrs/plin.jpg" alt="" className="w-full h-auto object-contain" />
+          </figure>
+          <div>José Mamani - Plin</div>
+          <div className="flex gap-2 items-center">950569436 <CopyIcon /></div>
+        </div>
+        <div onClick={() => handleCopyNumber("956890060")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+          <figure className="w-24 h-24">
+            <img src="/qrs/yape.jpg" alt="" className="w-full h-auto object-contain" />
+          </figure>
+          <div>Victor Atamari - Yape</div>
+          <div className="flex gap-2 items-center">956890060 <CopyIcon /></div>
+        </div>
+      </div>
+      <DynamicForm
+        buttonLabel="Inscribirse"
+        buttonSize="cta"
+        buttonVariant="cta"
+        schema={autovoluntarioFormSchema}
+        fields={fields}
+        onSubmit={handleCreate}
+        selectedItem={null}
+        className='grid-cols-4 px-2'
+      />
+      <Button onClick={() => setStep(1)} variant="outline" className="w-fit">Volver</Button>
+    </div>
   )
 }

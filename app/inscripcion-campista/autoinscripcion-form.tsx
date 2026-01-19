@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
 import { Precio } from "@/shared/types/supabase.types";
 import type { FieldConfig } from "@/shared/types/ui.types";
-import { ExternalLink } from "lucide-react";
+import { CopyIcon, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { z } from "zod";
 
 interface AutoinscripcionFormProps {
@@ -23,7 +24,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio, setStep }: Autoin
       .string()
       .trim()
       .refine(isValidPeruDni, {
-        message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
+        message: 'DNI inválido (debe tener 8 dígitos)',
       }),
     age: z
       .union([z.number(), z.string()])
@@ -42,7 +43,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio, setStep }: Autoin
         })
           .int('La edad debe ser un número entero')
           .min(14, 'La edad mínima es de 14 años')
-          .max(30, 'La edad no puede superar 30 años')
+          .max(90, 'La edad no puede superar 90 años')
       ),
     height: z
       .union([z.number(), z.string(), z.bigint()])
@@ -152,6 +153,11 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio, setStep }: Autoin
       setValue('parent_name', '', { shouldValidate: true });
       setValue('parent_cellphone_number', '', { shouldValidate: true });
     }
+  }
+
+  const handleCopyNumber = (number: string) => {
+    navigator.clipboard.writeText(number);
+    toast.info("Número copiado al portapapeles");
   }
 
   // Configuración de formulario
@@ -297,8 +303,26 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio, setStep }: Autoin
 
   return (
     <div className="w-full flex flex-col gap-2 items-center">
+      <div className="flex w-full justify-center gap-2">
+        <div onClick={() => handleCopyNumber("950569436")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+          <figure className="w-24 h-24">
+            <img src="/qrs/plin.jpg" alt="" className="w-full h-auto object-contain" />
+          </figure>
+          <div>José Mamani - Plin</div>
+          <div className="flex gap-2 items-center">950569436 <CopyIcon /></div>
+        </div>
+        <div onClick={() => handleCopyNumber("956890060")} className="flex flex-col items-center gap-px bg-slate-100 px-2 py-2 rounded border border-gray-200 cursor-pointer">
+          <figure className="w-24 h-24">
+            <img src="/qrs/yape.jpg" alt="" className="w-full h-auto object-contain" />
+          </figure>
+          <div>Victor Atamari - Yape</div>
+          <div className="flex gap-2 items-center">956890060 <CopyIcon /></div>
+        </div>
+      </div>
       <DynamicForm
         buttonLabel="Inscribirse"
+        buttonSize="cta"
+        buttonVariant="cta"
         schema={autoinscripcionesFormSchema}
         fields={fields}
         onSubmit={handleCreate}

@@ -7,33 +7,26 @@ import { es } from "date-fns/locale";
 
 export const columns: ColumnDef<Voluntario>[] = [
   {
-    accessorKey: 'is_active',
-    header: 'Estado',
-    cell: ({ row }) => (
-      <div>
-        {row.original.is_active ? (
-          <Badge variant="outline" className="bg-green-500 text-white">
-            Activo
-          </Badge>
-        ) : (
-          <Badge variant="outline" className="bg-red-500 text-white">
-            Inactivo
-          </Badge>
-        )}
-      </div>
-    )
-  },
-  {
     accessorKey: 'name',
     header: 'Nombre',
     cell: ({ row }) => (
-      <div className="flex flex-col">
-        <span className="font-medium">{row.original.name}</span>
-        {row.original.is_under_18 && (
-          <span className="text-xs text-muted-foreground">
-            Menor de edad
-          </span>
+      <div className="flex items-center gap-2">
+        {row.original.is_active ? (
+          <div className="h-2 w-2 border rounded-full bg-green-500"></div>
+        ) : (
+          <div className="h-2 w-2 border rounded-full bg-red-500"></div>
         )}
+        <div className="flex flex-col">
+          <span className="font-medium">{row.original.name}</span>
+          {row.original.is_under_18 && (
+            <span className="text-xs text-muted-foreground">
+              Menor de edad
+            </span>
+          )}
+          <div className="text-xs text-muted-foreground italic">
+            {row.original.dni} - {row.original.gender}
+          </div>
+        </div>
       </div>
     ),
     meta: {
@@ -51,20 +44,14 @@ export const columns: ColumnDef<Voluntario>[] = [
       <div>
         {row.original.age} años
       </div>
-    )
-  },
-  {
-    accessorKey: 'dni',
-    header: 'DNI',
-    cell: ({ row }) => (
-      <div>
-        {row.original.dni}
-      </div>
-    )
+    ),
+    meta: {
+      visible: false
+    }
   },
   {
     accessorKey: 'cellphone_number',
-    header: 'Teléfono',
+    header: 'Celular',
     cell: ({ row }) => (
       <div className="flex flex-col gap-1">
         {row.original.cellphone_number && (
@@ -166,6 +153,36 @@ export const columns: ColumnDef<Voluntario>[] = [
     },
   },
   {
+    accessorKey: 'shirt_size',
+    header: 'Talla de polo',
+    cell: ({ row }) => (
+      <div className="flex flex-col gap-1">
+        <span>{row.original.shirt_size}</span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'observations',
+    header: 'Observaciones',
+    cell: ({ row }) => (
+      <div>
+        {row.original.observations}
+      </div>
+    ),
+    meta: {
+      visible: false,
+    }
+  },
+  {
+    accessorKey: 'register_by',
+    header: 'Registrado por',
+    cell: ({ row }) => (
+      <div>
+        {row.original.register_by}
+      </div>
+    )
+  },
+  {
     accessorKey: 'check_in',
     header: 'Check-in',
     cell: ({ row }) => (
@@ -194,15 +211,6 @@ export const columns: ColumnDef<Voluntario>[] = [
         placeholder: 'Check-in'
       }
     },
-  },
-  {
-    accessorKey: 'register_by',
-    header: 'Registrado por',
-    cell: ({ row }) => (
-      <div>
-        {row.original.register_by}
-      </div>
-    )
   },
   {
     accessorKey: 'terms_accepted',

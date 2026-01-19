@@ -51,7 +51,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
   },
   {
     accessorKey: 'cellphone_number',
-    header: 'Teléfono',
+    header: 'Celular',
     cell: ({ row }) => (
       <div className="flex flex-col gap-1">
         {row.original.cellphone_number && (

@@ -1,6 +1,6 @@
 // utils/validators/dni.ts
 export function isValidPeruDni(dni: string): boolean {
-  if (!/^[1-9]\d{7}$/.test(dni)) return false
+  if (!/^[0-9]\d{7}$/.test(dni)) return false
 
   // DNIs inválidos comunes
   const invalids = [

@@ -15,7 +15,7 @@ const inscripcionesFormSchema = z.object({
     .string()
     .trim()
     .refine(isValidPeruDni, {
-      message: 'DNI inválido (debe tener 8 dígitos y no empezar con 0)',
+      message: 'DNI inválido (debe tener 8 dígitos)',
     }),
   age: z
     .union([z.number(), z.string()])
@@ -34,7 +34,7 @@ const inscripcionesFormSchema = z.object({
       })
         .int('La edad debe ser un número entero')
         .min(14, 'La edad mínima es de 14 años')
-        .max(30, 'La edad no puede superar 30 años')
+        .max(80, 'La edad no puede superar 80 años')
     ),
   height: z
     .union([z.number(), z.string(), z.bigint()])

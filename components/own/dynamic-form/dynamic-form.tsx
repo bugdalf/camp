@@ -21,6 +21,8 @@ import FieldRadio from './fields/field-radio'
 
 export function DynamicForm({
   buttonLabel,
+  buttonSize,
+  buttonVariant,
   fields,
   schema,
   onSubmit,
@@ -120,6 +122,8 @@ export function DynamicForm({
             type="submit"
             disabled={form.formState.isSubmitting || !form.formState.isValid}
             className="w-full col-span-full"
+            size={buttonSize}
+            variant={buttonVariant}
           >
             {form.formState.isSubmitting ? 'Cargando...' : buttonLabel ? buttonLabel : 'Guardar'}
           </Button>
