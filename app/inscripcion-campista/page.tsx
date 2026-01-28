@@ -8,7 +8,8 @@ import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 import { Inscripcion, Precio } from "@/shared/types/supabase.types"
 import Link from "next/link"
 import { usePreciosStore } from "@/lib/store/precios.store"
-import FirstInfo from "@/app/inscripcion-voluntario/first-info"
+import FirstInfo from "./first-info"
+
 
 const steps = [
   { id: 1, label: "Instrucciones" },
