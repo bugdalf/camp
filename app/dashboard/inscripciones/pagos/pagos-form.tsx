@@ -71,6 +71,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       label: 'Monto',
       type: 'integer',
       required: true,
+      className: 'col-span-4',
       placeholder: 'Ingresa el monto del pago',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -81,7 +82,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       label: 'Método de pago',
       type: 'select',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       options: [
         { label: 'Yape', value: 'yape' },
         { label: 'Efectivo', value: 'efectivo' }
@@ -92,7 +93,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       label: 'Caja',
       type: 'select',
       required: true,
-      className: 'col-span-2',
+      className: 'col-span-4',
       options: cajasOptions
     },
     {
@@ -100,7 +101,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       label: 'Comprobante de pago (imagen)',
       type: 'image',
       required: false,
-      className: 'col-span-2',
+      className: 'col-span-4',
       accept: 'image/*',
       helpText: 'Sube una captura de tu comprobante de pago'
     },
@@ -109,7 +110,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       label: 'Pago verificado (solo admin)',
       type: 'checkbox',
       required: false,
-      className: 'col-span-2',
+      className: 'col-span-4',
       defaultValue: false
     }
   ];
@@ -120,7 +121,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='w-sm px-2'
+      className='w-full px-2 grid-cols-4 border border-red-400'
     />
   )
 }
