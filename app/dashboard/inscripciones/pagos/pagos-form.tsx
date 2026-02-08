@@ -121,7 +121,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='w-full px-2 grid-cols-4 border border-red-400'
+      className='w-full px-2 grid-cols-4'
     />
   )
 }
