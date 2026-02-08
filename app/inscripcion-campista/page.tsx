@@ -47,7 +47,7 @@ export default function InscripcionCampistaPage() {
     const result = await createAutoInscripcion(valuesToCreate);
     if (result) {
       setNewInscription(result);
-      setStep(2);
+      setStep(3);
     }
   }
 

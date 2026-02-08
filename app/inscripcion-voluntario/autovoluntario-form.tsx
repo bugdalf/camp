@@ -129,7 +129,7 @@ export function AutovoluntarioForm({ onCreate, setStep }: AutovoluntarioFormProp
       label: 'DNI',
       type: 'text',
       required: true,
-      className: 'col-span-4 md:col-span-1',
+      className: 'col-span-4',
       placeholder: 'Ingresa tu DNI',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -140,7 +140,7 @@ export function AutovoluntarioForm({ onCreate, setStep }: AutovoluntarioFormProp
       label: 'Número de celular',
       type: 'text',
       required: false,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-2',
       placeholder: '987654321',
       inputMode: 'numeric',
       pattern: '[0-9]*',
@@ -151,7 +151,7 @@ export function AutovoluntarioForm({ onCreate, setStep }: AutovoluntarioFormProp
       label: 'Edad',
       type: 'integer',
       required: true,
-      className: 'col-span-2 md:col-span-1',
+      className: 'col-span-2',
       placeholder: 'Ej: 25',
       onChange: handleAgeChange // 🎯 Añadir handler
     },
@@ -171,13 +171,14 @@ export function AutovoluntarioForm({ onCreate, setStep }: AutovoluntarioFormProp
       label: 'Talla de polo',
       type: 'select',
       required: true,
-      className: 'col-span-4 md:col-span-1',
+      className: 'col-span-4',
       options: [
         { label: 'S', value: 's' },
         { label: 'M', value: 'm' },
         { label: 'L', value: 'l' },
         { label: 'XL', value: 'xl' }
-      ]
+      ],
+      placeholder: 'Selecciona una talla'
     },
     {
       name: 'commission',
@@ -185,6 +186,7 @@ export function AutovoluntarioForm({ onCreate, setStep }: AutovoluntarioFormProp
       type: 'select',
       required: true,
       className: 'col-span-4',
+      placeholder: 'Selecciona una comisión',
       options: [
         { label: 'Logística', value: 'logistica' },
         { label: 'Recepción', value: 'recepcion' },

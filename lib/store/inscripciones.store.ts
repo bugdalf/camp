@@ -93,7 +93,8 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
     try {
       const { count, error } = await supabase
         .from('inscripciones')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
 
       if (error) throw error;
 
@@ -248,6 +249,9 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
               payment_method: 'yape',
               payment_recipe_url: paymentRecipeUrl,
               payment_checked: false,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              register_by: values.register_by || null,
             }],
           };
 

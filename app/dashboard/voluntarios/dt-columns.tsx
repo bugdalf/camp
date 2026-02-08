@@ -109,18 +109,7 @@ export const columns: ColumnDef<Voluntario>[] = [
           </a>
         )}
       </div>
-    ),
-    meta: {
-      filterable: {
-        type: 'select',
-        placeholder: 'Pago',
-        label: 'Tipo de pago',
-        options: [
-          { label: 'Yape', value: 'yape' },
-          { label: 'Efectivo', value: 'efectivo' },
-        ]
-      }
-    }
+    )
   },
   {
     accessorKey: 'caja_name',
@@ -148,18 +137,7 @@ export const columns: ColumnDef<Voluntario>[] = [
           </div>
         )}
       </div>
-    ),
-    meta: {
-      filterable: {
-        type: 'select',
-        options: [
-          { label: 'Verificado', value: true },
-          { label: 'Pendiente', value: false }
-        ],
-        label: 'Estado de pago',
-        placeholder: 'Estado de pago'
-      }
-    },
+    )
   },
   {
     accessorKey: 'shirt_size',
@@ -208,18 +186,7 @@ export const columns: ColumnDef<Voluntario>[] = [
           </div>
         )}
       </div>
-    ),
-    meta: {
-      filterable: {
-        type: 'select',
-        options: [
-          { label: 'Check-in', value: true },
-          { label: 'Pendiente', value: false }
-        ],
-        label: 'Check-in',
-        placeholder: 'Check-in'
-      }
-    },
+    )
   },
   {
     accessorKey: 'terms_accepted',

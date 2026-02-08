@@ -308,7 +308,7 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='w-full grid-cols-4'
+      className='w-full px-2 grid-cols-4'
     />
   )
 }

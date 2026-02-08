@@ -25,7 +25,7 @@ export default function FieldSelect({ fieldConfig, formField }: FormFieldProps) 
       >
         <FormControl>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={'Selecciona una opción'} />
+            <SelectValue placeholder={fieldConfig.placeholder || 'Selecciona una opción'} />
           </SelectTrigger>
         </FormControl>
 
