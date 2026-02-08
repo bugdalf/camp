@@ -2,10 +2,11 @@
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
 import { useAuthStore } from "@/lib/store/auth.store";
+import { useCajasStore } from "@/lib/store/cajas.store";
 import { isValidPeruDni } from "@/lib/utils-functions/dni-validator";
 import { Voluntario } from "@/shared/types/supabase.types";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
-import { register } from "module";
+import { useMemo } from "react";
 import { z } from "zod";
 
 const voluntariosFormSchema = z.object({
@@ -45,6 +46,7 @@ const voluntariosFormSchema = z.object({
     .min(1, "El número de celular es requerido")
     .regex(/^\d{9}$/, "El número debe tener exactamente 9 dígitos numéricos"),
   payment_method: z.enum(['yape', 'efectivo']),
+  caja_id: z.string().optional().nullable().transform(val => val || undefined),
   payment_recipe_url: z.union([
     z.instanceof(File),
     z.string(),
@@ -89,11 +91,20 @@ interface VoluntariosFormProps {
 
 export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: VoluntariosFormProps) {
   const { user } = useAuthStore();
+  const { cajas } = useCajasStore();
+
+  const cajasOptions = useMemo(() => {
+    return cajas.map((caja) => ({
+      label: caja.name || '',
+      value: caja.id || '',
+    }));
+  }, [cajas]);
 
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
     const valuesToCreate = {
       ...values,
-      register_by: user?.email
+      register_by: user?.email,
+      caja_name: cajas.find(caja => caja.id === values.caja_id)?.name || '',
     }
 
     await onCreate(valuesToCreate);
@@ -101,7 +112,11 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
   }
 
   const handleEdit = async (values: Record<string, any>): Promise<void> => {
-    await onEdit(values, dialogHandlers.selectedItem.id);
+    const valuesToEdit = {
+      ...values,
+      caja_name: cajas.find(caja => caja.id === values.caja_id)?.name || '',
+    }
+    await onEdit(valuesToEdit, dialogHandlers.selectedItem.id);
     dialogHandlers.setOpenDialog(false);
   }
 
@@ -243,6 +258,14 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
         { label: 'Yape', value: 'yape' },
         { label: 'Efectivo', value: 'efectivo' }
       ]
+    },
+    {
+      name: 'caja_id',
+      label: 'Caja',
+      type: 'select',
+      required: true,
+      className: 'col-span-4',
+      options: cajasOptions
     },
     {
       name: 'payment_recipe_url',

@@ -123,6 +123,15 @@ export const columns: ColumnDef<Voluntario>[] = [
     }
   },
   {
+    accessorKey: 'caja_name',
+    header: 'Caja',
+    cell: ({ row }) => (
+      <div>
+        {row.original.caja_name}
+      </div>
+    )
+  },
+  {
     accessorKey: 'payment_checked',
     header: 'Estado de pago',
     cell: ({ row }) => (

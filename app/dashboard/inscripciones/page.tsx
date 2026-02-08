@@ -15,6 +15,7 @@ import { InscripcionHistoryList } from "./inscripcion-history-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { usePreciosStore } from "@/lib/store/precios.store";
 import PagosTable from "./pagos/pagos-table";
+import { useCajasStore } from "@/lib/store/cajas.store";
 
 function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
@@ -38,10 +39,12 @@ export default function InscripcionesPage() {
   const dialogHandlers = useDialogHandlers();
   const { inscripciones, fetchInscripciones, createInscripcion, updateInscripcion, deleteSoftInscripcion, selectedInscripcion, setSelectedInscripcion } = useInscripcionesStore();
   const { fetchPrecios } = usePreciosStore();
+  const { fetchCajas } = useCajasStore();
 
   useEffect(() => {
     fetchInscripciones();
     fetchPrecios();
+    fetchCajas();
   }, []);
 
   useEffect(() => {
@@ -130,7 +133,7 @@ export default function InscripcionesPage() {
         setOpenDialog={dialogHandlers.setOpenDialog}
         title="Inscribir"
       >
-        <Tabs defaultValue="form" className="w-full overflow-auto">
+        <Tabs defaultValue="form" className=" w-full md:w-xl h-[calc(80vh)] overflow-auto">
           <TabsList className="w-full">
             <TabsTrigger value="form">Formulario</TabsTrigger>
             <TabsTrigger value="pagos">Pagos</TabsTrigger>

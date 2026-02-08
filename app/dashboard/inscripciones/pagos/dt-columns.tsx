@@ -54,6 +54,39 @@ export const columns: ColumnDef<Pago>[] = [
     )
   },
   {
+    accessorKey: 'caja_name',
+    header: 'Caja',
+    cell: ({ row }) => (
+      <div className="flex flex-col">
+        <span className="font-medium">{row.original.caja_name}</span>
+      </div>
+    )
+  },
+  {
+    accessorKey: 'register_by',
+    header: 'Registrado por',
+    cell: ({ row }) => (
+      <div className="flex flex-col">
+        <span className="font-medium">{row.original.register_by}</span>
+      </div>
+    ),
+    meta: {
+      visible: false,
+    }
+  },
+  {
+    accessorKey: 'updated_by',
+    header: 'Actualizado por',
+    cell: ({ row }) => (
+      <div className="flex flex-col">
+        <span className="font-medium">{row.original.updated_by}</span>
+      </div>
+    ),
+    meta: {
+      visible: false,
+    }
+  },
+  {
     accessorKey: 'created_at',
     header: 'Registrado',
     cell: ({ row }) => {

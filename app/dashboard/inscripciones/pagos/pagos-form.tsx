@@ -1,13 +1,17 @@
 'use client'
 
 import { DynamicForm } from "@/components/own/dynamic-form/dynamic-form";
+import { useAuthStore } from "@/lib/store/auth.store";
+import { useCajasStore } from "@/lib/store/cajas.store";
 import { Inscripcion } from "@/shared/types/supabase.types";
 import type { DialogHandlers, FieldConfig } from "@/shared/types/ui.types";
+import { useMemo } from "react";
 import { z } from "zod";
 
 const pagosFormSchema = z.object({
   payment_amount: z.number().min(0, 'El precio es requerido'),
   payment_method: z.enum(['yape', 'efectivo']),
+  caja_id: z.string().optional(),
   payment_recipe_url: z.union([
     z.instanceof(File),
     z.string(),
@@ -25,13 +29,39 @@ interface PagosFormProps {
 }
 
 export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdit }: PagosFormProps) {
+  const { user } = useAuthStore();
+  const { cajas } = useCajasStore();
+
+  const cajasOptions = useMemo(() => {
+    return cajas.map((caja) => ({
+      label: caja.name || '',
+      value: caja.id || '',
+    }));
+  }, [cajas]);
+
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
-    await onCreate(values, selectedInscripcion?.id);
+    const valuesToCreate = {
+      ...values,
+      register_by: user?.email,
+      caja_id: values.caja_id || null,
+      caja_name: cajas.find((caja) => caja.id === values.caja_id)?.name || null,
+      payment_checked: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    await onCreate(valuesToCreate, selectedInscripcion?.id);
     dialogHandlers.setOpenDialog(false);
   }
 
   const handleEdit = async (values: Record<string, any>): Promise<void> => {
-    await onEdit(values, dialogHandlers.selectedItem.id, selectedInscripcion?.id);
+    const valuesToEdit = {
+      ...values,
+      updated_by: user?.email,
+      caja_id: values.caja_id || null,
+      caja_name: cajas.find((caja) => caja.id === values.caja_id)?.name || null,
+      updated_at: new Date().toISOString(),
+    }
+    await onEdit(valuesToEdit, dialogHandlers.selectedItem.id, selectedInscripcion?.id);
     dialogHandlers.setOpenDialog(false);
   }
 
@@ -59,6 +89,14 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       ]
     },
     {
+      name: 'caja_id',
+      label: 'Caja',
+      type: 'select',
+      required: true,
+      className: 'col-span-2',
+      options: cajasOptions
+    },
+    {
       name: 'payment_recipe_url',
       label: 'Comprobante de pago (imagen)',
       type: 'image',
@@ -83,7 +121,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='px-2 h-fit'
+      className='w-full px-2'
     />
   )
 }

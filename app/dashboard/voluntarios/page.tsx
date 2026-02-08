@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DeleteDialog from "@/components/own/generic-dialog/delete-dialog";
 import { VoluntariosForm } from "./voluntarios-form";
 import { VoluntariosHistoryList } from "./voluntarios-history-list";
+import { useCajasStore } from "@/lib/store/cajas.store";
 
 function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
@@ -36,9 +37,11 @@ function useDialogHandlers(): DialogHandlers {
 export default function VoluntariosPage() {
   const dialogHandlers = useDialogHandlers();
   const { voluntarios, fetchVoluntarios, createVoluntario, updateVoluntario, deleteSoftVoluntario } = useVoluntariosStore();
+  const { fetchCajas } = useCajasStore();
 
   useEffect(() => {
     fetchVoluntarios();
+    fetchCajas();
   }, []);
 
   const extraActionsBuilder = (voluntario: Voluntario) => {
