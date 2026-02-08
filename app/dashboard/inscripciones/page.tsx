@@ -131,7 +131,7 @@ export default function InscripcionesPage() {
       <GenericDialog
         openDialog={dialogHandlers.openDialog}
         setOpenDialog={dialogHandlers.setOpenDialog}
-        title="Inscribir"
+        title={dialogHandlers.selectedItem ? 'Editar Inscripción' : 'Inscribir'}
       >
         <Tabs defaultValue="form" className=" w-full md:w-xl h-[calc(80vh)] overflow-auto">
           <TabsList className="w-full">

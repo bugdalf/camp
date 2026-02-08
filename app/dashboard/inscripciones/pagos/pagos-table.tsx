@@ -43,7 +43,7 @@ export default function PagosTable({ inscripcion }: { inscripcion: Inscripcion }
       <GenericDialog
         openDialog={dialogHandlers.openDialog}
         setOpenDialog={dialogHandlers.setOpenDialog}
-        title="Nuevo Precio"
+        title={dialogHandlers.selectedItem ? 'Editar Pago' : 'Nuevo Pago'}
       >
         <PagosForm dialogHandlers={dialogHandlers} selectedInscripcion={inscripcion} onCreate={createPayment} onEdit={updatePayment} />
       </GenericDialog>

@@ -9,9 +9,9 @@ import { useMemo } from "react";
 import { z } from "zod";
 
 const pagosFormSchema = z.object({
-  payment_amount: z.number().min(0, 'El precio es requerido'),
+  payment_amount: z.coerce.number().min(0, 'El precio es requerido'),
   payment_method: z.enum(['yape', 'efectivo']),
-  caja_id: z.string().optional(),
+  caja_id: z.string().min(1, 'La caja es requerida'), // Cambiado: ahora es requerido y valida que no esté vacío
   payment_recipe_url: z.union([
     z.instanceof(File),
     z.string(),
@@ -33,17 +33,23 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
   const { cajas } = useCajasStore();
 
   const cajasOptions = useMemo(() => {
-    return cajas.map((caja) => ({
-      label: caja.name || '',
-      value: caja.id || '',
-    }));
+    // Añadida validación para asegurar que siempre hay opciones
+    if (!cajas || cajas.length === 0) {
+      return [];
+    }
+    return cajas
+      .filter(caja => caja.id && caja.name) // Filtrar cajas inválidas
+      .map((caja) => ({
+        label: caja.name || '',
+        value: caja.id || '',
+      }));
   }, [cajas]);
 
   const handleCreate = async (values: Record<string, any>): Promise<void> => {
     const valuesToCreate = {
       ...values,
       register_by: user?.email,
-      caja_id: values.caja_id || null,
+      caja_id: values.caja_id,
       caja_name: cajas.find((caja) => caja.id === values.caja_id)?.name || null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -56,7 +62,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
     const valuesToEdit = {
       ...values,
       updated_by: user?.email,
-      caja_id: values.caja_id || null,
+      caja_id: values.caja_id,
       caja_name: cajas.find((caja) => caja.id === values.caja_id)?.name || null,
       updated_at: new Date().toISOString(),
     }
@@ -115,13 +121,22 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
     }
   ];
 
+  // Añadido: Prevenir renderizado si no hay cajas y el campo es requerido
+  if (cajasOptions.length === 0) {
+    return (
+      <div className="w-full px-2 py-4 text-center text-muted-foreground">
+        <p>No hay cajas disponibles. Por favor, crea una caja primero.</p>
+      </div>
+    );
+  }
+
   return (
     <DynamicForm
       schema={pagosFormSchema}
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='w-full px-2 grid-cols-4'
+      className='w-full px-2 grid-cols-4 border border-red-500'
     />
   )
 }
