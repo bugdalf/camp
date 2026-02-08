@@ -45,7 +45,6 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       register_by: user?.email,
       caja_id: values.caja_id || null,
       caja_name: cajas.find((caja) => caja.id === values.caja_id)?.name || null,
-      payment_checked: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
@@ -121,7 +120,7 @@ export function PagosForm({ dialogHandlers, selectedInscripcion, onCreate, onEdi
       fields={fields}
       onSubmit={dialogHandlers.selectedItem ? handleEdit : handleCreate}
       selectedItem={dialogHandlers.selectedItem}
-      className='w-full px-2'
+      className='w-sm px-2'
     />
   )
 }
