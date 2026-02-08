@@ -7,9 +7,8 @@ import {
   ContactIcon,
   FrameIcon,
   NotebookPenIcon,
+  PiggyBankIcon,
 } from "lucide-react"
-
-
 
 import {
   Sidebar,
@@ -94,6 +93,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton tooltip="Precios">
                   <CoinsIcon />
                   <span>Precios</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <Link href="/dashboard/cajas">
+                <SidebarMenuButton tooltip="Cajas">
+                  <PiggyBankIcon />
+                  <span>Cajas</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>

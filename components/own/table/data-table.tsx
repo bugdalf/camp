@@ -28,10 +28,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
+
 
 import {
-  BanIcon,
-  CheckIcon,
   EllipsisVerticalIcon,
   PenIcon,
   PlusIcon,
@@ -166,105 +166,130 @@ export function DataTable<TData, TValue>({
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => {
                 return (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                  <ContextMenu key={row.id} modal={false}>
+                    <ContextMenuTrigger asChild>
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
 
-                    {/* ⚙️ Acciones */}
-                    <TableCell className="w-[40px]">
-                      <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            <EllipsisVerticalIcon className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
+                        {/* ⚙️ Acciones */}
+                        <TableCell className="w-[40px]">
+                          <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <EllipsisVerticalIcon className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end">
 
-                          <DropdownMenuItem
-                            onClick={() => {
-                              dialogHandlers.setSelectedItem(row.original)
-                              dialogHandlers.setOpenDialog(true)
-                            }}
-                          >
-                            <PenIcon className="mr-2 h-4 w-4" />
-                            Editar
-                          </DropdownMenuItem>
-                          {!disableDelete ? (
-                            <DropdownMenuItem
-                              onClick={() => {
-                                dialogHandlers.setSelectedItem(row.original)
-                                dialogHandlers.setOpenDialogDelete(true)
-                              }}
-                              variant="destructive"
-                            >
-                              <Trash2Icon className="mr-2 h-4 w-4" />
-                              Eliminar
-                            </DropdownMenuItem>
-                          ) : null}
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  dialogHandlers.setSelectedItem(row.original)
+                                  dialogHandlers.setOpenDialog(true)
+                                }}
+                              >
+                                <PenIcon className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              {!disableDelete ? (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    dialogHandlers.setSelectedItem(row.original)
+                                    dialogHandlers.setOpenDialogDelete(true)
+                                  }}
+                                  variant="destructive"
+                                >
+                                  <Trash2Icon className="mr-2 h-4 w-4" />
+                                  Eliminar
+                                </DropdownMenuItem>
+                              ) : null}
 
-                          {extraActions?.map((action) => (
-                            <DropdownMenuItem
-                              key={action.label}
-                              onClick={() => action.handler(row.original)}
-                              variant={action.variant}
-                            >
-                              <action.icon className="mr-2 h-4 w-4" />
-                              {action.label}
-                            </DropdownMenuItem>
-                          ))}
+                              {extraActions?.map((action) => (
+                                <DropdownMenuItem
+                                  key={action.label}
+                                  onClick={() => action.handler(row.original)}
+                                  variant={action.variant}
+                                >
+                                  <action.icon className="mr-2 h-4 w-4" />
+                                  {action.label}
+                                </DropdownMenuItem>
+                              ))}
 
-                          {extraActionsBuilder?.(row.original).map((action) => (
-                            <DropdownMenuItem
-                              key={action.label}
-                              onClick={() => action.handler(row.original)}
-                              variant={action.variant}
-                            >
-                              <action.icon className="mr-2 h-4 w-4" />
-                              {action.label}
-                            </DropdownMenuItem>
-                          ))}
+                              {extraActionsBuilder?.(row.original).map((action) => (
+                                <DropdownMenuItem
+                                  key={action.label}
+                                  onClick={() => action.handler(row.original)}
+                                  variant={action.variant}
+                                >
+                                  <action.icon className="mr-2 h-4 w-4" />
+                                  {action.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem
+                        onClick={() => {
+                          dialogHandlers.setSelectedItem(row.original)
+                          dialogHandlers.setOpenDialog(true)
+                        }}
+                      >
+                        <PenIcon className="mr-2 h-4 w-4" />
+                        Editar
+                      </ContextMenuItem>
+                      {!disableDelete ? (
+                        <ContextMenuItem
+                          onClick={() => {
+                            dialogHandlers.setSelectedItem(row.original)
+                            dialogHandlers.setOpenDialogDelete(true)
+                          }}
+                          variant="destructive"
+                        >
+                          <Trash2Icon className="mr-2 h-4 w-4" />
+                          Eliminar
+                        </ContextMenuItem>
+                      ) : null}
 
-                          {/* {isActive ? (
-                            <DropdownMenuItem
-                              onClick={() => {
-                                dialogHandlers.setSelectedItem(row.original)
-                                dialogHandlers.setOpenDialogDelete(true)
-                              }}
-                              className="text-red-500"
-                            >
-                              <BanIcon className="mr-2 h-4 w-4 text-red-500" />
-                              Cancelar
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem
-                              onClick={() => {
-                                dialogHandlers.setSelectedItem(row.original)
-                                dialogHandlers.setOpenDialogDelete(true)
-                              }}
-                              className="text-green-500"
-                            >
-                              <CheckIcon className="mr-2 h-4 w-4 text-green-500" />
-                              Re-activar
-                            </DropdownMenuItem>
-                          )} */}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
+                      {extraActions?.map((action) => (
+                        <ContextMenuItem
+                          key={action.label}
+                          onClick={() => action.handler(row.original)}
+                          variant={action.variant}
+                        >
+                          <action.icon className="mr-2 h-4 w-4" />
+                          {action.label}
+                        </ContextMenuItem>
+                      ))}
+
+                      {extraActionsBuilder?.(row.original).map((action) => (
+                        <ContextMenuItem
+                          key={action.label}
+                          onClick={() => action.handler(row.original)}
+                          variant={action.variant}
+                        >
+                          <action.icon className="mr-2 h-4 w-4" />
+                          {action.label}
+                        </ContextMenuItem>
+                      ))}
+                    </ContextMenuContent>
+                  </ContextMenu>
                 )
               })
             ) : (
