@@ -50,6 +50,7 @@ export function VoluntariosHistoryList({
       payment_method: 'Método de pago',
       payment_recipe_url: 'Comprobante',
       payment_checked: 'Pago verificado',
+      caja_name: 'Caja',
       parent_name: 'Nombre del padre',
       parent_cellphone_number: 'Teléfono del padre',
       terms_accepted: 'Términos aceptados',

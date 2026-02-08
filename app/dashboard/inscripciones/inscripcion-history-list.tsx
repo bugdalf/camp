@@ -92,6 +92,9 @@ export function InscripcionHistoryList({
           <span className="font-medium">Método:</span> {formatPaymentMethod(p.payment_method ?? '')}
         </p>
         <p className="text-sm">
+          <span className="font-medium">Caja:</span> {p.caja_name ?? '-'}
+        </p>
+        <p className="text-sm">
           <span className="font-medium">Verificado:</span> {p.payment_checked ? '✓ Sí' : '✗ No'}
         </p>
         {p.payment_recipe_url && (
