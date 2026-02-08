@@ -72,6 +72,14 @@ export type Pago = {
   updated_at?: string;
 }
 
+export type Caja = {
+  id?: string;
+  name?: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE';
 
 export interface InscripcionAudit {
