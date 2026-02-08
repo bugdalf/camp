@@ -327,7 +327,7 @@ export function AutoinscripcionForm({ onCreate, defaultPrecio, setStep }: Autoin
         fields={fields}
         onSubmit={handleCreate}
         selectedItem={null}
-        className='grid-cols-3'
+        className='grid-cols-3 px-2'
       />
       <Button onClick={() => setStep(1)} variant="outline" className="w-fit">Volver</Button>
     </div>
