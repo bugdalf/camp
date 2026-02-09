@@ -85,7 +85,7 @@ export default function LandingPage() {
             </div>
 
             <p className="text-white font-bold text-xs">
-              * Preventa: S/ 190 hasta el 8 de febrero
+              * Precio regular: S/ 220
             </p>
           </Link>
         </div>

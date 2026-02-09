@@ -86,7 +86,7 @@ export default function FirstInfo({ setStep }: { setStep: (step: number) => void
         </li>
         <li>El monto total a pagar es de <strong>S/ {defaultPrecio?.price}</strong> ({defaultPrecio?.name}) </li>
         <li>Puedes reservar tu inscripción desde <strong>S/ 50</strong>.</li>
-        <li className="italic ml-4 list-none border-2 border-amber-300 border-dashed p-2 rounded">¡Importante si solo reservas! El saldo debes pagarlo presencialmente en Jr. Mariano Nuñes N° 345 antes del <strong>8 de febrero</strong> para mantener el precio de Pre-venta.</li>
+        {/* <li className="italic ml-4 list-none border-2 border-amber-300 border-dashed p-2 rounded">¡Importante si solo reservas! El saldo debes pagarlo presencialmente en Jr. Mariano Nuñes N° 345 antes del <strong>8 de febrero</strong> para mantener el precio de Pre-venta.</li> */}
         <li>Adjunta en el formulario una captura de tu comprobante de pago (imagen clara).</li>
         <li>Debes ser mayor de 14 años para poder participar</li>
         <li>
