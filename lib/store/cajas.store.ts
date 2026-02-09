@@ -25,7 +25,10 @@ export const useCajasStore = create<CajasStore>((set, get) => ({
         .select('*')
         .order('created_at', { ascending: false }); // Ordenar por más reciente
 
-      if (error) throw error;
+      if (error) {
+        toast.error('No se pudieron cargar las cajas');
+        return;
+      }
       set({ cajas: data ?? [] });
     } catch (error) {
       toast.error('No se pudieron cargar las cajas');
