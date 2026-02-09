@@ -10,8 +10,6 @@ export default function LandingPage() {
   const [inscripcionesCount, setInscripcionesCount] = useState<number>(0);
   const { fetchInscripcionesCount } = useInscripcionesStore();
   const [daysLeft, setDaysLeft] = useState<number>(0);
-  const today = new Date();
-  const campDate = new Date("2026-02-22");
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -22,7 +20,11 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    const daysLeft = Math.floor((campDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const today = new Date().toLocaleString("en-US", { timeZone: "America/Lima" });
+    const todayPeru = new Date(today);
+    const campDate = new Date("2026-02-22T00:00:00");
+
+    const daysLeft = Math.ceil((campDate.getTime() - todayPeru.getTime()) / (1000 * 60 * 60 * 24));
     setDaysLeft(daysLeft);
   }, []);
 
@@ -38,16 +40,26 @@ export default function LandingPage() {
         {/* Fecha del evento */}
         <div className="animate-in fade-in slide-in-from-top-8 duration-700 delay-150">
           <div className="relative">
-            <div className="relative text-white font-display text-xl px-2 py-0 bg-[#0f45af] border-3 border-black z-1">
-              FALTAN
-            </div>
+            {daysLeft > 0 && (
+              <div className="relative text-white font-display text-xl px-2 py-0 bg-[#0f45af] border-3 border-black z-1">
+                FALTAN
+              </div>
+            )}
             <div className="absolute top-1 -left-1 w-full h-full bg-black"></div>
           </div>
-          <div className="flex items-end mt-2">
-            <div className="text-white font-display text-6xl text-outline-shadow">
-              {daysLeft}
-            </div>
-            <div className="text-white font-display text-xs mb-3 transform -rotate-90">DIAS</div>
+          <div className="flex justify-center items-end mt-2">
+            {daysLeft > 0 ? (
+              <div className="text-white font-display text-6xl text-outline-shadow">
+                {daysLeft}
+              </div>
+            ) : (
+              <div className="text-white font-display text-4xl text-outline-shadow">
+                ¡Es hoy!
+              </div>
+            )}
+            {daysLeft > 0 && (
+              <div className="text-white font-display text-xs mb-3 transform -rotate-90">DIAS</div>
+            )}
           </div>
         </div>
 
