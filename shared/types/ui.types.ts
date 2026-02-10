@@ -65,7 +65,7 @@ export interface HandlerResponse {
 
 export interface ExtraAction {
   label: string;
-  handler: (item: any) => void;
+  handler: (item?: any) => void;
   icon: LucideIcon;
   variant?: 'default' | 'destructive'
 }

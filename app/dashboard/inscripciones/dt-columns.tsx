@@ -156,18 +156,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
           </div>
         )}
       </div>
-    ),
-    meta: {
-      filterable: {
-        type: 'select',
-        options: [
-          { label: 'Check-in', value: true },
-          { label: 'Pendiente', value: false }
-        ],
-        label: 'Check-in',
-        placeholder: 'Check-in'
-      }
-    },
+    )
   },
   {
     accessorKey: 'created_at',

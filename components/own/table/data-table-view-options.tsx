@@ -23,8 +23,7 @@ export function DataTableViewOptions<TData>({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className="ml-auto flex h-8"
+          className="ml-auto flex"
         >
           <ListFilterIcon />
         </Button>

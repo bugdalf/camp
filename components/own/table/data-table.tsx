@@ -44,6 +44,7 @@ import { DataTableHeader } from "./data-table-header"
 import { DataTableFilters } from "./data-table-filters"
 
 import type { DialogHandlers, ExtraAction } from "@/shared/types/ui.types"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 type TextFilter = {
   type: "text"
@@ -84,6 +85,8 @@ interface DataTableProps<TData, TValue> {
   dialogHandlers: DialogHandlers
   extraActions?: ExtraAction[]
   extraActionsBuilder?: (row: TData) => ExtraAction[]
+  toolbarActions?: ExtraAction[]
+  toolbarActionsBuilder?: (row: TData) => ExtraAction[]
   disableDelete?: boolean
 }
 
@@ -94,6 +97,8 @@ export function DataTable<TData, TValue>({
   dialogHandlers,
   extraActions,
   extraActionsBuilder,
+  toolbarActions,
+
   disableDelete,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -149,9 +154,28 @@ export function DataTable<TData, TValue>({
               dialogHandlers.setOpenDialog(true)
             }}
           >
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Crear {entity}
+            <PlusIcon />
+            <span className="hidden sm:block">Crear {entity}</span>
           </Button>
+
+          {/* Aqui las acciones extra para el toolbar */}
+          {toolbarActions?.map((action) => (
+            <Tooltip key={action.label}>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => action.handler()}
+                  size="icon"
+                  variant="outline"
+                >
+                  {action.icon && <action.icon />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{action.label}</p>
+              </TooltipContent>
+            </Tooltip>
+
+          ))}
 
           <DataTableViewOptions table={table} />
         </div>

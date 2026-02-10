@@ -9,13 +9,15 @@ import DeleteDialog from "@/components/own/generic-dialog/delete-dialog";
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store";
 import { InscripcionesForm } from "./inscripciones-form";
 import { toast } from "sonner";
-import { BanIcon, EyeIcon, PlusIcon, SendIcon } from "lucide-react";
+import { BanIcon, EyeIcon, FileDiffIcon, FileSpreadsheetIcon, PlusIcon, SendIcon } from "lucide-react";
 import { Inscripcion } from "@/shared/types/supabase.types";
 import { InscripcionHistoryList } from "./inscripcion-history-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { usePreciosStore } from "@/lib/store/precios.store";
 import PagosTable from "./pagos/pagos-table";
 import { useCajasStore } from "@/lib/store/cajas.store";
+import { exportInscripcionesCSV } from "@/lib/utils-functions/export-inscripciones-csv";
+import { exportPagosCSV } from "@/lib/utils-functions/export-pagos-csv";
 
 function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
@@ -48,12 +50,10 @@ export default function InscripcionesPage() {
   }, []);
 
   useEffect(() => {
-    //selectedItem solo cambia cuando se selecciona un item de la tabla y da inicio a selectedInscription
-    // al crear o editar un item de la tabla se actualiza selectedInscripcion en el store por cada accion
     setSelectedInscripcion(dialogHandlers.selectedItem);
   }, [dialogHandlers.selectedItem]);
 
-  const extraActionsBuilder = (voluntario: Inscripcion) => {
+  const extraActionsBuilder = (voluntario?: Inscripcion) => {
     const extraActions: ExtraAction[] = [
       {
         label: "Compartir Ticket",
@@ -91,7 +91,7 @@ export default function InscripcionesPage() {
         icon: EyeIcon
       },
     ];
-    if (voluntario.is_active) {
+    if (voluntario?.is_active) {
       extraActions.push({
         label: "Cancelar Inscripción",
         handler: (voluntario: Inscripcion) => {
@@ -116,6 +116,19 @@ export default function InscripcionesPage() {
     return extraActions;
   }
 
+  const toolbarActions: ExtraAction[] = [
+    {
+      label: "Reporte de Inscripciones CSV",
+      handler: exportInscripcionesCSV,
+      icon: FileSpreadsheetIcon
+    },
+    {
+      label: "Reporte de Pagos CSV",
+      handler: exportPagosCSV,
+      icon: FileDiffIcon
+    }
+  ]
+
   return (
     <div className="h-full flex flex-col overflow-auto">
       <h2 className="text-2xl font-bold">Inscripciones</h2>
@@ -127,6 +140,7 @@ export default function InscripcionesPage() {
         dialogHandlers={dialogHandlers}
         disableDelete={true}
         extraActionsBuilder={extraActionsBuilder}
+        toolbarActions={toolbarActions}
       />
       <GenericDialog
         openDialog={dialogHandlers.openDialog}
