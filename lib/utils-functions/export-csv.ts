@@ -1,8 +1,9 @@
+import { toast } from "sonner";
 
 
 export const exportToCSV = (data: any[], filename: string) => {
   if (!data || data.length === 0) {
-    // toast.error('No hay datos para exportar');
+    toast.error('No hay datos para exportar');
     return;
   }
 
@@ -35,4 +36,5 @@ export const exportToCSV = (data: any[], filename: string) => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  toast.success(`Reporte ${filename} exportado correctamente`);
 }

@@ -89,7 +89,7 @@ export const exportInscripcionesCSV = async () => {
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    const filename = `inscripciones_${new Date().toISOString().split('T')[0]}.csv`;
+    const filename = `Inscripciones_camp2026_${new Date().toISOString().split('T')[0]}.csv`;
 
     link.setAttribute('href', url);
     link.setAttribute('download', filename);

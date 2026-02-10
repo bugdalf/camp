@@ -4,7 +4,7 @@ import { DataTable } from "@/components/own/table/data-table";
 import { useVoluntariosStore } from "@/lib/store/voluntarios.store";
 import { Voluntario } from "@/shared/types/supabase.types";
 import { DialogHandlers, ExtraAction } from "@/shared/types/ui.types";
-import { BanIcon, EyeIcon, Link2Icon, PlusIcon } from "lucide-react";
+import { BanIcon, EyeIcon, FileSpreadsheetIcon, Link2Icon, PlusIcon } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { columns } from "./dt-columns";
@@ -14,6 +14,8 @@ import DeleteDialog from "@/components/own/generic-dialog/delete-dialog";
 import { VoluntariosForm } from "./voluntarios-form";
 import { VoluntariosHistoryList } from "./voluntarios-history-list";
 import { useCajasStore } from "@/lib/store/cajas.store";
+import { exportInscripcionesCSV } from "@/lib/utils-functions/export-inscripciones-csv";
+import { exportToCSV } from "@/lib/utils-functions/export-csv";
 
 function useDialogHandlers(): DialogHandlers {
   const [openDialog, setOpenDialog] = useState(false);
@@ -93,6 +95,16 @@ export default function VoluntariosPage() {
     return extraActions;
   }
 
+  const toolbarActions = [
+    {
+      label: "Reporte de Voluntarios CSV",
+      handler: () => {
+        exportToCSV(voluntarios || [], 'Voluntarios_camp2026');
+      },
+      icon: FileSpreadsheetIcon
+    }
+  ]
+
   return (
     <div className="h-full flex flex-col overflow-auto">
       <h2 className="text-2xl font-bold">Voluntarios</h2>
@@ -104,6 +116,7 @@ export default function VoluntariosPage() {
         dialogHandlers={dialogHandlers}
         disableDelete={true}
         extraActionsBuilder={extraActionsBuilder}
+        toolbarActions={toolbarActions}
       />
       <GenericDialog
         openDialog={dialogHandlers.openDialog}
