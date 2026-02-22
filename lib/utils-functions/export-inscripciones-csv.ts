@@ -23,7 +23,8 @@ export const exportInscripcionesCSV = async () => {
         price_name, 
         price_amount, 
         shirt_size, 
-        gender, 
+        gender,
+        height,
         observations
       `)
       .order('created_at', { ascending: false });
@@ -51,6 +52,7 @@ export const exportInscripcionesCSV = async () => {
       'Monto',
       'Talle de Camiseta',
       'Género',
+      'Estatura',
       'Observaciones'
     ];
 
@@ -78,6 +80,7 @@ export const exportInscripcionesCSV = async () => {
       row.price_amount || '',
       row.shirt_size || '',
       row.gender || '',
+      row.height || '',
       row.observations || ''
     ]);
 
