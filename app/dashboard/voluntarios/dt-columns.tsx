@@ -82,9 +82,19 @@ export const columns: ColumnDef<Voluntario>[] = [
         placeholder: '',
         label: 'Buscar por comisión',
         options: [
-          { label: 'Cocina', value: 'cocina' },
-          { label: 'Limpieza', value: 'limpieza' },
-          { label: 'Producción', value: 'produccion' },
+          { label: 'Logística', value: 'logistica' },
+          { label: 'Recepción', value: 'recepcion' },
+          { label: 'Programación y actividades', value: 'programacion-actividades' },
+          { label: 'Sonido y luces', value: 'sonido-luces' },
+          { label: 'Publicidad', value: 'publicidad' },
+          { label: 'Alimentación y limpieza', value: 'alimentacion-limpieza' },
+          { label: 'Finanzas', value: 'finanzas' },
+          { label: 'Atención de pastores', value: 'atencion-pastores' },
+          { label: 'Jueces', value: 'jueces' },
+          { label: 'Contenido digital', value: 'contenido-digital' },
+          { label: 'Líderes de equipo', value: 'lideres-equipo' },
+          { label: 'Dinámicas y Souvenires', value: 'dinamicas-souvenires' },
+          { label: 'Salud', value: 'salud' },
         ]
       }
     }

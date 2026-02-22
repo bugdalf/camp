@@ -215,7 +215,8 @@ export function VoluntariosForm({ dialogHandlers, onCreate, onEdit }: Voluntario
         { label: 'Jueces', value: 'jueces' },
         { label: 'Contenido digital', value: 'contenido-digital' },
         { label: 'Líderes de equipo', value: 'lideres-equipo' },
-        { label: 'Dinámicas y Souvenires', value: 'dinamicas-souvenires' }
+        { label: 'Dinámicas y Souvenires', value: 'dinamicas-souvenires' },
+        { label: 'Salud', value: 'salud' },
       ]
     },
     {
