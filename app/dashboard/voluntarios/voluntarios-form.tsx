@@ -39,7 +39,7 @@ const voluntariosFormSchema = z.object({
     ),
   gender: z.enum(['varon', 'mujer']),
   shirt_size: z.enum(['s', 'm', 'l', 'xl']),
-  commission: z.enum(['logistica', 'recepcion', 'programacion-actividades', 'sonido-luces', 'publicidad', 'alimentacion-limpieza', 'finanzas', 'atencion-pastores', 'jueces', 'contenido-digital', 'lideres-equipo', 'dinamicas-souvenires']),
+  commission: z.enum(['logistica', 'recepcion', 'programacion-actividades', 'sonido-luces', 'publicidad', 'alimentacion-limpieza', 'finanzas', 'atencion-pastores', 'jueces', 'contenido-digital', 'lideres-equipo', 'dinamicas-souvenires', 'salud']),
   is_under_18: z.boolean().default(false),
   cellphone_number: z
     .string()
