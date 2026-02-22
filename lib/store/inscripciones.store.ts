@@ -65,6 +65,7 @@ type InscripcionesStore = {
   setSelectedInscripcion: (inscripcion: Inscripcion | null) => void
 
   fetchInscripciones: () => Promise<void>
+  fetchInscripcionesBySearch: (searchTerm: string) => Promise<Inscripcion[]>
   fetchInscripcionesCount: () => Promise<number>
   fetchInscripcionById: (id: string) => Promise<Inscripcion | null>
   createInscripcion: (values: any) => Promise<Inscripcion | null>
@@ -117,6 +118,29 @@ export const useInscripcionesStore = create<InscripcionesStore>((set, get) => ({
       set({ inscripciones: data ?? [] });
     } catch (error) {
       toast.error('No se pudieron cargar las inscripciones');
+    }
+  },
+
+  fetchInscripcionesBySearch: async (searchTerm) => {
+    try {
+      if (!searchTerm || searchTerm.trim().length < 3) return [];
+
+      const searchLower = `%${searchTerm.toLowerCase().trim()}%`
+
+      const { data, error } = await supabase
+        .from('inscripciones')
+        .select('*')
+        .or(
+          `name.ilike.${searchLower},dni.ilike.${searchLower}`
+        )
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data ?? [];
+    } catch (error) {
+      toast.error('No se pudieron cargar las inscripciones');
+      return [];
     }
   },
 

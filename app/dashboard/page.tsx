@@ -7,15 +7,31 @@ import { QRScannerModal } from "@/components/own/check-in/qr-scanner-modal"
 import { EntityDetailModal } from "@/components/own/check-in/entity-detail-modal"
 import { CheckInButton } from "@/components/own/check-in/check-in-button"
 import { useCheckIn } from "@/components/own/check-in/use-check-in"
+import { useState } from "react"
 
 import { Inscripcion, Voluntario } from "@/shared/types/supabase.types"
 import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 import { useVoluntariosStore } from "@/lib/store/voluntarios.store"
+import { ManualSearchVoluntariosModal } from "@/components/own/check-in/manual-search-voluntarios-modal"
+import { ManualSearchCampistasModal } from "@/components/own/check-in/manual-search-inscripcion-modal"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { fetchInscripcionById, handleCheckInInscripcion } = useInscripcionesStore()
-  const { fetchVoluntarioById, handleCheckInVoluntario } = useVoluntariosStore()
+
+  const {
+    fetchInscripcionById,
+    handleCheckInInscripcion,
+    fetchInscripcionesBySearch,
+  } = useInscripcionesStore()
+
+  const {
+    fetchVoluntarioById,
+    handleCheckInVoluntario,
+    fetchVoluntariosBySearch,
+  } = useVoluntariosStore()
+
+  const [showSearchCampistas, setShowSearchCampistas] = useState(false)
+  const [showSearchVoluntarios, setShowSearchVoluntarios] = useState(false)
 
   const checkInInscripciones = useCheckIn<Inscripcion>({
     type: 'inscripcion',
@@ -28,6 +44,16 @@ export default function DashboardPage() {
     fetchById: fetchVoluntarioById,
     handleCheckIn: handleCheckInVoluntario,
   })
+
+  const handleSelectCampista = (inscripcion: Inscripcion) => {
+    setShowSearchCampistas(false)
+    checkInInscripciones.handleManualSelection(inscripcion)
+  }
+
+  const handleSelectVoluntario = (voluntario: Voluntario) => {
+    setShowSearchVoluntarios(false)
+    checkInVoluntarios.handleManualSelection(voluntario)
+  }
 
   return (
     <div className="w-full min-h-screen flex flex-col px-4 py-8 md:px-8 gap-8">
@@ -67,9 +93,15 @@ export default function DashboardPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-center md:text-left">Check-in</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+          {/* Campistas */}
           <div className="flex gap-1 p-2 border-2 border-dashed rounded-lg">
-            <Button variant="outline" className="grow">
-              <SearchIcon className="" />
+            <Button
+              variant="outline"
+              className="grow"
+              onClick={() => setShowSearchCampistas(true)}
+            >
+              <SearchIcon />
               Buscar Campista
             </Button>
             <CheckInButton
@@ -77,9 +109,15 @@ export default function DashboardPage() {
               label="Campistas"
             />
           </div>
+
+          {/* Voluntarios */}
           <div className="flex gap-1 p-2 border-2 border-dashed rounded-lg">
-            <Button variant="outline" className="grow">
-              <SearchIcon className="" />
+            <Button
+              variant="outline"
+              className="grow"
+              onClick={() => setShowSearchVoluntarios(true)}
+            >
+              <SearchIcon />
               Buscar Voluntario
             </Button>
             <CheckInButton
@@ -87,10 +125,17 @@ export default function DashboardPage() {
               label="Voluntarios"
             />
           </div>
+
         </div>
       </section>
 
       {/* Modales — campistas */}
+      <ManualSearchCampistasModal
+        open={showSearchCampistas}
+        onClose={() => setShowSearchCampistas(false)}
+        onSearch={fetchInscripcionesBySearch}
+        onSelectInscripcion={handleSelectCampista}
+      />
       <QRScannerModal
         open={checkInInscripciones.showScanModal}
         onClose={checkInInscripciones.handleCloseScanModal}
@@ -105,6 +150,12 @@ export default function DashboardPage() {
       />
 
       {/* Modales — voluntarios */}
+      <ManualSearchVoluntariosModal
+        open={showSearchVoluntarios}
+        onClose={() => setShowSearchVoluntarios(false)}
+        onSearch={fetchVoluntariosBySearch}
+        onSelectVoluntario={handleSelectVoluntario}
+      />
       <QRScannerModal
         open={checkInVoluntarios.showScanModal}
         onClose={checkInVoluntarios.handleCloseScanModal}

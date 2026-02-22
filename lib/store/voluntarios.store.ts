@@ -61,6 +61,7 @@ type VoluntariosStore = {
   voluntarios: Voluntario[]
 
   fetchVoluntarios: () => Promise<void>
+  fetchVoluntariosBySearch: (searchTerm: string) => Promise<Voluntario[]>
   fetchVoluntarioById: (id: string) => Promise<Voluntario | null>
   createVoluntario: (values: any) => Promise<Voluntario | null>
   updateVoluntario: (values: any, id: string) => Promise<void>
@@ -89,6 +90,29 @@ export const useVoluntariosStore = create<VoluntariosStore>((set, get) => ({
     } catch (error) {
       console.error('Error al obtener voluntarios:', error);
       toast.error('No se pudieron cargar los voluntarios');
+    }
+  },
+
+  fetchVoluntariosBySearch: async (searchTerm) => {
+    try {
+      if (!searchTerm || searchTerm.trim().length < 3) return [];
+
+      const searchLower = `%${searchTerm.toLowerCase().trim()}%`
+
+      const { data, error } = await supabase
+        .from('voluntarios')
+        .select('*')
+        .or(
+          `name.ilike.${searchLower},dni.ilike.${searchLower}`
+        )
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data ?? [];
+    } catch (error) {
+      toast.error('No se pudieron cargar los voluntarios');
+      return [];
     }
   },
 
