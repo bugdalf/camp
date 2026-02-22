@@ -13,9 +13,12 @@ import {
   PhoneIcon,
   ShirtIcon,
   RulerIcon,
+  CheckIcon,
+  XIcon,
 } from "lucide-react"
-import { Inscripcion } from "@/shared/types/supabase.types"
+import { Inscripcion, Pago } from "@/shared/types/supabase.types"
 import { useDebounce } from "@/lib/hooks/use-debounce"
+import { cn } from "@/lib/utils"
 
 interface ManualSearchCampistasModalProps {
   open: boolean
@@ -53,7 +56,7 @@ export function ManualSearchCampistasModal({
         const results = await onSearch(debouncedSearch)
         setInscripciones(results)
       } catch (error) {
-        console.error("Error searching campistas:", error)
+        console.error("Error buscando campistas:", error)
         setInscripciones([])
       } finally {
         setIsLoading(false)
@@ -126,106 +129,118 @@ export function ManualSearchCampistasModal({
               <p className="text-sm">No se encontraron campistas</p>
             </div>
           ) : (
-            inscripciones.map((inscripcion) => (
-              <div
-                key={inscripcion.id}
-                className="border rounded-xl p-3 flex flex-col gap-3 bg-card"
-              >
-                {/* Cabecera */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-muted rounded-full p-2 shrink-0">
-                      <UserIcon size={16} className="text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm leading-tight">{inscripcion.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        DNI: {inscripcion.dni || "No registrado"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    {inscripcion.check_in && (
-                      <Badge variant="secondary" className="text-xs">
-                        ✓ Ya ingresó
-                      </Badge>
-                    )}
-                    {inscripcion.is_under_18 && (
-                      <Badge variant="outline" className="text-xs text-amber-500 border-amber-500">
-                        Menor de edad
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Info adicional */}
-                <div className="bg-muted rounded-lg p-2 flex flex-col gap-1.5">
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    {inscripcion.age && (
-                      <span>{inscripcion.age} años</span>
-                    )}
-                    {inscripcion.gender && (
-                      <span>{inscripcion.gender === "varon" ? "Varón" : "Mujer"}</span>
-                    )}
-                    {inscripcion.cellphone_number && (
-                      <span className="flex items-center gap-1">
-                        <PhoneIcon size={11} />
-                        {inscripcion.cellphone_number}
-                      </span>
-                    )}
-                    {inscripcion.shirt_size && (
-                      <span className="flex items-center gap-1">
-                        <ShirtIcon size={11} />
-                        Talla {SHIRT_LABELS[inscripcion.shirt_size]}
-                      </span>
-                    )}
-                    {inscripcion.height && (
-                      <span className="flex items-center gap-1">
-                        <RulerIcon size={11} />
-                        {inscripcion.height} cm
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Estado de pago */}
-                  {inscripcion.price_name && (
-                    <div className="flex items-center justify-between border-t border-border pt-1.5 mt-0.5">
-                      <span className="text-xs text-muted-foreground">{inscripcion.price_name}</span>
-                      <Badge
-                        variant={inscripcion.payment_completed ? "secondary" : "outline"}
-                        className={`text-xs ${!inscripcion.payment_completed ? "text-red-500 border-red-400" : ""}`}
-                      >
-                        {inscripcion.payment_completed ? "Pago completo" : "Pago pendiente"}
-                      </Badge>
-                    </div>
-                  )}
-
-                  {/* Tutor si es menor */}
-                  {inscripcion.is_under_18 && inscripcion.parent_name && (
-                    <div className="border-t border-border pt-1.5 mt-0.5">
-                      <p className="text-xs text-muted-foreground">
-                        Tutor:{" "}
-                        <span className="text-foreground font-medium">{inscripcion.parent_name}</span>
-                        {inscripcion.parent_cellphone_number && (
-                          <span className="ml-2">{inscripcion.parent_cellphone_number}</span>
-                        )}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Acción */}
-                <Button
-                  className="w-full"
-                  size="sm"
-                  disabled={!!inscripcion.check_in}
-                  onClick={() => handleSelect(inscripcion)}
+            inscripciones.map((inscripcion) => {
+              const totalPaid = inscripcion.payments?.reduce((acc, payment) => acc + (payment.payment_amount || 0), 0) || 0;
+              const isPaidCompleted = totalPaid >= (inscripcion.price_amount || 0);
+              return (
+                <div
+                  key={inscripcion.id}
+                  className="border border-red-400 rounded-xl p-3 flex flex-col gap-3 bg-card"
                 >
-                  <QrCodeIcon size={15} />
-                  {inscripcion.check_in ? "Ya realizó check-in" : "Marcar Check-in"}
-                </Button>
-              </div>
-            ))
+                  {/* Cabecera */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-muted rounded-full p-2 shrink-0">
+                        <UserIcon size={16} className="text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm leading-tight">{inscripcion.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          DNI: {inscripcion.dni || "No registrado"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      {inscripcion.check_in && (
+                        <Badge variant="secondary" className="text-xs">
+                          ✓ Ya ingresó
+                        </Badge>
+                      )}
+                      {inscripcion.is_under_18 && (
+                        <Badge variant="outline" className="text-xs text-amber-500 border-amber-500">
+                          Menor de edad
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Info adicional */}
+                  <div className="bg-muted rounded-lg p-2 flex flex-col gap-1.5">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      {inscripcion.age && (
+                        <span>{inscripcion.age} años</span>
+                      )}
+                      {inscripcion.gender && (
+                        <span>{inscripcion.gender === "varon" ? "Varón" : "Mujer"}</span>
+                      )}
+                      {inscripcion.cellphone_number && (
+                        <span className="flex items-center gap-1">
+                          <PhoneIcon size={11} />
+                          {inscripcion.cellphone_number}
+                        </span>
+                      )}
+                      {inscripcion.shirt_size && (
+                        <span className="flex items-center gap-1">
+                          <ShirtIcon size={11} />
+                          Talla {SHIRT_LABELS[inscripcion.shirt_size]}
+                        </span>
+                      )}
+                      {inscripcion.height && (
+                        <span className="flex items-center gap-1">
+                          <RulerIcon size={11} />
+                          {inscripcion.height} cm
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Estado de pago */}
+                    {inscripcion.price_name && (
+                      <div className="flex items-center gap-1 border-t border-border pt-1.5 mt-0.5">
+                        <span className="text-xs text-muted-foreground">{inscripcion.price_name}</span>
+                        <div className="flex gap-1 grow">
+                          {inscripcion.payments?.map((payment: Pago, index: number) => (
+                            <div key={`${payment.id}-${index}`} className={cn("flex items-center gap-px px-px rounded text-xs border-2", payment.payment_method === 'efectivo' ? 'border-green-500' : 'border-purple-500')}>
+                              {payment.payment_amount}
+                              {payment.payment_checked ? <CheckIcon className="h-3 w-3" /> : <XIcon className="h-3 w-3" />}
+                            </div>
+                          ))}
+                        </div>
+                        <Badge
+                          variant={isPaidCompleted ? "success" : "warning"}
+                          className={`text-xs ${!isPaidCompleted ? "text-red-500 border-red-400" : ""}`}
+                        >
+                          {isPaidCompleted ? "Pago completo" : "Pago pendiente"}
+                        </Badge>
+                      </div>
+                    )}
+
+                    {/* Tutor si es menor */}
+                    {inscripcion.is_under_18 && inscripcion.parent_name && (
+                      <div className="border-t border-border pt-1.5 mt-0.5">
+                        <p className="text-xs text-muted-foreground">
+                          Tutor:{" "}
+                          <span className="text-foreground font-medium">{inscripcion.parent_name}</span>
+                          {inscripcion.parent_cellphone_number && (
+                            <span className="ml-2">{inscripcion.parent_cellphone_number}</span>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Acción */}
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    disabled={!!inscripcion.check_in}
+                    onClick={() => handleSelect(inscripcion)}
+                  >
+                    <QrCodeIcon size={15} />
+                    {inscripcion.check_in ? "Ya realizó check-in" : "Marcar Check-in"}
+                  </Button>
+                </div>
+              )
+            })
           )}
         </div>
       </DialogContent>

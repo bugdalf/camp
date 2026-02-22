@@ -42,7 +42,7 @@ export function EntityDetailModal<T extends CheckInEntity>({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="h-[calc(100vh-5rem)] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="w-6 h-6 text-green-500" />
