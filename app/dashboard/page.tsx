@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Backpack, Contact } from "lucide-react"
+import { Backpack, Contact, SearchIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { QRScannerModal } from "@/components/own/check-in/qr-scanner-modal"
 import { EntityDetailModal } from "@/components/own/check-in/entity-detail-modal"
@@ -30,35 +30,72 @@ export default function DashboardPage() {
   })
 
   return (
-    <div className="w-full h-screen flex flex-col p-8 items-center gap-4">
-      <div className="flex flex-col items-center gap-2">
-        <span className="text-2xl font-bold">Accesos directos</span>
-        <div className="flex justify-center items-center gap-2">
-          <Button onClick={() => router.push("/dashboard/inscripciones")}>
-            <Backpack className="mr-2" /> Inscripciones
-          </Button>
-          <Button onClick={() => router.push("/dashboard/voluntarios")}>
-            <Contact className="mr-2" />Voluntarios
-          </Button>
-        </div>
+    <div className="w-full min-h-screen flex flex-col px-4 py-8 md:px-8 gap-8">
+
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground mt-1 text-sm">Panel de control de check-in</p>
       </div>
 
-      <div className="flex flex-col items-center gap-2">
-        <span className="text-2xl font-bold">Check-in</span>
-        <div className="flex justify-center items-center gap-2">
-          <CheckInButton onClick={checkInInscripciones.handleStartScan} label="Check-in Campistas" />
-          <CheckInButton onClick={checkInVoluntarios.handleStartScan} label="Check-in Voluntarios" />
+      {/* Accesos directos */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-center md:text-left">Accesos directos</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            size="lg"
+            variant="outline"
+            className="h-16 flex flex-col gap-1 text-sm"
+            onClick={() => router.push("/dashboard/inscripciones")}
+          >
+            <Backpack className="size-5" />
+            Inscripciones
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="h-16 flex flex-col gap-1 text-sm"
+            onClick={() => router.push("/dashboard/voluntarios")}
+          >
+            <Contact className="size-5" />
+            Voluntarios
+          </Button>
         </div>
-      </div>
+      </section>
 
-      {/* campistas */}
+      {/* Check-in */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-center md:text-left">Check-in</h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="flex gap-1 p-2 border-2 border-dashed rounded-lg">
+            <Button variant="outline" className="grow">
+              <SearchIcon className="" />
+              Buscar Campista
+            </Button>
+            <CheckInButton
+              onClick={checkInInscripciones.handleStartScan}
+              label="Campistas"
+            />
+          </div>
+          <div className="flex gap-1 p-2 border-2 border-dashed rounded-lg">
+            <Button variant="outline" className="grow">
+              <SearchIcon className="" />
+              Buscar Voluntario
+            </Button>
+            <CheckInButton
+              onClick={checkInVoluntarios.handleStartScan}
+              label="Voluntarios"
+            />
+          </div>
+        </div>
+      </section>
 
+      {/* Modales — campistas */}
       <QRScannerModal
         open={checkInInscripciones.showScanModal}
         onClose={checkInInscripciones.handleCloseScanModal}
         onQRScanned={checkInInscripciones.handleQRScanned}
       />
-
       <EntityDetailModal
         open={checkInInscripciones.showResultModal}
         onClose={checkInInscripciones.handleCloseResultModal}
@@ -67,14 +104,12 @@ export default function DashboardPage() {
         type="inscripcion"
       />
 
-      {/* voluntarios */}
-
+      {/* Modales — voluntarios */}
       <QRScannerModal
         open={checkInVoluntarios.showScanModal}
         onClose={checkInVoluntarios.handleCloseScanModal}
         onQRScanned={checkInVoluntarios.handleQRScanned}
       />
-
       <EntityDetailModal
         open={checkInVoluntarios.showResultModal}
         onClose={checkInVoluntarios.handleCloseResultModal}
