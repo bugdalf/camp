@@ -88,7 +88,7 @@ export function QRScannerModal({ open, onClose, onQRScanned }: QRScannerModalPro
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-full md:w-sm">
         <DialogHeader>
           <DialogTitle>Escanear código QR</DialogTitle>
           <DialogDescription>

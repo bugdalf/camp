@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Backpack, Contact, SearchIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { QRScannerModal } from "@/components/own/check-in/qr-scanner-modal"
-import { EntityDetailModal } from "@/components/own/check-in/entity-detail-modal"
+import { InscripcionDetailModal } from "@/components/own/check-in/inscripcion-detail-modal"
 import { CheckInButton } from "@/components/own/check-in/check-in-button"
 import { useCheckIn } from "@/components/own/check-in/use-check-in"
 import { useState } from "react"
@@ -14,6 +14,7 @@ import { useInscripcionesStore } from "@/lib/store/inscripciones.store"
 import { useVoluntariosStore } from "@/lib/store/voluntarios.store"
 import { ManualSearchVoluntariosModal } from "@/components/own/check-in/manual-search-voluntarios-modal"
 import { ManualSearchCampistasModal } from "@/components/own/check-in/manual-search-inscripcion-modal"
+import { VoluntarioDetailModal } from "@/components/own/check-in/voluntario-detail-modal"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -141,12 +142,11 @@ export default function DashboardPage() {
         onClose={checkInInscripciones.handleCloseScanModal}
         onQRScanned={checkInInscripciones.handleQRScanned}
       />
-      <EntityDetailModal
+      <InscripcionDetailModal
         open={checkInInscripciones.showResultModal}
         onClose={checkInInscripciones.handleCloseResultModal}
         entity={checkInInscripciones.scanResult}
         onConfirmCheckIn={checkInInscripciones.handleConfirmCheckIn}
-        type="inscripcion"
       />
 
       {/* Modales — voluntarios */}
@@ -161,12 +161,11 @@ export default function DashboardPage() {
         onClose={checkInVoluntarios.handleCloseScanModal}
         onQRScanned={checkInVoluntarios.handleQRScanned}
       />
-      <EntityDetailModal
+      <VoluntarioDetailModal
         open={checkInVoluntarios.showResultModal}
         onClose={checkInVoluntarios.handleCloseResultModal}
         entity={checkInVoluntarios.scanResult}
         onConfirmCheckIn={checkInVoluntarios.handleConfirmCheckIn}
-        type="voluntario"
       />
     </div>
   )
