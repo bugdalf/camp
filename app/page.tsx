@@ -63,6 +63,7 @@ export default function LandingPage() {
           </div>
         </div>
 
+
         {/* Logo principal */}
         <figure className="max-w-lg animate-in fade-in zoom-in duration-700 delay-300">
           <img
@@ -101,11 +102,86 @@ export default function LandingPage() {
             </p>
           </Link>
         </div>
+        {/* === EMBARQUE SECTION === */}
+        <section className="w-full px-4 py-6 pt-0">
+          <div className="max-w-lg mx-auto">
+            {/* Title */}
+            {/* <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="relative text-black font-display text-2xl px-3 py-1 bg-white border-3 border-black z-10">
+                  Información de embarque
+                </div>
+                <div className="absolute top-1 -left-1 w-full h-full bg-[#0f45af]"></div>
+              </div>
+            </div> */}
+
+            {/* Card */}
+            <div className="border-2 border-white/20 bg-[#0a1628] rounded-md overflow-hidden">
+              {/* Top stripe */}
+              <div className="h-1.5 flex">
+                {[...Array(30)].map((_, i) => (
+                  <div key={i} className={`flex-1 ${i % 2 === 0 ? 'bg-[#0f45af]' : 'bg-white/10'}`} style={{ transform: 'skewX(-15deg)' }} />
+                ))}
+              </div>
+
+              <div className="p-6 flex items-center justify-between gap-4">
+                {/* Left: time */}
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[#7aa0e0] mb-1">
+                    En puerta de embarque
+                  </p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-5xl font-display text-white leading-none">04:00</p>
+                    <p className="text-2xl font-display text-[#f9d303] leading-none mb-0.5">PM</p>
+                  </div>
+                  <p className="text-sm text-[#7aa0e0] font-bold mt-1 tracking-widest">22 FEB 2026</p>
+                </div>
+
+                {/* Vertical dashed divider */}
+                <div className="self-stretch border-l border-dashed border-white/20" />
+
+                {/* Right: location */}
+                <div className="flex flex-col items-end gap-3">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#7aa0e0] mb-0.5 text-right">
+                      Punto de encuentro
+                    </p>
+
+                    <p className="text-white/60 text-xs text-right">Colegio Federico More Av. Ferrocarril #331</p>
+                    <p className="text-white/60 text-xs text-right">Ver la ubicación exacta<br />en Google Maps</p>
+                  </div>
+                  <a
+                    href="https://maps.app.goo.gl/3CK1wmXVNmgXagom8"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative group"
+                  >
+                    <div className="relative flex items-center gap-2 text-black font-display text-sm px-4 py-2 bg-[#f9d303] border-2 border-black z-10 group-hover:bg-yellow-300 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      Ver en Maps
+                    </div>
+                    <div className="absolute top-1 -left-1 w-full h-full bg-black z-0"></div>
+                  </a>
+                </div>
+              </div>
+
+              {/* Bottom stripe */}
+              <div className="h-1.5 flex">
+                {[...Array(30)].map((_, i) => (
+                  <div key={i} className={`flex-1 ${i % 2 === 0 ? 'bg-[#0f45af]' : 'bg-white/10'}`} style={{ transform: 'skewX(-15deg)' }} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Scroll to Video Button */}
         <button
           onClick={scrollToVideo}
-          className="flex flex-col items-center text-white mt-12 mb-8 animate-in fade-in slide-in-from-bottom-4 hover:text-amber-400 transition-colors duration-300 cursor-pointer group"
+          className="flex flex-col items-center text-white mt-2 mb-8 animate-in fade-in slide-in-from-bottom-4 hover:text-amber-400 transition-colors duration-300 cursor-pointer group"
         >
           <ChevronDownIcon size={40} className="animate-bounce group-hover:scale-110 transition-transform" />
         </button>
@@ -115,13 +191,12 @@ export default function LandingPage() {
       <section id="video-section" className="w-full p-4 scroll-mt-4">
         <h2 className="text-white font-display text-4xl text-center mb-8">Vive la Experiencia</h2>
         <div className="max-w-5xl mx-auto">
-          {/* Video Container - Responsive */}
           <div className="relative w-full aspect-video overflow-hidden rounded-md border-2 border-[#0f45af] animate-in fade-in zoom-in duration-700">
             <iframe
               className="absolute top-0 left-0 w-full h-full"
               src="https://www.youtube.com/embed/Xpw1UExgyaQ"
               title="Campamento Desafío 2026"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture "
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
           </div>
@@ -159,8 +234,6 @@ export default function LandingPage() {
         </div>
         <h2 className="text-white font-extrabold text-2xl text-center mt-12">No te lo pierdas</h2>
         <p className="text-white text-center">Síguenos y activa las notificaciones</p>
-
-
 
         <div className="flex justify-center items-center gap-4 mt-2">
           <Link href="https://www.tiktok.com/@campdesafiojuliaca" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-all duration-300">

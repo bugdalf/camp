@@ -5,249 +5,229 @@ import { useParams } from "next/navigation"
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from "react";
 import { useVoluntariosStore } from "@/lib/store/voluntarios.store";
+import { CheckCircle2, Clock, Zap } from "lucide-react";
 
-// Date formatting utility
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
   return `${date.getDate().toString().padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
 };
 
-// Commission labels
-const getCommissionLabel = (commission?: string) => {
-  const labels = {
-    'logistica': { text: 'Logística', icon: '👩🏻‍💻', color: 'bg-orange-100 text-orange-700 border-orange-200' },
-    'recepcion': { text: 'Recepción', icon: '👋🏻', color: 'bg-purple-100 text-purple-700 border-purple-200' },
-    'programacion-actividades': { text: 'Programación y actividades', icon: '📅', color: 'bg-green-100 text-green-700 border-green-200' },
-    'sonido-luces': { text: 'Sonido y luces', icon: '🔊', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-    'publicidad': { text: 'Publicidad', icon: '📸', color: 'bg-pink-100 text-pink-700 border-pink-200' },
-    'alimentacion-limpieza': { text: 'Alimentación y limpieza', icon: '🍽️', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
-    'finanzas': { text: 'Finanzas', icon: '💰', color: 'bg-red-100 text-red-700 border-red-200' },
-    'atencion-pastores': { text: 'Atención de pastores', icon: '🙏', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-    'jueces': { text: 'Jueces', icon: '⚖️', color: 'bg-teal-100 text-teal-700 border-teal-200' },
-    'contenido-digital': { text: 'Contenido digital', icon: '📱', color: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
-    'lideres-equipo': { text: 'Líderes de equipo', icon: '🧗🏻‍♂️', color: 'bg-gray-100 text-gray-700 border-gray-200' },
-    'dinamicas-souvenires': { text: 'Dinámicas y Souvenires', icon: '🎁', color: 'bg-orange-100 text-orange-700 border-orange-200' },
-  };
-  return labels[commission as keyof typeof labels] || { text: '-', icon: '📋', color: 'bg-gray-100 text-gray-700 border-gray-200' };
+const COMMISSIONS: Record<string, { text: string; icon: string; code: string }> = {
+  'logistica': { text: 'Logística', icon: '👩🏻‍💻', code: 'LOG' },
+  'recepcion': { text: 'Recepción', icon: '👋🏻', code: 'REC' },
+  'programacion-actividades': { text: 'Prog. y Actividades', icon: '📅', code: 'PRG' },
+  'sonido-luces': { text: 'Sonido y Luces', icon: '🔊', code: 'SND' },
+  'publicidad': { text: 'Publicidad', icon: '📸', code: 'PUB' },
+  'alimentacion-limpieza': { text: 'Alimentación y Limpieza', icon: '🍽️', code: 'ALI' },
+  'finanzas': { text: 'Finanzas', icon: '💰', code: 'FIN' },
+  'atencion-pastores': { text: 'Atención Pastores', icon: '🙏', code: 'PAS' },
+  'jueces': { text: 'Jueces', icon: '⚖️', code: 'JUE' },
+  'contenido-digital': { text: 'Contenido Digital', icon: '📱', code: 'DIG' },
+  'lideres-equipo': { text: 'Líderes de Equipo', icon: '🧗🏻‍♂️', code: 'LID' },
+  'dinamicas-souvenires': { text: 'Dinámicas y Souvenires', icon: '🎁', code: 'DIN' },
+  'salud': { text: 'Salud', icon: '🚑', code: 'SAL' },
 };
+
+const getCommission = (key?: string) =>
+  COMMISSIONS[key as keyof typeof COMMISSIONS] ?? { text: 'Sin asignar', icon: '📋', code: 'N/A' };
+
+const Field = ({ label, value }: { label: string; value?: string | number | null }) => (
+  <div className="flex flex-col gap-0.5">
+    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">{label}</span>
+    <span className="text-sm font-semibold text-gray-800">
+      {value ?? <span className="text-gray-300">—</span>}
+    </span>
+  </div>
+);
 
 export default function VoluntarioPage() {
   const { id } = useParams();
   const [voluntarioData, setVoluntarioData] = useState<Voluntario | null>(null);
-
   const { fetchVoluntarioById } = useVoluntariosStore();
 
   useEffect(() => {
     if (id) {
       const idString = Array.isArray(id) ? id[0] : id;
-      fetchVoluntarioById(idString).then((data) => {
-        setVoluntarioData(data);
-      });
+      fetchVoluntarioById(idString).then(setVoluntarioData);
     }
   }, [id]);
 
-  const commissionInfo = getCommissionLabel(voluntarioData?.commission);
+  if (!voluntarioData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-3 text-gray-400">
+          <div className="w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+          <span className="text-sm font-medium tracking-wide">Buscando voluntario...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const commission = getCommission(voluntarioData.commission);
+  const paymentLabel = voluntarioData.payment_method === 'yape'
+    ? 'Yape' : voluntarioData.payment_method === 'efectivo'
+      ? 'Efectivo' : null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      {!voluntarioData ? (
-        <div className="text-white text-lg">
-          Buscando voluntario...
-        </div>
-      ) : (
-        <div className="relative w-full max-w-md">
-          {/* Ticket Container */}
-          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-            {/* Decorative stripes at top */}
-            <div className="h-3 bg-linear-to-rrom-purple-500 via-indigo-500 to-purple-500 flex">
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`flex-1 ${i % 2 === 0 ? 'bg-white' : 'bg-transparent'}`}
-                  style={{ transform: 'skewX(-20deg)' }}
-                />
-              ))}
-            </div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 font-sans">
+      <div className="w-full max-w-sm">
 
-            {/* Top Section */}
-            <div className="p-6 pb-4">
-              {/* Volunteer Badge */}
-              <div className="flex justify-center mb-4">
-                <div className="inline-flex items-center gap-2 bg-linear-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                  </svg>
-                  VOLUNTARIO
-                </div>
-              </div>
+        {/* === MAIN TICKET === */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
 
-              {/* Header */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Nombre</p>
-                  <p className="text-lg font-bold text-gray-900 leading-tight">
-                    {voluntarioData.name}
-                  </p>
-                  {voluntarioData.dni && (
-                    <p className="text-xs text-gray-500 mt-1">DNI: {voluntarioData.dni}</p>
-                  )}
-                </div>
-
-                <div className="text-right">
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Código</p>
-                  <p className="text-lg font-bold text-indigo-600 font-mono">
-                    V-{voluntarioData.id?.slice(0, 5).toUpperCase()}
-                  </p>
-                  {voluntarioData.payment_checked ? (
-                    <div className="inline-flex items-center gap-1 mt-1 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Pagado
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-1 mt-1 bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded-full">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Pago por verificar
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Commission Badge - Destacado */}
-              <div className="mb-4">
-                <div className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 ${commissionInfo.color}`}>
-                  <span className="text-3xl">{commissionInfo.icon}</span>
-                  <div>
-                    <p className="text-xs uppercase tracking-wide opacity-70 font-semibold">Comisión Asignada</p>
-                    <p className="text-xl font-bold">{commissionInfo.text}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Event Details */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900">CAMPAMENTO</p>
-                    <p className="text-sm text-gray-500">Servicio Voluntario</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Participant Details Grid */}
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Edad</p>
-                  <p className="text-base font-semibold text-gray-900">
-                    {voluntarioData.age || '-'} años
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Celular</p>
-                  <p className="text-base font-semibold text-gray-900">
-                    {voluntarioData.cellphone_number || '-'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Parent/Guardian Info (if minor) */}
-              {voluntarioData.is_under_18 && voluntarioData.parent_name && (
-                <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                  <p className="text-xs text-amber-700 uppercase tracking-wide mb-2 font-semibold">
-                    Responsable
-                  </p>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-900">{voluntarioData.parent_name}</p>
-                    {voluntarioData.parent_cellphone_number && (
-                      <p className="text-sm text-gray-600">{voluntarioData.parent_cellphone_number}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Pago and Date Info */}
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Registro</p>
-                  <p className="text-sm font-semibold text-gray-900">
-                    {voluntarioData.created_at ? formatDate(voluntarioData.created_at) : '-'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Aporte</p>
-                  <p className="text-sm font-semibold text-indigo-600 uppercase">
-                    {voluntarioData.payment_method === 'yape' ? '💳 Yape' :
-                      voluntarioData.payment_method === 'efectivo' ? '💵 Efectivo' : '-'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Perforated divider */}
-            <div className="relative h-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t-2 border-dashed border-gray-300"></div>
-              </div>
-              <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-linear-to-br from-purple-500 via-indigo-500 to-blue-600 rounded-full"></div>
-              <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-linear-to-br from-purple-500 via-indigo-500 to-blue-600 rounded-full"></div>
-            </div>
-
-            {/* Bottom Section - QR Code */}
-            <div className="p-6 pt-4 bg-gray-50">
-              <p className="text-sm text-gray-600 text-center mb-4 font-medium">
-                Credencial de Voluntario - Presenta este código QR
+          {/* Header strip — purple for volunteers */}
+          <div className="bg-indigo-700 px-5 py-3 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] text-indigo-200 font-semibold tracking-widest uppercase">Credencial</p>
+              <p className="text-xs text-white font-mono font-bold tracking-wider">
+                V-{voluntarioData.id?.slice(0, 12).toUpperCase() ?? '—'}
               </p>
-
-              <div className="flex justify-center mb-4">
-                <div className="bg-white p-4 rounded-xl shadow-md border-2 border-indigo-200">
-                  <QRCodeSVG
-                    value={voluntarioData.id || ""}
-                    size={180}
-                    level="H"
-                    includeMargin={false}
-                  />
-                </div>
-              </div>
-
-              <p className="text-center text-xs text-gray-400 font-mono mt-2 tracking-wider">
-                {voluntarioData.id?.toUpperCase()}
-              </p>
-
-              {/* Status badge */}
-              {voluntarioData.is_active && (
-                <div className="mt-4 flex justify-center">
-                  <div className="inline-flex items-center gap-2 bg-linear-to-r from-purple-100 to-indigo-100 text-indigo-700 text-sm px-4 py-2 rounded-full font-medium border border-indigo-200">
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-                    Voluntario Activo
-                  </div>
-                </div>
-              )}
             </div>
-
-            {/* Decorative stripes at bottom */}
-            <div className="h-3 bg-linear-to-r from-purple-500 via-indigo-500 to-purple-500 flex">
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`flex-1 ${i % 2 === 0 ? 'bg-white' : 'bg-transparent'}`}
-                  style={{ transform: 'skewX(-20deg)' }}
-                />
-              ))}
+            <div className="w-20">
+              <img src="/main-logo.webp" alt="Logo" width={100} height={100} />
             </div>
           </div>
+
+          {/* Volunteer name */}
+          <div className="px-5 pt-4 pb-3 border-b border-gray-100">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-0.5">Voluntario</p>
+            <p className="text-xl font-black text-gray-900 leading-tight">
+              {voluntarioData.name ?? <span className="text-gray-300">—</span>}
+            </p>
+            {voluntarioData.dni && (
+              <p className="text-xs text-gray-400 font-mono mt-0.5">DNI: {voluntarioData.dni}</p>
+            )}
+          </div>
+
+          {/* Commission — big boarding-pass style */}
+          <div className="px-5 py-4 border-b border-gray-100">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">Comisión asignada</p>
+            <div className="flex items-center gap-4">
+              <span className="text-2xl leading-none">{commission.icon}</span>
+              <p className="text-base font-bold text-gray-800 mt-1 leading-tight">{commission.text}</p>
+            </div>
+          </div>
+          {/* Route section */}
+          <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">Desde</span>
+              <span className="text-5xl font-black text-gray-900 leading-none tracking-tight">JUL</span>
+              <span className="text-xs text-gray-400 mt-0.5">Juliaca</span>
+            </div>
+
+            <div className="flex flex-col items-center gap-1 flex-1 px-4">
+              <div className="flex items-center gap-1 w-full">
+                <div className="flex-1 border-t border-dashed border-gray-300" />
+                <span className="text-lg">✈️</span>
+                <div className="flex-1 border-t border-dashed border-gray-300" />
+              </div>
+              <span className="text-[10px] text-gray-400 font-medium">CAMPAMENTO 2026</span>
+            </div>
+
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">Destino</span>
+              <span className="text-5xl font-black text-blue-700 leading-none tracking-tight">CAM</span>
+              <span className="text-xs text-gray-400 mt-0.5">Campamento</span>
+            </div>
+          </div>
+          {/* QR Section */}
+          <div className="px-5 py-2 bg-gray-50 flex flex-col items-center">
+            <div className="bg-white p-3.5 rounded-xl shadow-sm border border-gray-200">
+              <QRCodeSVG
+                value={voluntarioData.id || ""}
+                size={160}
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+            <p className="text-[10px] font-mono text-gray-400 tracking-widest text-center">
+              {voluntarioData.id?.toUpperCase()}
+            </p>
+          </div>
+
+          {/* Status + active indicator row */}
+          <div className="px-5 py-3 flex items-center gap-2 border-b border-gray-100">
+            {voluntarioData.payment_checked ? (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200 px-2 py-1 rounded-full">
+                <CheckCircle2 size={11} /> Pago verificado
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-gray-50 text-gray-500 border border-gray-200 px-2 py-1 rounded-full">
+                <Clock size={11} /> Pago por verificar
+              </span>
+            )}
+
+            {voluntarioData.is_active && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-1 rounded-full">
+                <Zap size={11} className="fill-indigo-400" /> Activo
+              </span>
+            )}
+          </div>
+
+          {/* Info grid */}
+          <div className="px-5 py-4 grid grid-cols-3 gap-4 border-b border-gray-100">
+            <Field label="Edad" value={voluntarioData.age ? `${voluntarioData.age} años` : null} />
+            <Field label="Celular" value={voluntarioData.cellphone_number} />
+            <Field label="Aporte" value={paymentLabel} />
+          </div>
+
+          <div className="px-5 py-3 border-b border-gray-100">
+            <Field label="Registro" value={voluntarioData.created_at ? formatDate(voluntarioData.created_at) : null} />
+          </div>
+
+          {/* Responsable (if minor) */}
+          {voluntarioData.is_under_18 && (
+            <div className="px-5 py-3 bg-amber-50 border-b border-amber-100">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-600 mb-1">Responsable</p>
+              <p className="text-sm font-semibold text-gray-800">
+                {voluntarioData.parent_name ?? <span className="text-gray-300">—</span>}
+              </p>
+              {voluntarioData.parent_cellphone_number && (
+                <p className="text-xs text-gray-500 mt-0.5">{voluntarioData.parent_cellphone_number}</p>
+              )}
+            </div>
+          )}
+
+          {/* Perforated divider */}
+          <div className="relative flex items-center my-0 mt-2">
+            <div className="absolute -left-6 w-12 h-12 bg-gray-100 rounded-full z-10" />
+            <div className="absolute -right-6 w-12 h-12 bg-gray-100 rounded-full z-10" />
+            <div className="w-full border-t-2 border-dashed border-gray-200 mx-3" />
+          </div>
+
+          {/* Embarque section */}
+          <div className="px-5 py-4 bg-indigo-700 border-b border-indigo-600">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-200 mb-1">En puerta de embarque</p>
+                <p className="text-3xl font-black text-white leading-none">04:00 PM</p>
+                <p className="text-sm text-indigo-200 font-medium mt-0.5">22 FEB 2026</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-200 mb-1">Punto de encuentro</p>
+                <a
+                  href="https://maps.app.goo.gl/3CK1wmXVNmgXagom8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 bg-white text-indigo-700 text-xs font-bold px-3 py-2 rounded-lg shadow-sm hover:bg-indigo-50 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  Ver en Maps
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom strip */}
+          <div className="h-2 bg-indigo-700" />
         </div>
-      )}
+
+        <p className="text-center text-[11px] text-gray-400 mt-4">Campamento Desafío · Verano 2026</p>
+      </div>
     </div>
-  )
+  );
 }
